@@ -1,4 +1,4 @@
-package com.example.neighborsrefrigerator.ui.theme
+package com.neighbor.neighborsrefrigerator.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

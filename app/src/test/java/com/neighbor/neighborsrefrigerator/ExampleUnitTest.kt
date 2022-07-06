@@ -1,4 +1,4 @@
-package com.example.neighborsrefrigerator
+package com.neighbor.neighborsrefrigerator
 
 import org.junit.Test
 

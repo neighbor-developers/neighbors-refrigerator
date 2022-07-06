@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.neighborsrefrigerator">
+    package="com.neighbor.neighborsrefrigerator">
 
     <application
         android:allowBackup="true"
@@ -14,7 +14,7 @@
         android:theme="@style/Theme.NeighborsRefrigerator"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.NeighborsRefrigerator">
@@ -24,6 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.neighbor.neighborsrefrigerator.scenarios.intro.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>
