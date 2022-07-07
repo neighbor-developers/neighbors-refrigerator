@@ -1,8 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
-import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +13,9 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostDetailsScreen
+import com.neighbor.neighborsrefrigerator.viewmodels.SharePostDetailViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +54,14 @@ fun MainScreen() {
         floatingActionButtonPosition = FabPosition.End,
         isFloatingActionButtonDocked = true
     ) {
-        // 안에 페이지 넣으면 댐
+        // 안에 페이지 넣으면 댐 - 나눔페이지
+        SharePostDetailsScreen(
+            sharePostDetailViewModel = SharePostDetailViewModel(),
+            onBackClick = { /*TODO*/ },
+            onAccuseClick = { /*TODO*/ }
+        ) {
+//
+        }
         Text(text = "A", modifier = Modifier.padding(it))
     }
 }
