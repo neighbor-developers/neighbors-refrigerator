@@ -1,9 +1,9 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
@@ -16,46 +16,85 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.data.ProductData
 import java.util.*
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
+import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.scenarios.main.RouteAction
+import java.util.concurrent.CountDownLatch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */) {
+fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */,  route: NAV_ROUTE, routeAction: RouteAction) {
     Card(
-        // onClick= onClick,
-        modifier = Modifier.fillMaxWidth(),
+        onClick= { routeAction.navTo(route) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        elevation = 0.dp
     ) {
-        Column(horizontalAlignment = Alignment.Start) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-
-                val modifier = Modifier.fillMaxWidth()
-                ItemImage(productImg = product.productData.productImg, modifier = modifier)
-                IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
+        Box(Modifier.fillMaxSize()) {
+            Surface(
+                modifier = Modifier.padding(start = 8.dp, top = 8.dp),
+                color = Color(0.267f, 0.694f, 0.239f, 1.0f),
+                shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)))
+            {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.TopEnd)
+                {
+                    IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 10.dp, start = 10.dp),
+                    contentAlignment = Alignment.BottomStart)
+                {
+                    ItemText(product = product.productData, product.distance)
+                }
             }
-           ItemText(product = product.productData, product.distance)
+                val modifier = Modifier.size(100.dp)
+                ItemImage(productImg = product.productData.productImg, modifier = modifier)
+
+            Column(horizontalAlignment = Alignment.Start) {
+
+
+            }
+
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByDistance(product: ProductIncludeDistanceData/* onClick: ()-> Unit */) {
+fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, routeAction: RouteAction) {
     Card(
-        // onClick= onClick,
-        modifier = Modifier.padding(end = 10.dp)
+        onClick= { routeAction.navTo(NAV_ROUTE.SHARE_DETAIL) },
+        modifier = Modifier
+            .padding(end = 20.dp)
+            .fillMaxWidth()
     ) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            Box( modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+        Surface(shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)), color = Color(0.267f, 0.694f, 0.239f, 1.0f)) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+                    val modifier = Modifier.size(100.dp)
+                    ItemImage(productImg = product.productData.productImg, modifier = modifier)
 
-                val modifier = Modifier.height(100.dp).padding(end = 10.dp)
-                ItemImage(productImg = product.productData.productImg, modifier = modifier)
-                IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
-            }
-            Column(horizontalAlignment = Alignment.Start, modifier = Modifier.padding(bottom = 10.dp)) {
-                ItemText(product = product.productData, distance = product.distance)
+                }
+                Box(contentAlignment = Alignment.TopEnd) {
+                    IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
+                    Column(horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom, modifier = Modifier
+                        .height(100.dp)
+                        .padding(start = 7.dp, end = 7.dp, bottom = 10.dp)) {
+                        ItemText(product = product.productData, distance = product.distance)
+                    }
+                }
             }
         }
     }
@@ -69,23 +108,27 @@ fun ItemText(product: ProductData, distance: Double){
         3 -> "구매일자"
         else -> { "" }
     }
-    Text(text = product.productName, fontSize = 17.sp, modifier = Modifier.padding(bottom = 10.dp))
-    Text(text = "$valiType : $day", fontSize = 12.sp, color = Color.DarkGray)
-    Text(text = "내 위치에서 ${distance}km", fontSize = 12.sp, color = Color.DarkGray)
-    Text(text = "업로드 : 3분전", fontSize = 12.sp, color = Color.DarkGray)
+    Column() {
+        Text(text = product.productName, fontSize = 15.sp, color = Color.White, modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = "$valiType : $day", fontSize = 10.sp, color = Color.White)
+        Text(text = "내 위치에서 ${distance}km", fontSize = 10.sp, color = Color.White)
+        Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.White)
+    }
 }
 @Composable
 fun ItemImage(productImg:String, modifier: Modifier){
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(productImg)
-            .crossfade(true)
-            .build(),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        placeholder = painterResource(R.drawable.icon_google),
-        modifier = modifier
-    )
+    Surface (shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp))){
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(productImg)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(R.drawable.icon_google),
+            modifier = modifier
+        )
+    }
 }
 
 
@@ -95,24 +138,24 @@ fun IsTrustMark(isTrust: Boolean) {
     if (isTrust) {
         Icon(Icons.Filled.Favorite, tint = Color.Yellow, contentDescription = null, modifier = Modifier
             .size(30.dp)
-            .padding(5.dp))
+            .padding(end = 10.dp, top = 10.dp))
     }
 }
-
-@Preview
-@Composable
-fun ItemViewPreview() {
-    ItemCardByTime(
-        ProductIncludeDistanceData(
-        ProductData(
-            productID = ",",
-            postID = 1,
-            productName = "a",
-            validateType = 1,
-            validateDate = Date(2022, 3, 4),
-            validateImg = null,
-            productImg = "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7a2ccc0b-6765-4972-8221-8310ba6575a6%2FUntitled.png?table=block&id=9b25b556-a9a7-4637-a960-fd87f7b72cab&spaceId=cd12198d-d450-4deb-b809-0aa7cc554553&width=1730&userId=5c9e2a77-0418-4987-b276-3de00770167c&cache=v2"
-        ),
-        distance = 3.4)
-    )
-}
+//
+//@Preview
+//@Composable
+//fun ItemViewPreview() {
+//    ItemCardByTime(
+//        ProductIncludeDistanceData(
+//        ProductData(
+//            productID = ",",
+//            postID = 1,
+//            productName = "a",
+//            validateType = 1,
+//            validateDate = Date(2022, 3, 4),
+//            validateImg = null,
+//            productImg = "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7a2ccc0b-6765-4972-8221-8310ba6575a6%2FUntitled.png?table=block&id=9b25b556-a9a7-4637-a960-fd87f7b72cab&spaceId=cd12198d-d450-4deb-b809-0aa7cc554553&width=1730&userId=5c9e2a77-0418-4987-b276-3de00770167c&cache=v2"
+//        ),
+//        distance = 3.4)
+//    )
+//}
