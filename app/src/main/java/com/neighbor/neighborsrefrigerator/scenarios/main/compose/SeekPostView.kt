@@ -16,12 +16,17 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
 
 @Composable
 fun SeekPostScreen(
-    sharePostViewModel: SharePostViewModel
+    sharePostViewModel: SharePostViewModel,
+    route: NAV_ROUTE,
+    navHostController: NavHostController
 ) {
     Column() {
         SearchBox(onSearch = { sharePostViewModel.search() })
@@ -30,25 +35,34 @@ fun SeekPostScreen(
             modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
             fontSize = 20.sp
         )
-        SeekPostList(sharePostViewModel.posts.collectAsState())
+        SeekPostList(sharePostViewModel.posts.collectAsState(), route = route, navHostController = navHostController)
     }
 }
 @Composable
-fun SeekPostList(posts : State<List<PostData>?>){
+fun SeekPostList(posts : State<List<PostData>?>,
+                 route: NAV_ROUTE,
+                 navHostController: NavHostController){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 30.dp, end = 30.dp)) {
         posts.value?.let {
             it.forEach {
-                SeekItem(postData = it, distance = 3.4)
+                SeekItem(postData = it, distance = 3.4, route = route, navHostController = navHostController)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SeekItem(postData: PostData, distance : Double){
-    Card(modifier = Modifier.padding(top = 10.dp, bottom = 10.dp).fillMaxWidth(), elevation = 0.dp) {
+fun SeekItem(postData: PostData, distance : Double,
+             route: NAV_ROUTE,
+             navHostController: NavHostController){
+    Card(
+        onClick = {navHostController.navigate(route = "${route.routeName}/${postData.title}")},
+        modifier = Modifier
+            .padding(top = 10.dp, bottom = 10.dp)
+            .fillMaxWidth(), elevation = 0.dp) {
         Column() {
         Text(text = postData.title!!, fontSize = 15.sp, modifier = Modifier.padding(bottom = 7.dp))
         Text(text = postData.content!!, fontSize = 12.sp, color = Color.DarkGray, maxLines = 1,modifier = Modifier.padding(bottom = 10.dp))

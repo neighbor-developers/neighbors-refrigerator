@@ -16,6 +16,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -24,14 +26,14 @@ import java.util.*
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
-import com.neighbor.neighborsrefrigerator.scenarios.main.RouteAction
 import java.util.concurrent.CountDownLatch
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */,  route: NAV_ROUTE, routeAction: RouteAction) {
+fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { routeAction.navTo(route) },
+        onClick= { navHostController.navigate(route = "${route.routeName}/${product.productData.productID}") },
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp),
@@ -59,23 +61,21 @@ fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */, 
                     ItemText(product = product.productData, product.distance)
                 }
             }
-                val modifier = Modifier.size(100.dp)
+                val modifier = Modifier.size(110.dp)
                 ItemImage(productImg = product.productData.productImg, modifier = modifier)
 
             Column(horizontalAlignment = Alignment.Start) {
 
-
             }
-
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, routeAction: RouteAction) {
+fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { routeAction.navTo(NAV_ROUTE.SHARE_DETAIL) },
+        onClick= { navHostController.navigate("${route.routeName}/${product.productData.productID}") },
         modifier = Modifier
             .padding(end = 20.dp)
             .fillMaxWidth()

@@ -24,27 +24,28 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
-import com.neighbor.neighborsrefrigerator.scenarios.main.RouteAction
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SharePostScreen(
     sharePostViewModel: SharePostViewModel,
     route: NAV_ROUTE,
-    routeAction: RouteAction
+    navHostController: NavHostController
 ) {
-Column {
-        SearchBox(onSearch = { sharePostViewModel.search() })
-        Text(
-            text = "# 어쩌고님 위치에서 가까운 나눔",
-            modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
-            fontSize = 15.sp
-        )
-        SharePostListByDistance(productData = sharePostViewModel.products.collectAsState(), route, routeAction)
+
+
+    val state = rememberScrollState()
+    LaunchedEffect(Unit) { state.animateScrollTo(100) }
+    Column(
+        Modifier
+            .verticalScroll(state)
+            .size(700.dp)) {
+        SearchBox { sharePostViewModel.search() }
+        SharePostListByDistance(productData = sharePostViewModel.products.collectAsState(), route, navHostController)
         androidx.compose.foundation.Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -58,14 +59,19 @@ Column {
                 strokeWidth = 1F
             )
         }
-        SharePostListByTime(productData = sharePostViewModel.products.collectAsState(), route, routeAction)
+        SharePostListByTime(productData = sharePostViewModel.products.collectAsState(), route, navHostController)
     }
 
 }
 
 
 @Composable
-fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, routeAction: RouteAction) {
+fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController) {
+    Text(
+        text = "# 어쩌고님 위치에서 가까운 나눔",
+        modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
+        fontSize = 15.sp
+    )
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(30.dp),
@@ -76,14 +82,14 @@ fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, r
     ) {
         productData.value?.let {
             items(productData.value!!) { item ->
-                ItemCardByTime(item, route, routeAction)
+                ItemCardByTime(item, route, navHostController)
             }
         }
     }
 }
 
 @Composable
-fun SharePostListByDistance(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, routeAction: RouteAction){
+fun SharePostListByDistance(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController){
     Row (modifier = Modifier
         .fillMaxWidth()
         .horizontalScroll(rememberScrollState())
@@ -91,7 +97,7 @@ fun SharePostListByDistance(productData: State<List<ProductIncludeDistanceData>?
     {
         productData.value?.let {
             it.forEach {
-                ItemCardByDistance(product = it, route, routeAction)
+                ItemCardByDistance(product = it, route, navHostController)
             }
         }
     }

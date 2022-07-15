@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
+import android.graphics.ComposePathEffect
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.* // ktlint-disable no-wildcard-imports
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -17,17 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavAction
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +40,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 enum class NAV_ROUTE(val routeName:String, val description:String){
-    MAIN_SHARE("MAIN_SHARE","나눔 리스트 화면"),
-    MAIN_SEEK("MAIN_SEEK", "구함 리스트 화면"),
+    MAIN("MAIN","나눔/구함 리스트 화면"),
+    START("MAIN_2", "시작(나눔 리스트 화면)"),
     SHARE_DETAIL("SHARE_DETAIL", "나눔 상세페이지"),
     SEEK_DETAIL("SEEK_DETAIL", "구함 상세페이지"),
     CHAT_LIST("CHAT_LIST", "채팅 리스트화면"),
@@ -49,56 +50,48 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
     WRITE_SEEK("WRITE_SEEK", "구함 글쓰기 페이지")
 }
 
-class RouteAction(navHostController: NavHostController){
-    //특정 페이지 이동
-    val navTo: (NAV_ROUTE) -> Unit = { navRoute ->
-        navHostController.navigate(navRoute.routeName)
-    }
-
-    val goBack: () -> Unit = {
-        navHostController.navigateUp()
-    }
-}
-
 @Composable
-fun Screen(startRoute: String= NAV_ROUTE.MAIN_SHARE.routeName){
+fun Screen(startRoute: String= NAV_ROUTE.START.routeName){
 
     // 네비게이션 컨트롤러
     val navController = rememberNavController()
 
-    // 네비게이션 라우트
-    val routeAction = remember(navController) {RouteAction(navController)}
-
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute){
 
-        composable(NAV_ROUTE.MAIN_SHARE.routeName){
-            MainScreen(routeAction = routeAction)
+        composable(NAV_ROUTE.START.routeName){
+            MainScreen(navController, 1)
         }
-        composable(route = NAV_ROUTE.SHARE_DETAIL.routeName){
-            SharePostDetail(routeAction = routeAction, it.arguments?.getString("productID"))
+        composable("${NAV_ROUTE.MAIN.routeName}/{type}", arguments = listOf(navArgument("type"){
+            type = NavType.IntType
+            defaultValue = 1}))
+        {
+            MainScreen(navController, it.arguments?.getInt("type")?:1)
         }
-        composable(NAV_ROUTE.SEEK_DETAIL.routeName){
-            MainScreen(routeAction = routeAction)
+        composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{productID}", arguments = listOf(navArgument("productID"){type = NavType.StringType})){
+            SharePostDetail(navController, it.arguments?.getString("productID"))
+        }
+        composable("${NAV_ROUTE.SEEK_DETAIL.routeName}/{postID}", arguments = listOf(navArgument("postID"){type = NavType.StringType})){
+            SeekPostDetail(navController, it.arguments?.getString("postID"))
         }
         composable(NAV_ROUTE.WRITE_SEEK.routeName) {
-            MainScreen(routeAction = routeAction)
+
         }
         composable(NAV_ROUTE.WRITE_SHARE.routeName){
-            MainScreen(routeAction = routeAction)
+
         }
         composable(NAV_ROUTE.CHAT.routeName){
-            MainScreen(routeAction = routeAction)
+
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
-            MainScreen(routeAction = routeAction)
+
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainScreen(routeAction: RouteAction) {
+fun MainScreen(navController: NavHostController, type: Int?) {
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
@@ -106,11 +99,12 @@ fun MainScreen(routeAction: RouteAction) {
     BottomSheetScaffold(
         sheetBackgroundColor = Color.LightGray,
         sheetContentColor = Color.Black,
+        sheetShape = MaterialTheme.shapes.small.copy(topStart = CornerSize(40.dp), topEnd = CornerSize(40.dp)),
         sheetContent = {
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
+                    .height(30.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text("Category")
@@ -125,7 +119,7 @@ fun MainScreen(routeAction: RouteAction) {
                 title = {
                 },
                 actions = {
-                    IconButton(onClick = { routeAction.navTo(NAV_ROUTE.CHAT_LIST) }) {
+                    IconButton(onClick = { navController.navigate(NAV_ROUTE.CHAT_LIST.routeName) }) {
                         Icon(Icons.Filled.Send, contentDescription = "")
                     }
 
@@ -148,36 +142,59 @@ fun MainScreen(routeAction: RouteAction) {
                     onDismissRequest = { isDropDownMenuExpanded = false },
                     offset = DpOffset((10).dp, 0.dp)
                 ) {
-                    DropdownMenuItem(onClick = { routeAction.navTo(NAV_ROUTE.WRITE_SHARE) }) {
+                    DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.WRITE_SHARE.routeName) }) {
                         Text("나눔")
                     }
-                    DropdownMenuItem(onClick = { routeAction.navTo(NAV_ROUTE.WRITE_SEEK) }) {
+                    DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.WRITE_SEEK.routeName) }) {
                         Text("구함")
                     }
                 }
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-        sheetPeekHeight = 40.dp
+        sheetPeekHeight = 35.dp
     ) {
 
         Column(modifier = Modifier
             .padding(it)
             .fillMaxSize()) {
             Row(){
-                TextButton(onClick = { routeAction.navTo(NAV_ROUTE.MAIN_SHARE) }, modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp)) {
+                Button(
+                    onClick = { navController.navigate("${NAV_ROUTE.MAIN.routeName}/${1}") },
+                    modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
+                    enabled = when(type){
+                        1 -> false
+                        else -> true
+                    }
+                ) {
                     Text(text = "나눔")
                 }
-                TextButton(onClick = { routeAction.navTo(NAV_ROUTE.MAIN_SEEK) }, modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)) {
+                Button(
+                    onClick = { navController.navigate("${NAV_ROUTE.MAIN.routeName}/${2}") },
+                    modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
+                    enabled = when(type){
+                        1 -> true
+                        else -> false
+                    }
+                ) {
                     Text(text = "구함")
                 }
             }
-            SharePostScreen(
-                sharePostViewModel = SharePostViewModel(),
-                route = NAV_ROUTE.SHARE_DETAIL,
-                routeAction = routeAction
-            )
-            //SeekPostScreen(sharePostViewModel = SharePostViewModel())
+            when(type){
+                1 -> SharePostScreen(
+                    sharePostViewModel = SharePostViewModel(),
+                    route = NAV_ROUTE.SHARE_DETAIL,
+                    navHostController = navController
+                )
+                2 -> SeekPostScreen(
+                    sharePostViewModel = SharePostViewModel(),
+                    route = NAV_ROUTE.SEEK_DETAIL,
+                    navHostController = navController
+                )
+            }
+
         }
     }
 }
@@ -206,115 +223,3 @@ fun MainScreen(routeAction: RouteAction) {
         }
     }
  }
-
-//@Preview
-//@Composable
-//fun DefaultPreview() {
-//    MainScreen()
-//}
-
-//    var skipHalfExpanded by remember { mutableStateOf(false) }
-//    val bottomSheetState = rememberBottomSheetScaffoldState()
-//    val scope = rememberCoroutineScope()
-
-//    Scaffold(
-//        scaffoldState = scaffoldState,
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                },
-//                actions = {
-//                    IconButton(onClick = { /* 채팅 페이지 이동*/ }) {
-//                        Icon(Icons.Filled.Send, contentDescription = "")
-//                    }
-//                    IconButton(onClick = { /* 마이페이지 드로어 */ }) {
-//                        Icon(Icons.Filled.Menu, contentDescription = "")
-//                    }
-//                },
-//                modifier = Modifier.fillMaxWidth(),
-//                backgroundColor = MaterialTheme.colors.background
-//            )
-//        },
-//        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = { isDropDownMenuExpanded = true },
-//                contentColor = Color.Black,
-//                backgroundColor = Color.Yellow
-//            ) {
-//                Icon(Icons.Filled.Edit, contentDescription = "a")
-//                DropdownMenu(
-//                    modifier = Modifier.wrapContentSize(),
-//                    expanded = isDropDownMenuExpanded,
-//                    onDismissRequest = { isDropDownMenuExpanded = false },
-//                    offset = DpOffset((10).dp, 0.dp)
-//                ) {
-//                    DropdownMenuItem(onClick = { /*나눔 글쓰기 페이지 이동*/ }) {
-//                        Text("나눔")
-//                    }
-//                    DropdownMenuItem(onClick = { /*구함 글쓰기 페이지 이동*/ }) {
-//                        Text("구함")
-//                    }
-//                }
-//            }
-//        },
-//        floatingActionButtonPosition = FabPosition.End,
-//        isFloatingActionButtonDocked = false
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .padding(it)
-//                .fillMaxSize()
-//        ) {
-//            Row() {
-//                TextButton(
-//                    onClick = { /*나눔페이지*/ },
-//                    modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp)
-//                ) {
-//                    Text(text = "나눔")
-//                }
-//                TextButton(
-//                    onClick = { /*구함페이지*/ },
-//                    modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
-//                ) {
-//                    Text(text = "구함")
-//                }
-//            }
-//            SharePostScreen(
-//                sharePostViewModel = SharePostViewModel()
-//            )
-//        }
-//        Column(
-//            modifier = Modifier.fillMaxSize().padding(16.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            Row(
-//                Modifier.toggleable(
-//                    value = skipHalfExpanded,
-//                    role = Role.Checkbox,
-//                    onValueChange = { checked -> skipHalfExpanded = checked }
-//                )
-//            ) {
-//                Checkbox(checked = skipHalfExpanded, onCheckedChange = null)
-//                Spacer(Modifier.width(16.dp))
-//                Text("Skip Half Expanded State")
-//            }
-//            Spacer(Modifier.height(20.dp))
-//            Button(onClick = { scope.launch { bottomSheetState.show() } }) {
-//                Text("Click to show sheet")
-//            }
-//        }
-
-//    ModalBottomSheetLayout(
-//        sheetState = bottomSheetState,
-//        sheetContent = {
-//            Column(Modifier.padding(20.dp)) {
-//                Text(text = "어쩌구~")
-//                Text(text = "어쩌구~")
-//                Text(text = "어쩌구~")
-//                Text(text = "어쩌구~")
-//                Text(text = "어쩌구~")
-//            }
-//        }
-//    ) {
-//    }
-//}
