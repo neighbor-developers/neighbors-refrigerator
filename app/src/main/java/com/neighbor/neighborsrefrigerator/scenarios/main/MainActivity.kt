@@ -60,13 +60,7 @@ fun Screen(startRoute: String= NAV_ROUTE.START.routeName){
     NavHost(navController, startRoute){
 
         composable(NAV_ROUTE.START.routeName){
-            MainScreen(navController, 1)
-        }
-        composable("${NAV_ROUTE.MAIN.routeName}/{type}", arguments = listOf(navArgument("type"){
-            type = NavType.IntType
-            defaultValue = 1}))
-        {
-            MainScreen(navController, it.arguments?.getInt("type")?:1)
+            MainScreen(navController)
         }
         composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{productID}", arguments = listOf(navArgument("productID"){type = NavType.StringType})){
             SharePostDetail(navController, it.arguments?.getString("productID"))
@@ -91,10 +85,11 @@ fun Screen(startRoute: String= NAV_ROUTE.START.routeName){
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainScreen(navController: NavHostController, type: Int?) {
+fun MainScreen(navController: NavHostController) {
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+    var types by remember { mutableStateOf("share") }
 
     BottomSheetScaffold(
         sheetBackgroundColor = Color.LightGray,
@@ -160,35 +155,37 @@ fun MainScreen(navController: NavHostController, type: Int?) {
             .fillMaxSize()) {
             Row(){
                 Button(
-                    onClick = { navController.navigate("${NAV_ROUTE.MAIN.routeName}/${1}") },
+                    onClick = { types = "share" },
                     modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
-                    enabled = when(type){
-                        1 -> false
+                    enabled = when(types){
+                        "share" -> false
+                        "seek" -> true
                         else -> true
                     }
                 ) {
                     Text(text = "나눔")
                 }
                 Button(
-                    onClick = { navController.navigate("${NAV_ROUTE.MAIN.routeName}/${2}") },
+                    onClick = { types = "seek" },
                     modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
-                    enabled = when(type){
-                        1 -> true
-                        else -> false
+                    enabled = when(types){
+                        "share" -> true
+                        "seek" -> false
+                        else -> true
                     }
                 ) {
                     Text(text = "구함")
                 }
             }
-            when(type){
-                1 -> SharePostScreen(
+            when(types){
+                "share" -> SharePostScreen(
                     sharePostViewModel = SharePostViewModel(),
                     route = NAV_ROUTE.SHARE_DETAIL,
                     navHostController = navController
                 )
-                2 -> SeekPostScreen(
+                "seek" -> SeekPostScreen(
                     sharePostViewModel = SharePostViewModel(),
                     route = NAV_ROUTE.SEEK_DETAIL,
                     navHostController = navController
