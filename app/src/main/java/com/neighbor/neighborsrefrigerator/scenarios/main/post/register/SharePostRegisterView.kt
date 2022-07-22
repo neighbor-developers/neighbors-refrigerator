@@ -43,15 +43,14 @@ var sampleList: List<Pair<String, String>> = listOf(Pair("100", "과일"), Pair(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SharePostRegisterScreen(
-    viewModel: SharePostRegisterViewModel,
-    navHostController: NavHostController,
-    route: NAV_ROUTE,
+    navHostController: NavHostController
 ) {
-    var locationType = remember { mutableStateOf("") }
-    var periodType = remember { mutableStateOf("") }
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
+    val locationType = remember { mutableStateOf("") }
+    val periodType = remember { mutableStateOf("") }
+    val title by remember { mutableStateOf("") }
+    val content by remember { mutableStateOf("") }
 
+    val viewModel = SharePostRegisterViewModel()
 
     Scaffold(
         topBar = {
@@ -358,8 +357,6 @@ fun SampleSpinner(
 @Composable
 fun DefaultPreview() {
     SharePostRegisterScreen(
-        viewModel = SharePostRegisterViewModel(),
-        route = NAV_ROUTE.WRITE_SHARE,
         navHostController = NavHostController(context = LocalContext.current)
     )
 }

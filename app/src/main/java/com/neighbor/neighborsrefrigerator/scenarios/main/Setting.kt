@@ -27,8 +27,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.TopBar
-import com.neighbor.neighborsrefrigerator.scenarios.main.animateAlignmentAsState
 
 @Composable
 private fun animateAlignmentAsState(
@@ -39,14 +37,10 @@ private fun animateAlignmentAsState(
 }
 
 @Composable
-fun Setting(navController: NavController) {
+fun Setting() {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(modifier = Modifier.fillMaxSize()) {
-            TopBar(
-                title = "설정",
-                buttonIcon = Icons.Filled.ArrowBack,
-                onButtonClicked = { navController.popBackStack() }
-            )
+
             Column(
                 modifier = Modifier.fillMaxSize()
                     .padding(50.dp, 40.dp, 0.dp, 0.dp)

@@ -1,8 +1,10 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,9 +27,13 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,12 +46,15 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
     MAIN("MAIN","나눔/구함 리스트 화면"),
     SHARE_DETAIL("SHARE_DETAIL", "나눔 상세페이지"),
     SEEK_DETAIL("SEEK_DETAIL", "구함 상세페이지"),
+    SHARE_REGISTER("SHARE_REGISTER", "나눔 등록페이지"),
+    SEEK_REGISTER("SEEK_REGISTER", "구함 등록페이지"),
     CHAT_LIST("CHAT_LIST", "채팅 리스트화면"),
     CHAT("CHAT", "채팅화면"),
-    WRITE_SHARE("WRITE_SHARE", "나눔 글쓰기 페이지"),
-    WRITE_SEEK("WRITE_SEEK", "구함 글쓰기 페이지")
+    SETTING("SETTING", "설정화면"),
+    TRADE_HISTORY("TRADE_HISTORY", "거래 내역")
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
 
@@ -64,10 +73,10 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
         composable("${NAV_ROUTE.SEEK_DETAIL.routeName}/{postID}", arguments = listOf(navArgument("postID"){type = NavType.StringType})){
             SeekPostDetail(navController, it.arguments?.getString("postID"))
         }
-        composable(NAV_ROUTE.WRITE_SEEK.routeName) {
-
+        composable(NAV_ROUTE.SHARE_REGISTER.routeName){
+            SharePostRegisterScreen(navController)
         }
-        composable(NAV_ROUTE.WRITE_SHARE.routeName){
+        composable(NAV_ROUTE.SEEK_REGISTER.routeName){
 
         }
         composable(NAV_ROUTE.CHAT.routeName){
@@ -76,6 +85,11 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
         composable(NAV_ROUTE.CHAT_LIST.routeName){
 
         }
+        composable(NAV_ROUTE.SETTING.routeName){
+            Setting()
+        }
+        composable(NAV_ROUTE.TRADE_HISTORY.routeName){}
+
     }
 }
 
@@ -86,6 +100,8 @@ fun MainScreen(navController: NavHostController) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
     var types by remember { mutableStateOf("share") }
+
+    val scope = rememberCoroutineScope()
 
     BottomSheetScaffold(
         sheetBackgroundColor = Color.LightGray,
@@ -114,7 +130,10 @@ fun MainScreen(navController: NavHostController) {
 
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* 마이페이지 드로어 */ }) {
+                    IconButton(onClick = {
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }}) {
                         Icon(Icons.Filled.Menu, contentDescription = "")
                     }
                 },
@@ -131,17 +150,21 @@ fun MainScreen(navController: NavHostController) {
                     onDismissRequest = { isDropDownMenuExpanded = false },
                     offset = DpOffset((10).dp, 0.dp)
                 ) {
-                    DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.WRITE_SHARE.routeName) }) {
+                    DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.SHARE_REGISTER.routeName) }) {
                         Text("나눔")
                     }
-                    DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.WRITE_SEEK.routeName) }) {
+                    DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.SEEK_REGISTER.routeName) }) {
                         Text("구함")
                     }
                 }
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-        sheetPeekHeight = 35.dp
+        sheetPeekHeight = 35.dp,
+        drawerContent = {
+            Drawer(navController)
+        },
+        drawerGesturesEnabled = scaffoldState.drawerState.isOpen
     ) {
 
         Column(modifier = Modifier

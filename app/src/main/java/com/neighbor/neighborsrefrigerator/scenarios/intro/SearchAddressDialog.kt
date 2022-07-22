@@ -114,10 +114,10 @@ fun DialogUI(viewModel: RegisterInfoViewModel) {
 @Composable
 fun AddressList(viewModel: RegisterInfoViewModel) {
     val addressList = viewModel.addressList.collectAsState()
-    addressList.value?.let {
+    addressList.value?.let { address ->
         LazyColumn(userScrollEnabled = true) {
             itemsIndexed(
-                addressList.value!!
+                address
             ) { index, item ->
                 Log.d("실행", "있음")
                 Card(onClick = {}) {

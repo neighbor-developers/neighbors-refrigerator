@@ -27,8 +27,7 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            RegisterInfo()
-            //LoginScreen { googleLogin() }
+            LoginScreen { googleLogin() }
         }
     }
 

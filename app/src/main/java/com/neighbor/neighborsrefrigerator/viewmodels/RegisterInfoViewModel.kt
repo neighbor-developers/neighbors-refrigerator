@@ -1,15 +1,6 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.content.ClipData
-import android.content.Context
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ListView
-import android.widget.TextView
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,14 +44,16 @@ class RegisterInfoViewModel : ViewModel() {
                         Log.d("리스트", addressList.value.toString())
 
                     } catch (e: NullPointerException) {
-                        Log.d("실패", e.message.toString())
+                        Log.d("실패1", e.message.toString())
+                        var failedText = "검색 결과가 없습니다"
+                        addressList.value = listOf(failedText)
                     }
                 } else {
-                    Log.d("실패", "에러")
+                    Log.d("실패2", "에러")
                 }
             }
             override fun onFailure(call: Call<AddressDetail>, t: Throwable) {
-                Log.d("실패", t.message.toString())
+                Log.d("실패3", t.message.toString())
             }
         })
     }

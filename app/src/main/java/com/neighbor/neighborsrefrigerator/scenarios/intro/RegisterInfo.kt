@@ -105,9 +105,10 @@ fun GetAddress() {
             leadingIcon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             trailingIcon = {
                 IconButton(onClick = { dialogState = true }) {
-                    SearchAddressDialog(dialogState = dialogState, onDissmissRequest = {
-                        dialogState = !it
-                    }, viewModel = RegisterInfoViewModel())
+                    SearchAddressDialog(
+                        dialogState = dialogState,
+                        onDissmissRequest = { dialogState = !it },
+                        viewModel = RegisterInfoViewModel())
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
                 }
