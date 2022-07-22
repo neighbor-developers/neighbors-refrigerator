@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 
 
 @Composable
@@ -106,7 +107,7 @@ fun GetAddress() {
                 IconButton(onClick = { dialogState = true }) {
                     SearchAddressDialog(dialogState = dialogState, onDissmissRequest = {
                         dialogState = !it
-                    })
+                    }, viewModel = RegisterInfoViewModel())
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
                 }

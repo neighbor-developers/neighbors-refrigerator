@@ -1,4 +1,4 @@
-package com.neighbor.neighborsrefrigerator.scenarios.mainDrawer
+package com.neighbor.neighborsrefrigerator.scenarios.main.drawer
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -13,10 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,7 +54,9 @@ fun Drawer(
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val showNicknameDialog = remember { mutableStateOf(false) }
-    val flowerNum = "1"
+    val flowerNum = remember {
+        mutableStateOf(1)
+    }
 
     Surface {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -67,9 +66,9 @@ fun Drawer(
                     .padding(top = 48.dp)
             ) {
                 if (showDialog.value)
-                    flowerDialog(value = "", setShowDialog = {
-                        showDialog.value = it
-                    }) {}
+                    flowerDialog(
+                        setShowDialog = { showDialog.value = it },
+                        flowerNum)
                 Button(
                     onClick = {
                         showDialog.value = true
@@ -86,58 +85,68 @@ fun Drawer(
                         ),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
-                    setFlower(flowerNum)
-                }
-
-                Row(
-                    modifier
-                        .fillMaxWidth()
-                        .padding(start = 10.dp, top = 15.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (showNicknameDialog.value)
-                        CustomDialog(value = "", setShowDialog = {
-                            showNicknameDialog.value = it
-                        }) {}
-                    Text(
-                        "Nickname", fontSize = 25.sp
-                    )
-                    IconButton(modifier = Modifier.then(Modifier.size(30.dp)),
-                        onClick = {
-                            showNicknameDialog.value = true
-                        }) {
-                        Icon(
-                            Icons.Filled.Settings,
-                            "contentDescription",
-                            tint = Color.Gray
-                        )
-                    }
-                }
-
-                screens.forEach { screen ->
-                    Spacer(Modifier.height(24.dp))
-                    modifier
-                        .padding(top = 10.dp)
-
-                    Text(
-                        text = screen.title,
-                        style = MaterialTheme.typography.h4,
-                        fontSize = 33.sp,
-                        modifier = Modifier
-                            .clickable {
-                                onDestinationClicked(screen.route)
-                            }
-                            .padding(start = 24.dp)
+                    Image(
+                        painter = painterResource(
+                        when(flowerNum.value){
+                            1 -> R.drawable.sprout
+                            2 -> R.drawable.sprout2
+                            3 -> R.drawable.sprout3
+                            else -> R.drawable.sprout
+                        }),
+                        contentDescription = "App icon"
                     )
                 }
+
+            }
+
+            Row(
+                modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, top = 15.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if (showNicknameDialog.value)
+                    CustomDialog(value = "", setShowDialog = {
+                        showNicknameDialog.value = it
+                    }) {}
+                Text(
+                    "Nickname", fontSize = 25.sp
+                )
+                IconButton(modifier = Modifier.then(Modifier.size(30.dp)),
+                    onClick = {
+                        showNicknameDialog.value = true
+                    }) {
+                    Icon(
+                        Icons.Filled.Settings,
+                        "contentDescription",
+                        tint = Color.Gray
+                    )
+                }
+            }
+
+            screens.forEach { screen ->
+                Spacer(Modifier.height(24.dp))
+                modifier
+                    .padding(top = 10.dp)
+
+                Text(
+                    text = screen.title,
+                    style = MaterialTheme.typography.h4,
+                    fontSize = 33.sp,
+                    modifier = Modifier
+                        .clickable {
+                            onDestinationClicked(screen.route)
+                        }
+                        .padding(start = 24.dp)
+                )
             }
         }
     }
 }
 
+
 @Composable
-fun flowerDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (String) -> Unit) {
-    val flowerNum = remember { mutableStateOf(value) }
+fun flowerDialog(setShowDialog: (Boolean) -> Unit, flowerNum : MutableState<Int>) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
@@ -194,9 +203,7 @@ fun flowerDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (Str
                                         ),
                                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                                 ) {
-                                    flowerNum.value = "1"
-                                    setFlower(flowerNum.value)
-                                    setValue(flowerNum.value)
+                                    flowerNum.value = 1
                                 }
 
                                 Button(
@@ -214,9 +221,7 @@ fun flowerDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (Str
                                         ),
                                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                                 ) {
-                                    flowerNum.value = "2"
-                                    setFlower(flowerNum.value)
-                                    setValue(flowerNum.value)
+                                    flowerNum.value = 2
                                 }
 
                                 Button(
@@ -234,9 +239,7 @@ fun flowerDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (Str
                                         ),
                                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                                 ) {
-                                    flowerNum.value = "3"
-                                    setFlower(flowerNum.value)
-                                    setValue(flowerNum.value)
+                                    flowerNum.value = 3
                                 }
                             }
                         }
@@ -244,29 +247,6 @@ fun flowerDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (Str
                 }
             }
         }
-    }
-}
-
-
-@Composable
-fun setFlower(value: String) {
-    if (value == "1") {
-        Image(
-            painter = painterResource(R.drawable.sprout),
-            contentDescription = "App icon"
-        )
-    }
-    if (value == "2") {
-        Image(
-            painter = painterResource(R.drawable.sprout2),
-            contentDescription = "App icon"
-        )
-    }
-    if (value == "3") {
-        Image(
-            painter = painterResource(R.drawable.sprout3),
-            contentDescription = "App icon"
-        )
     }
 }
 

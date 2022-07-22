@@ -1,8 +1,5 @@
-package com.neighbor.neighborsrefrigerator.scenarios.mainDrawer
+package com.neighbor.neighborsrefrigerator.scenarios.main.drawer
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -13,6 +10,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.neighbor.neighborsrefrigerator.scenarios.main.Setting
 import com.neighbor.neighborsrefrigerator.ui.theme.NeighborsRefrigeratorTheme
 import kotlinx.coroutines.launch
 

@@ -1,8 +1,13 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -18,11 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun SearchAddressDialog(
     dialogState: Boolean,
-    onDissmissRequest: (dialogState: Boolean) -> Unit
+    onDissmissRequest: (dialogState: Boolean) -> Unit,
+    viewModel: RegisterInfoViewModel
 ) {
     if (dialogState) {
         AlertDialog(
@@ -37,31 +44,33 @@ fun SearchAddressDialog(
                         "찾으시려는 동(읍/면/리)과 번지수or건물명을 정확하게 입력해 주세요.",
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentSize(),
+                            .fillMaxWidth()
+                            .height(50.dp),
                         fontSize = 16.sp,
                         lineHeight = 17.sp
                     )
-                    DialogUI()
+                    DialogUI(viewModel)
                 }
             },
             buttons = {
             },
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-            shape = RoundedCornerShape(9.dp)
+            shape = RoundedCornerShape(9.dp),
+            modifier = Modifier.height(300.dp)
         )
     }
 }
 
 @Composable
-fun DialogUI() {
+fun DialogUI(viewModel: RegisterInfoViewModel) {
+
     var textState by remember { mutableStateOf(TextFieldValue()) }
+    var userAddressInput by remember { mutableStateOf(TextFieldValue()) }
 
     Column {
         Spacer(
             modifier = Modifier
-                    .height(12.dp)
-                    .fillMaxWidth()
+                .fillMaxWidth()
         )
         /*Divider(
             color = Color.DarkGray,
@@ -77,72 +86,67 @@ fun DialogUI() {
                 painterResource(id = R.drawable.ic_baseline_search_24)
             }
         )*/
-        getAddressDetail()
-        AddressList(state = false, addressList = arrayListOf())
-    }
-}
 
-@Composable
-fun getAddressDetail(){
-    var userAddressInput by remember { mutableStateOf(TextFieldValue()) }
-    var text:List<String> = arrayListOf()
-
-    OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
             value = userAddressInput,
             onValueChange = { newValue -> userAddressInput = newValue },
             singleLine = true,
             trailingIcon = {
-                IconButton(onClick = { RegisterInfoViewModel().setAddress(textField = userAddressInput.text, completion = {
-                    text = RegisterInfoViewModel().sendAddress(it)
-                })}) {
-                    AddressList(state = true, addressList = text)
+                IconButton(onClick = { viewModel.setAddress(textField = userAddressInput.text)
+                }) {
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
+
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
-                    // 기본 테마 색 지정
-                    backgroundColor = Color.White
+                // 기본 테마 색 지정
+                backgroundColor = Color.White
             )
-    )
+        )
+        AddressList(viewModel)
+    }
 }
 
 // sharedPreference 사용 필요
+@OptIn(ExperimentalMaterialApi::class)
+@SuppressLint("RememberReturnType", "StateFlowValueCalledInComposition")
 @Composable
-fun AddressList(state: Boolean, addressList: List<String>) {
-    var listState by remember { mutableStateOf(state) }
-    val list by remember { mutableStateOf(addressList) }
-    if(listState){
+fun AddressList(viewModel: RegisterInfoViewModel) {
+    viewModel.addressList.value?.let {
         Log.d("실행", "true")
-        LazyColumn() {
-            itemsIndexed(
-                list
-            ) { index, item ->
-                Text(
-                    text = item
-                    /* fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp)
-                    * */
-                )
+        if (viewModel.addressList.value!!.isNotEmpty()) {
+
+            Log.d("실행", it.toString() + "aa")
+            LazyColumn(userScrollEnabled = true) {
+                itemsIndexed(
+                    viewModel.addressList.value!!
+                ) { index, item ->
+                    Log.d("실행", "있음")
+                    Card(onClick = {}) {
+                        Text(text = item, modifier = Modifier.padding(5.dp))
+                    }
+                }
+
             }
         }
+        Log.d("실행", "true2")
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview2() {
-    Surface() {
-        var dialogState by remember {
-            mutableStateOf(true)
-        }
-
-        SearchAddressDialog(dialogState = dialogState, onDissmissRequest = {
-            dialogState = !it
-        })
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview2() {
+//    Surface() {
+//        var dialogState by remember {
+//            mutableStateOf(true)
+//        }
+//
+//        SearchAddressDialog(dialogState = dialogState, onDissmissRequest = {
+//            dialogState = !it
+//        })
+//    }
+//}

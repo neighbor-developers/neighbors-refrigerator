@@ -1,4 +1,4 @@
-package com.neighbor.neighborsrefrigerator.scenarios.main.compose
+package com.neighbor.neighborsrefrigerator.scenarios.main.post.register
 
 import android.os.Build
 import android.widget.CalendarView
@@ -16,7 +16,6 @@ import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -281,7 +280,7 @@ fun CustomCalendarView(onDateSelected: (LocalDate) -> Unit) {
     AndroidView(
         modifier = Modifier.wrapContentSize(),
         factory = { context ->
-            CalendarView(ContextThemeWrapper(context, R.style.CalenderViewCustom))
+            CalendarView(ContextThemeWrapper(context, R.style.Theme_NeighborsRefrigerator))
         },
         update = { view ->
             view.minDate = 30 // contraints

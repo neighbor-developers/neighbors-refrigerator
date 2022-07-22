@@ -1,4 +1,4 @@
-package com.neighbor.neighborsrefrigerator.scenarios.mainDrawer
+package com.neighbor.neighborsrefrigerator.scenarios.main.drawer
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable

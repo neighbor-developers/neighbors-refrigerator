@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.TextView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.neighbor.neighborsrefrigerator.data.APiObject
 import com.neighbor.neighborsrefrigerator.data.AddressDetail
+import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Call
 import retrofit2.Response
 
@@ -24,13 +26,14 @@ import retrofit2.Response
 
 class RegisterInfoViewModel : ViewModel() {
     private val _nickName = MutableLiveData<String>()
-    private val _address = MutableLiveData<String>()
+    //val addressList = MutableLiveData<List<String>>()
+    var addressList = MutableStateFlow<List<String>?>(null)
     private val _dialogAddress = MutableLiveData<String>()
     val nickname: LiveData<String>
         get() = _nickName
 
 
-    fun setAddress(textField: String, completion: (List<AddressDetail.HtReturnValue.Result.Zipcode>)->Unit){
+    fun setAddress(textField: String){
         val text: String = textField.let{
             it
         }
@@ -42,11 +45,13 @@ class RegisterInfoViewModel : ViewModel() {
             override fun onResponse(call: Call<AddressDetail>, response: Response<AddressDetail>) {
                 if (response.isSuccessful) {
                     try {
-                        var addressDetail: List<AddressDetail.HtReturnValue.Result.Zipcode> = arrayListOf()
-                        addressDetail = response.body()!!.htReturnValue.result.zipcodes
+                        var _addressList: List<AddressDetail.HtReturnValue.Result.Zipcode> = arrayListOf()
+                        _addressList = response.body()!!.htReturnValue.result.zipcodes
 
+                        addressList.value = sendAddress(_addressList)
                         Log.d("성공", "${response.raw()}")
-                        completion(addressDetail)
+                        Log.d("리스트", addressList.value.toString())
+
                     } catch (e: NullPointerException) {
                         Log.d("실패", e.message.toString())
                     }
@@ -58,7 +63,6 @@ class RegisterInfoViewModel : ViewModel() {
                 Log.d("실패", t.message.toString())
             }
         })
-        Log.d("확인", "주소 검색 작동")
     }
 
     private fun setClickList() {
@@ -68,12 +72,11 @@ class RegisterInfoViewModel : ViewModel() {
 
     fun sendAddress(addressDetail: List<AddressDetail.HtReturnValue.Result.Zipcode>): List<String>{
 
-        var generalAddressList: List<String> = arrayListOf()
-        var roadNameAddressList: List<String> = arrayListOf()
+        var generalAddressList: ArrayList<String> = arrayListOf()
+        var roadNameAddressList: ArrayList<String> = arrayListOf()
         // 도로명 주소가 추후에 필요하면 추가
-
         for (m in addressDetail) {
-            generalAddressList = generalAddressList.plus(m.addressByNumberOfLot)
+            generalAddressList.add(m.addressByNumberOfLot)
         }
         Log.d("성공", "주소 dialog에 전송")
 
