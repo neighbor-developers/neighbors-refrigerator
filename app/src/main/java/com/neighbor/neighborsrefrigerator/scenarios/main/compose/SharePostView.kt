@@ -1,14 +1,12 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -29,6 +27,7 @@ import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SharePostScreen(
@@ -36,15 +35,12 @@ fun SharePostScreen(
     route: NAV_ROUTE,
     navHostController: NavHostController
 ) {
-
-
     val state = rememberScrollState()
-    LaunchedEffect(Unit) { state.animateScrollTo(100) }
+    LaunchedEffect(Unit) { state.animateScrollTo(0) }
     Column(
-        Modifier
-            .verticalScroll(state)
-            .size(700.dp)) {
-        SearchBox { sharePostViewModel.search() }
+        modifier = Modifier.verticalScroll(state).height(1000.dp)
+    ) {
+        SearchBox(sharePostViewModel, "share")
         SharePostListByDistance(productData = sharePostViewModel.products.collectAsState(), route, navHostController)
         androidx.compose.foundation.Canvas(
             modifier = Modifier
@@ -59,23 +55,23 @@ fun SharePostScreen(
                 strokeWidth = 1F
             )
         }
-        SharePostListByTime(productData = sharePostViewModel.products.collectAsState(), route, navHostController)
+        SharePostListByTime(productData = sharePostViewModel.products.collectAsState(), route, navHostController, state)
     }
 
 }
 
 
 @Composable
-fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController) {
-    Text(
-        text = "# 어쩌고님 위치에서 가까운 나눔",
-        modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
-        fontSize = 15.sp
-    )
+fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController, state: ScrollState) {
+
+    val scrollState = rememberLazyGridState()
+    val coroutineScope = rememberCoroutineScope()
+
     LazyVerticalGrid(
+        state = scrollState,
         columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(30.dp),
-        horizontalArrangement = Arrangement.spacedBy(30.dp),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
+        horizontalArrangement = Arrangement.spacedBy(40.dp),
         modifier = Modifier
             .padding(top = 10.dp, start = 30.dp, end = 30.dp),
         userScrollEnabled = true
@@ -86,10 +82,17 @@ fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, r
             }
         }
     }
+
+
 }
 
 @Composable
 fun SharePostListByDistance(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController){
+    Text(
+        text = "# 어쩌고님 위치에서 가까운 나눔",
+        modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
+        fontSize = 15.sp
+    )
     Row (modifier = Modifier
         .fillMaxWidth()
         .horizontalScroll(rememberScrollState())
@@ -104,7 +107,7 @@ fun SharePostListByDistance(productData: State<List<ProductIncludeDistanceData>?
 }
 
 @Composable
-fun SearchBox(onSearch: (String) -> Unit) {
+fun SearchBox(sharePostViewModel: SharePostViewModel, type: String) {
     var content by remember { mutableStateOf("") }
     Box(
         modifier = Modifier
@@ -117,7 +120,7 @@ fun SearchBox(onSearch: (String) -> Unit) {
             .fillMaxWidth()
             .size(45.dp), shape = MaterialTheme.shapes.large.copy(cornersize))
 
-        IconButton(onClick = { onSearch(content) }) {
+        IconButton(onClick = {sharePostViewModel.search(content, type)}) {
             Icon(Icons.Filled.Search, contentDescription = null)
         }
     }

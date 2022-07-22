@@ -36,36 +36,22 @@ fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */, 
         onClick= { navHostController.navigate(route = "${route.routeName}/${product.productData.productID}") },
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
-        elevation = 0.dp
+            .height(230.dp),
+        shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)),
+        elevation = 10.dp
     ) {
         Box(Modifier.fillMaxSize()) {
-            Surface(
-                modifier = Modifier.padding(start = 8.dp, top = 8.dp),
-                color = Color(0.267f, 0.694f, 0.239f, 1.0f),
-                shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)))
-            {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.TopEnd)
-                {
-                    IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 10.dp, start = 10.dp),
-                    contentAlignment = Alignment.BottomStart)
-                {
-                    ItemText(product = product.productData, product.distance)
-                }
-            }
-                val modifier = Modifier.size(110.dp)
+            Column() {
+                val modifier = Modifier.fillMaxHeight(0.6f)
                 ItemImage(productImg = product.productData.productImg, modifier = modifier)
-
-            Column(horizontalAlignment = Alignment.Start) {
-
+                ItemText(product = product.productData, product.distance)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.TopEnd)
+            {
+                IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
             }
         }
     }
@@ -78,9 +64,11 @@ fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, na
         onClick= { navHostController.navigate("${route.routeName}/${product.productData.productID}") },
         modifier = Modifier
             .padding(end = 20.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)),
+        elevation = 10.dp
     ) {
-        Surface(shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)), color = Color(0.267f, 0.694f, 0.239f, 1.0f)) {
+        Surface(shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp))) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                     val modifier = Modifier.size(100.dp)
@@ -90,8 +78,7 @@ fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, na
                 Box(contentAlignment = Alignment.TopEnd) {
                     IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
                     Column(horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom, modifier = Modifier
-                        .height(100.dp)
-                        .padding(start = 7.dp, end = 7.dp, bottom = 10.dp)) {
+                        .height(100.dp)) {
                         ItemText(product = product.productData, distance = product.distance)
                     }
                 }
@@ -108,11 +95,11 @@ fun ItemText(product: ProductData, distance: Double){
         3 -> "구매일자"
         else -> { "" }
     }
-    Column() {
-        Text(text = product.productName, fontSize = 15.sp, color = Color.White, modifier = Modifier.padding(bottom = 10.dp))
-        Text(text = "$valiType : $day", fontSize = 10.sp, color = Color.White)
-        Text(text = "내 위치에서 ${distance}km", fontSize = 10.sp, color = Color.White)
-        Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.White)
+    Column(Modifier.padding(10.dp)) {
+        Text(text = product.productName, fontSize = 15.sp, color = Color.Black, modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = "$valiType : $day", fontSize = 10.sp, color = Color.Black)
+        Text(text = "내 위치에서 ${distance}km", fontSize = 10.sp, color = Color.Black)
+        Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.Black)
     }
 }
 @Composable

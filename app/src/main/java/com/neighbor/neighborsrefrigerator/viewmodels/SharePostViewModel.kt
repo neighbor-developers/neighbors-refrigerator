@@ -42,10 +42,16 @@ class SharePostViewModel : ViewModel() {
                 ProductData(",", 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
         )
     )
-    fun search(content: String = "") {
-        if (content != "") {
-            /* 데이터 검색 */
+    fun search(item: String, type : String) {
+        if (item != "") {
+            when(type) {
+                "share" -> {}
+                "seek" -> {}
+            }
         }
+    }
+    fun chooseCategory(item: String){
+
     }
     /*
     1. 데이터 가져오기

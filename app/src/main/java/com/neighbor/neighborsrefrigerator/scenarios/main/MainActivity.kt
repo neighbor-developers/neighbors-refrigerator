@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
-import android.graphics.ComposePathEffect
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
@@ -28,9 +26,9 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -104,9 +102,7 @@ fun MainScreen(navController: NavHostController) {
             ) {
                 Text("Category")
             }
-            /*카테고리 내용*/
-
-             categoryView(categoryList = listOf("a", "s", "d", "a", "s", "d", "s", "s"))
+             categoryView()
         },
         scaffoldState = scaffoldState,
         topBar = {
@@ -197,12 +193,14 @@ fun MainScreen(navController: NavHostController) {
 }
 
  @Composable
- fun categoryView(categoryList: List<String>){
+ fun categoryView(){
+     val categoryList = listOf("채소","과일", "정육", "수산", "냉동식품", "간편식품")
+
     LazyVerticalGrid(
-        columns = GridCells.Fixed(4),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = Modifier.padding(30.dp)
+        columns = GridCells.Fixed(3),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.padding(20.dp)
     ) {
         items(categoryList){ item ->
             CategoryItemView(item)
@@ -210,13 +208,14 @@ fun MainScreen(navController: NavHostController) {
 
     }
  }
-
  @Composable
  fun CategoryItemView(item: String){
-    Card() {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Filled.Favorite, contentDescription = item, modifier = Modifier.height(40.dp))
-            Text(text = "야채")
-        }
-    }
+     val viewModel = SharePostViewModel()
+     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+         IconButton(onClick = {viewModel.search(item = item, type = "categoty")}) {
+             Icon(Icons.Filled.Favorite, contentDescription = item)
+         }
+         Text(text = item)
+     }
+
  }
