@@ -4,10 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -49,6 +45,7 @@ fun SearchAddressDialog(
                         fontSize = 16.sp,
                         lineHeight = 17.sp
                     )
+
                     DialogUI(viewModel)
                 }
             },
@@ -116,24 +113,19 @@ fun DialogUI(viewModel: RegisterInfoViewModel) {
 @SuppressLint("RememberReturnType", "StateFlowValueCalledInComposition")
 @Composable
 fun AddressList(viewModel: RegisterInfoViewModel) {
-    viewModel.addressList.value?.let {
-        Log.d("실행", "true")
-        if (viewModel.addressList.value!!.isNotEmpty()) {
-
-            Log.d("실행", it.toString() + "aa")
-            LazyColumn(userScrollEnabled = true) {
-                itemsIndexed(
-                    viewModel.addressList.value!!
-                ) { index, item ->
-                    Log.d("실행", "있음")
-                    Card(onClick = {}) {
-                        Text(text = item, modifier = Modifier.padding(5.dp))
-                    }
+    val addressList = viewModel.addressList.collectAsState()
+    addressList.value?.let {
+        LazyColumn(userScrollEnabled = true) {
+            itemsIndexed(
+                addressList.value!!
+            ) { index, item ->
+                Log.d("실행", "있음")
+                Card(onClick = {}) {
+                    Text(text = item, modifier = Modifier.padding(5.dp))
                 }
-
             }
+
         }
-        Log.d("실행", "true2")
     }
 }
 //

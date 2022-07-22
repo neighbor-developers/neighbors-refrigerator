@@ -28,7 +28,6 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SharePostScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,7 +38,6 @@ class MainActivity : ComponentActivity() {
 }
 enum class NAV_ROUTE(val routeName:String, val description:String){
     MAIN("MAIN","나눔/구함 리스트 화면"),
-    START("MAIN_2", "시작(나눔 리스트 화면)"),
     SHARE_DETAIL("SHARE_DETAIL", "나눔 상세페이지"),
     SEEK_DETAIL("SEEK_DETAIL", "구함 상세페이지"),
     CHAT_LIST("CHAT_LIST", "채팅 리스트화면"),
@@ -49,7 +47,7 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
 }
 
 @Composable
-fun Screen(startRoute: String= NAV_ROUTE.START.routeName){
+fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
 
     // 네비게이션 컨트롤러
     val navController = rememberNavController()
@@ -57,7 +55,7 @@ fun Screen(startRoute: String= NAV_ROUTE.START.routeName){
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute){
 
-        composable(NAV_ROUTE.START.routeName){
+        composable(NAV_ROUTE.MAIN.routeName){
             MainScreen(navController)
         }
         composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{productID}", arguments = listOf(navArgument("productID"){type = NavType.StringType})){
