@@ -3,7 +3,7 @@ package com.neighbor.neighborsrefrigerator.data
 import java.util.*
 
 data class ProductData(
-    val productID: String,
+    val id: String,
     val postID: Int,
     val productName: String,
     val validateType: Int,
