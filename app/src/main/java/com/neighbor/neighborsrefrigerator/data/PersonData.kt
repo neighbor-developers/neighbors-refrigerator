@@ -9,5 +9,7 @@ data class PersonData(
     val nickname: String,
     val homeAddr: String,
     val reportPoint: Int = 0,
+    val latitude : Double,
+    val longitude : Double,
     val createdAt: Date
 )

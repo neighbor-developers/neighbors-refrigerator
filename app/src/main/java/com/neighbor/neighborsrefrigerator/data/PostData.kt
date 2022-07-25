@@ -20,5 +20,7 @@ data class PostData(
     val createdAt: Date,
     val updatedAt: Date?,
     val completedAt: Date?,
+    val latitude : Double,
+    val longitude : Double,
     val state : String
 )
