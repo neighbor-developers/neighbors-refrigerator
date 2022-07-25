@@ -1,8 +1,10 @@
 package com.neighbor.neighborsrefrigerator.network
 
+import ReturnObjectForWrite
 import com.neighbor.neighborsrefrigerator.data.AddressDetail
 import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
 import com.neighbor.neighborsrefrigerator.data.UserData
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -21,5 +23,5 @@ interface DBAccessInterface {
     @POST("/user/join")
     fun userJoin(
         @Body userData: UserData
-    ): retrofit2.Call<ReturnObjectForPost>
+    ): retrofit2.Call<ReturnObjectForWrite>
 }

@@ -53,11 +53,11 @@ fun SearchAddressDialog(
             buttons = {
                 Row(){
                     TextButton(
-                        onClick =
-                        onDismiss) {
+                        onClick = onDismiss
+                    ) {
                         Text(text = "확인")
                     }
-                    TextButton(onClick = onDismiss) {
+                    TextButton(onClick = { viewModel.registerPersonDB() }) {
                         Text(text = "Calcel")
                     }
                 }
@@ -115,14 +115,16 @@ fun DialogUI(viewModel: RegisterInfoViewModel) {
 @SuppressLint("RememberReturnType", "StateFlowValueCalledInComposition")
 @Composable
 fun AddressList(viewModel: RegisterInfoViewModel) {
-    val addressList = viewModel.addressList.collectAsState()
+    val addressList = viewModel.addressList.collectAsState()    // 바로, 계속 변화 감지, 통로
     addressList.value?.let { address ->
         LazyColumn(userScrollEnabled = true) {
             itemsIndexed(
                 address
             ) { index, item ->
                 Log.d("실행", "있음")
-                Card(onClick = {}) {
+                Card(onClick = {
+                    //
+                }) {
                     Text(text = item, modifier = Modifier.padding(5.dp))
                 }
             }
