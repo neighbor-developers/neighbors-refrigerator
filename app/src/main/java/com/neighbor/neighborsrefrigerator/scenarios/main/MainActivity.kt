@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.scenarios.main
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -28,6 +29,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
+import com.neighbor.neighborsrefrigerator.network.DBAccessModule
+import com.neighbor.neighborsrefrigerator.network.DBApiObject
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostDetail
@@ -38,6 +43,9 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -185,7 +193,10 @@ fun MainScreen(navController: NavHostController) {
             .fillMaxSize()) {
             Row(){
                 Button(
-                    onClick = { types = "share" },
+                    onClick = {
+                        val testObject : DBAccessModule = DBAccessModule()
+                        testObject.getPostByUserId(2)
+                        types = "share" },
                     modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
                     enabled = when(types){

@@ -11,8 +11,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
+import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
+import com.neighbor.neighborsrefrigerator.network.DBApiObject
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class StartActivity : ComponentActivity() {
     // Firebase
@@ -26,6 +31,7 @@ class StartActivity : ComponentActivity() {
         viewModel.tryLogin(this)
 
         lifecycleScope.launchWhenCreated {
+
             viewModel.loginResult.collect { isLogin ->
                 if (isLogin) {
                     if (auth.currentUser != null) {
