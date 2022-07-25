@@ -110,7 +110,6 @@ fun GetAddress() {
                     SearchAddressDialog(
                         dialogState = showDialogState,
                         onDismiss = showDialogviewModel::onmDialogDismiss,
-                        onConfirm = showDialogviewModel::onDialogConfirm,
                         viewModel = RegisterInfoViewModel())
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)

@@ -23,10 +23,7 @@ class SharePostViewModel : ViewModel() {
 //    - updated_at: Date
 //    - completed_at: Date - not null이면 완료
     val posts = MutableStateFlow<List<PostData>?>(
-    listOf(
-        PostData(1, "헬로미스터 마이 예스터데이", "100_10", 1, "어쩌고저쩌고어쩌고저쩌고~~~~~~~₩", 1, "ㅇㅇ", 0.4, "!!!!", Date(2022, 3, 4), Date(2022, 3, 4), Date(2022, 3, 4)),
-        PostData(1, "헬로미스터 마이 예스터데이", "100_10", 1, "어쩌고저쩌고어쩌고저쩌고~~~~~~~₩", 1, "ㅇㅇ", 0.4, "!!!!", Date(2022, 3, 4), Date(2022, 3, 4), Date(2022, 3, 4)),
-        PostData(1, "헬로미스터 마이 예스터데이", "100_10", 1, "어쩌고저쩌고어쩌고저쩌고쩌고저쩌고어쩌고저쩌고쩌고저쩌고어쩌고저쩌고~~~~~~~~~~~~~~~~₩", 1, "ㅇㅇ", 0.4, "!!!!", Date(2022, 3, 4), Date(2022, 3, 4), Date(2022, 3, 4))))
+    listOf())
 
     val products = MutableStateFlow<List<ProductIncludeDistanceData>?>(
         listOf(

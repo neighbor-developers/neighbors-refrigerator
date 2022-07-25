@@ -26,7 +26,7 @@ fun ChatScreen(navController : NavHostController, chatData: ChatData){
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = chatData.contactUID.toString(), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 17.sp) },
+                title = { Text(text = chatData.id.toString(), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 17.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")

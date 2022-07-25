@@ -54,8 +54,6 @@ fun Drawer(
     var locationDialogState by remember { mutableStateOf(false) }
     val showNicknameDialog = remember { mutableStateOf(false) }
     val flowerNum = remember { mutableStateOf(1) }
-    val showDialogviewModel: ShowDialogViewModel by viewModel()
-    val showDialogState: Boolean by showDialogviewModel.showDialog.collectAsState()
 
     Surface{
         Column(
@@ -66,7 +64,7 @@ fun Drawer(
 
             if (locationDialogState)
                 SearchAddressDialog(
-                    dialogState = showDialogState,
+                    dialogState = locationDialogState,
                     onDismiss = {locationDialogState = false},
                     viewModel = RegisterInfoViewModel())
             Button(
