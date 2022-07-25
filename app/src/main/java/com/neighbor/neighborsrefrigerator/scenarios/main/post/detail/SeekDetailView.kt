@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun SeekPostDetail(navHostController: NavHostController, postId: String?) {
+
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "구함 상세 페이지", fontSize = 30.sp)

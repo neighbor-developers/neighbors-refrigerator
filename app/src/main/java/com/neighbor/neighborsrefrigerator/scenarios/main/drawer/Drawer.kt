@@ -40,7 +40,7 @@ data class DrawerItem(
 
 private val drawerMenu = listOf(
     DrawerItem(NAV_ROUTE.SETTING, "설정"),
-    DrawerItem(NAV_ROUTE.TRADE_HISTORY, "거래 내역")
+    DrawerItem(NAV_ROUTE.TRADE_HISTORY, "거래 내역"),
 )
 
 @Composable

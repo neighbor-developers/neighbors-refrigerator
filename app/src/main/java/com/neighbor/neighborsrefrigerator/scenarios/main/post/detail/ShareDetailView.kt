@@ -1,14 +1,13 @@
-package com.neighbor.neighborsrefrigerator.scenarios.main.compose
+package com.neighbor.neighborsrefrigerator.scenarios.main.post.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.traceEventEnd
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,77 +22,117 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
+import com.neighbor.neighborsrefrigerator.scenarios.main.compose.ItemImage
+import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.*
 
 @Composable
-fun SharePostDetail(navHostController: NavHostController, product: String?) {
-    val scaffoldState = rememberScaffoldState()
+fun SharePostDetail(navHostController: NavHostController, productID: String?) {
 
+    val post = PostData(1, "헬로미스터 마이 예스터데이", "100_10", 1, "어쩌고저쩌고어쩌고저쩌고쩌고저쩌고어쩌고저쩌고쩌고저쩌고어쩌고저쩌고~~~~~~~~~~~~~~~~₩", 1, "ㅇㅇ", 0.4, "!!!!", Date(2022, 3, 4), Date(2022, 3, 4), Date(2022, 3, 4))
+    val product = ProductIncludeDistanceData(
+        ProductData(",", 1, "감자랑 고구마", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4)
+
+    val day = "${product.productData.validateDate.year}년 ${product.productData.validateDate.month}월 ${product.productData.validateDate.day}일"
+    val valiType = when (product.productData.validateType) {
+        1 -> "유통기한"
+        2 -> "제조일자"
+        3 -> "구매일자"
+        else -> {
+            ""
+        }
+    }
+
+    val scaffoldState = rememberScaffoldState()
+    var declarationDialogState by remember {
+        mutableStateOf(false)
+    }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
                 title = {},
                 actions = {
-                    IconButton(onClick = { /*신고 다이얼로그*/ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "")
+                    IconButton(onClick = { declarationDialogState = true }) {
+                        Icon(Icons.Filled.Warning, contentDescription = "", tint = Color.Red)
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick =  { navHostController.navigateUp() }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "")
                     }
                 },
-                modifier = Modifier.fillMaxSize()
-
+                backgroundColor = Color.Transparent,
+                elevation = 0.dp
             )
         }
     ) {
-        Surface(modifier = Modifier.padding(it)) {
-
-        }
-        Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
-            Text(text = "상품 자세히 보기", fontSize = 20.sp)
-            Row() {
-                val modifier = Modifier.size(200.dp)
-//                ItemImage(productImg = product.productData.productImg, modifier = modifier)
-//
-//                Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-//                    val day = "${product.productData.validateDate.year}년 ${product.productData.validateDate.month}월 ${product.productData.validateDate.day}일"
-//                    val valiType = when (product.productData.validateType) {
-//                        1 -> "유통기한"
-//                        2 -> "제조일자"
-//                        3 -> "구매일자"
-//                        else -> { "" }
-//                    }
-//                    Text(text = product.productData.productName, fontSize = 15.sp, color = Color.White, modifier = Modifier.padding(bottom = 10.dp))
-//                    Text(text = "$valiType : $day", fontSize = 10.sp, color = Color.White)
-//                    Text(text = "내 위치에서 ${product.distance}km", fontSize = 10.sp, color = Color.White)
-//                    Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.White)
-//                    }
+        Surface(modifier = Modifier
+            .padding(it)
+            .fillMaxSize()) {
+            if (declarationDialogState) {
+                DeclarationDialog(type = 1) {
+                    declarationDialogState = false
                 }
-            Text(text = "상품 상세 설명", fontSize = 20.sp)
-            Text(text = "어ㅉ거구", modifier = Modifier.fillMaxWidth().height(200.dp))
-            Text(text = "상품 사진 모아보기", fontSize = 20.sp)
-
+            }
+            Column {
+                Text(text = "상품 자세히 보기", fontSize = 20.sp, modifier = Modifier.padding(start = 30.dp, top = 10.dp, bottom = 20.dp))
+                Row() {
+                    Spacer(modifier = Modifier.width(30.dp))
+                    val modifier = Modifier.size(150.dp)
+                    ItemImage(productImg = product.productData.productImg, modifier = modifier)
+                    Spacer(modifier = Modifier.width(30.dp))
+                    Text(text = product.productData.productName, fontSize = 20.sp)
+                }
+                Spacer(modifier = Modifier.height(30.dp))
+                Surface(shape = MaterialTheme.shapes.large.copy(topEnd = CornerSize(70.dp))) {
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color(0xff00ac77))) {
+                        Text(text = "내 위치에서 ${product.distance}km", fontSize = 20.sp, color = Color.White)
+                        Text(text = "$valiType : $day", fontSize = 20.sp, color = Color.White)
+                    }
+                }
+            }
         }
-
     }
+}
+
+@Composable
+fun Detail(){
+
 }
 
 
 
 @Preview
 @Composable
-fun preview111(){
+fun Rreview111() {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Filled.Warning, contentDescription = "")
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "")
+                    }
+                },
+                backgroundColor = Color.Transparent,
+                elevation = 0.dp
+            )
+        }
+    ) {
+        Surface(modifier = Modifier.padding(it)) {
 
-    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
-        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "나눔 상세 페이지", fontSize = 30.sp)
-            Text(text = "상품 아이디 : h")
-            Button(onClick = { }) {
-                Text(text = "뒤로가기", Modifier.size(width = 100.dp, height = 40.dp))
-            }
         }
     }
 }

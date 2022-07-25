@@ -45,7 +45,7 @@ class RegisterInfoViewModel : ViewModel() {
 
                     } catch (e: NullPointerException) {
                         Log.d("실패1", e.message.toString())
-                        var failedText = "검색 결과가 없습니다"
+                        val failedText = "검색 결과가 없습니다"
                         addressList.value = listOf(failedText)
                     }
                 } else {

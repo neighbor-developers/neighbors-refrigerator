@@ -1,4 +1,4 @@
-package com.neighbor.neighborsrefrigerator.scenarios.main.compose
+package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -12,22 +12,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.scenarios.main.compose.ItemCardByDistance
+import com.neighbor.neighborsrefrigerator.scenarios.main.compose.ItemCardByTime
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun SharePostScreen(
@@ -65,7 +61,6 @@ fun SharePostScreen(
 fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController, state: ScrollState) {
 
     val scrollState = rememberLazyGridState()
-    val coroutineScope = rememberCoroutineScope()
 
     LazyVerticalGrid(
         state = scrollState,
@@ -115,10 +110,10 @@ fun SearchBox(sharePostViewModel: SharePostViewModel, type: String) {
             .padding(top = 5.dp, end = 30.dp, start = 30.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
-        val cornersize = CornerSize(20.dp)
+        val cornerSize = CornerSize(20.dp)
         OutlinedTextField(value = content, onValueChange = { content = it }, modifier = Modifier
             .fillMaxWidth()
-            .size(45.dp), shape = MaterialTheme.shapes.large.copy(cornersize))
+            .size(45.dp), shape = MaterialTheme.shapes.large.copy(cornerSize))
 
         IconButton(onClick = {sharePostViewModel.search(content, type)}) {
             Icon(Icons.Filled.Search, contentDescription = null)
@@ -134,7 +129,7 @@ fun Preview() {
         .fillMaxSize()
         .background(Color.White)) {
         Text(text = "# 내 위치에서 가까운 나눔", modifier = Modifier.padding(start = 20.dp, end = 15.dp, top = 30.dp, bottom = 30.dp), fontSize = 18.sp)
-        androidx.compose.foundation.Canvas(modifier = Modifier
+        Canvas(modifier = Modifier
             .fillMaxWidth()
             .padding(30.dp)) {
             val canvasHeight = size.height

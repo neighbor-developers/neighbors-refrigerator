@@ -1,10 +1,12 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.text.SimpleDateFormat
 import java.util.*
 
 class SharePostViewModel : ViewModel() {
@@ -59,7 +61,9 @@ class SharePostViewModel : ViewModel() {
         }
     }
     fun chooseCategory(item: String){
-
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(Date(System.currentTimeMillis()))
+        val curTime = dateFormat.format(Date(time))
     }
     /*
     1. 데이터 가져오기
