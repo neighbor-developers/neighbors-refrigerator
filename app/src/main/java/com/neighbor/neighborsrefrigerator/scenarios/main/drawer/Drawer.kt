@@ -27,11 +27,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.intro.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.ShowDialogViewModel
 
 data class DrawerItem(
     val route: NAV_ROUTE,
@@ -52,6 +54,8 @@ fun Drawer(
     var locationDialogState by remember { mutableStateOf(false) }
     val showNicknameDialog = remember { mutableStateOf(false) }
     val flowerNum = remember { mutableStateOf(1) }
+    val showDialogviewModel: ShowDialogViewModel by viewModel()
+    val showDialogState: Boolean by showDialogviewModel.showDialog.collectAsState()
 
     Surface{
         Column(
@@ -62,10 +66,9 @@ fun Drawer(
 
             if (locationDialogState)
                 SearchAddressDialog(
-                    dialogState = locationDialogState,
-                    onDissmissRequest = { locationDialogState = !it },
-                    viewModel = RegisterInfoViewModel()
-                )
+                    dialogState = showDialogState,
+                    onDismiss = {locationDialogState = false},
+                    viewModel = RegisterInfoViewModel())
             Button(
                 onClick = {
                     flowerDialogState = true

@@ -27,7 +27,6 @@ import kotlinx.coroutines.coroutineScope
 fun SearchAddressDialog(
     dialogState: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
     viewModel: RegisterInfoViewModel
 ) {
     // https://blog.logrocket.com/adding-alertdialog-jetpack-compose-android-apps/
@@ -53,9 +52,11 @@ fun SearchAddressDialog(
             },
             buttons = {
                 Row(){
-                    TextButton(onClick = onConfirm) {
+                    TextButton(
+                        onClick =
+                        onDismiss) {
                         Text(text = "확인")
-                    } ,
+                    }
                     TextButton(onClick = onDismiss) {
                         Text(text = "Calcel")
                     }

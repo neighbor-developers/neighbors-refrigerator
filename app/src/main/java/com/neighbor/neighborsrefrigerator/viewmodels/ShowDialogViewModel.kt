@@ -18,6 +18,7 @@ class ShowDialogViewModel: ViewModel() {
     }
 
     fun onmDialogDismiss(){
+
         _showDialog.value = false
     }
 }
