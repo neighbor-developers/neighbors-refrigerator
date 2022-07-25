@@ -1,11 +1,16 @@
-import com.google.gson.annotations.SerializedName
-import com.neighbor.neighborsrefrigerator.data.PostData
+package com.neighbor.neighborsrefrigerator.data
 
-data class ReturnObjectForWrite (
+import com.google.gson.annotations.SerializedName
+
+data class ReturnObjectForNickname(
+
     @SerializedName("isConnect")
     val isConnect: Boolean,
     @SerializedName("resultCode")
     val resultCode: Int,
     @SerializedName("msg")
-    val msg: String
+    val msg: String,
+    @SerializedName("isExist")
+    val isExist: Boolean
+
 )

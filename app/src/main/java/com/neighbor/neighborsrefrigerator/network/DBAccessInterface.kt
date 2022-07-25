@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.network
 
 import ReturnObjectForWrite
 import com.neighbor.neighborsrefrigerator.data.AddressDetail
+import com.neighbor.neighborsrefrigerator.data.ReturnObjectForNickname
 import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
 import com.neighbor.neighborsrefrigerator.data.UserData
 import retrofit2.Call
@@ -24,4 +25,9 @@ interface DBAccessInterface {
     fun userJoin(
         @Body userData: UserData
     ): retrofit2.Call<ReturnObjectForWrite>
+
+    @GET("/user/checkNickname")
+    fun checkNickname(
+        @Query("nickname") nickname: String
+    ): retrofit2.Call<ReturnObjectForNickname>
 }

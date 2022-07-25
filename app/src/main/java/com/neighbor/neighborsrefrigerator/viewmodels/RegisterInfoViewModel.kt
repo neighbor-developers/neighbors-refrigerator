@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 
 import ReturnObjectForWrite
 import android.os.Build
+import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -22,6 +23,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.create
+import java.sql.SQLData
+import java.sql.Timestamp
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -34,23 +38,23 @@ import kotlin.collections.ArrayList
 // dialog에서 address 검색 구성하기
 
 class RegisterInfoViewModel : ViewModel() {
-    private val _nickName = MutableSharedFlow<String?>()
+    private val _nickName = MutableStateFlow<String?>(null)
     private val _addressMain = MutableStateFlow<String?>(null)
     private val _addressDetail = MutableStateFlow<String?>(null)
-//    val nickname: StateFlow<String?>
-//        get() = _nickName
-    val addressMain: StateFlow<String?>
-        get() = _addressMain.asStateFlow()
+    val nickname: StateFlow<String?>
+        get() = _nickName
+    //var addressMain: StateFlow<String?>
+    //    get() = _addressMain
     val addressDetail: StateFlow<String?>
-        get() = _addressDetail.asStateFlow()
+        get() = _addressDetail
     //val addressList = MutableLiveData<List<String>>()
     var addressList = MutableStateFlow<List<String>?>(null)
     private val _dialogAddress = MutableLiveData<String>()
 
     val time = System.currentTimeMillis()
-    val dateFormat = SimpleDateFormat("yyyy-mm-dd hh:mm:ss")
-    val curTime = dateFormat.format(Date(time))
+    val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(time))
 
+    val useState = MutableStateFlow<Boolean?>(false)
 
     fun setAddress(textField: String){
         val text: String = textField.let{
@@ -104,21 +108,51 @@ class RegisterInfoViewModel : ViewModel() {
         return generalAddressList
     }
 
+    fun checkNickname(nickname: String){
+    //  0일때만 등록 ->
+    // 1일때는 거부 ->
+        val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
+
+        dbAccessApi.checkNickname(nickname).enqueue(object :
+            Callback<ReturnObjectForNickname> {
+
+            override fun onResponse(
+                call: Call<ReturnObjectForNickname>,
+                response: Response<ReturnObjectForNickname>
+            ) {
+
+                if(!response.body()!!.isExist){
+                    registerPersonDB()
+                    useState.value = true
+                }else{
+                    useState.value = false
+                }
+            }
+            override fun onFailure(call: Call<ReturnObjectForNickname>, t: Throwable) {
+                Log.d("실패", t.localizedMessage)
+            }
+        })
+    }
+
+
     fun registerPersonDB(){
-        val userdata = UserData(1,
-        "a",
-        "a@naver.com",
-        "SeoYEonn^^",
-        "산기대학로 237",
-        0,
-        30.3,
-        30.3,
-        curTime)
+        val userdata =
+            UserData(20,
+            "a",
+            "a@naver.com",
+                "yahoo",
+            "산기대학로 237",
+            0,
+            30.3,
+            30.3,
+            timeStamp
+            )
+
 
         val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
 
         dbAccessApi.userJoin(
-            userdata
+            userdata!!
         ).enqueue(object :
             Callback<ReturnObjectForWrite> {
 
@@ -132,7 +166,6 @@ class RegisterInfoViewModel : ViewModel() {
             override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
                 Log.d("실패", t.localizedMessage)
             }
-
         })
     }
 }

@@ -1,6 +1,7 @@
 package com.neighbor.neighborsrefrigerator.data
 
 import com.google.gson.annotations.SerializedName
+import java.sql.Timestamp
 import java.util.*
 
 data class UserData(

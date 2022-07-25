@@ -29,6 +29,7 @@ fun SearchAddressDialog(
     onDismiss: () -> Unit,
     viewModel: RegisterInfoViewModel
 ) {
+    val useState = viewModel.useState.collectAsState()
     // https://blog.logrocket.com/adding-alertdialog-jetpack-compose-android-apps/
     if (dialogState) {
         AlertDialog(
@@ -53,11 +54,18 @@ fun SearchAddressDialog(
             buttons = {
                 Row(){
                     TextButton(
-                        onClick = onDismiss
+                        onClick = {
+
+                            viewModel.checkNickname("yahoo")
+
+                            onDismiss}
                     ) {
                         Text(text = "확인")
                     }
-                    TextButton(onClick = { viewModel.registerPersonDB() }) {
+                    TextButton(onClick = {
+
+                        onDismiss })
+                    {
                         Text(text = "Calcel")
                     }
                 }
@@ -123,7 +131,9 @@ fun AddressList(viewModel: RegisterInfoViewModel) {
             ) { index, item ->
                 Log.d("실행", "있음")
                 Card(onClick = {
-                    //
+//                    viewModel.addressMain.let {
+//                        it
+//                    }
                 }) {
                     Text(text = item, modifier = Modifier.padding(5.dp))
                 }
