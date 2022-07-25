@@ -1,8 +1,5 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +19,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.ShowDialogViewModel
 
 
 @Composable
@@ -88,6 +88,8 @@ fun GetNickname() {
 fun GetAddress() {
     var userAddressInput by remember { mutableStateOf(TextFieldValue()) }
     var dialogState by remember { mutableStateOf(false) }
+    val showDialogviewModel: ShowDialogViewModel by viewModel()
+    val showDialogState: Boolean by showDialogviewModel.showDialog.collectAsState()
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -106,8 +108,9 @@ fun GetAddress() {
             trailingIcon = {
                 IconButton(onClick = { dialogState = true }) {
                     SearchAddressDialog(
-                        dialogState = dialogState,
-                        onDissmissRequest = { dialogState = !it },
+                        dialogState = showDialogState,
+                        onDismiss = showDialogviewModel::onmDialogDismiss,
+                        onConfirm = showDialogviewModel::onDialogConfirm,
                         viewModel = RegisterInfoViewModel())
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)

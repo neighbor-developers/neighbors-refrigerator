@@ -1,7 +1,9 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.util.Log
+import android.view.WindowManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -24,15 +26,15 @@ import kotlinx.coroutines.coroutineScope
 @Composable
 fun SearchAddressDialog(
     dialogState: Boolean,
-    onDissmissRequest: (dialogState: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
     viewModel: RegisterInfoViewModel
 ) {
+    // https://blog.logrocket.com/adding-alertdialog-jetpack-compose-android-apps/
     if (dialogState) {
         AlertDialog(
             backgroundColor = Color.White,
-            onDismissRequest = {
-                onDissmissRequest(dialogState)
-            },
+            onDismissRequest = onDismiss,
             title = null,
             text = {
                 Column() {
@@ -50,6 +52,15 @@ fun SearchAddressDialog(
                 }
             },
             buttons = {
+                Row(){
+                    TextButton(onClick = onConfirm) {
+                        Text(text = "확인")
+                    } ,
+                    TextButton(onClick = onDismiss) {
+                        Text(text = "Calcel")
+                    }
+                }
+
             },
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
             shape = RoundedCornerShape(9.dp),
@@ -74,16 +85,6 @@ fun DialogUI(viewModel: RegisterInfoViewModel) {
             thickness = 0.8.dp,
             modifier = Modifier.padding(horizontal = 16.dp)
         )*/
-        /*TextField(
-            modifier = Modifier.padding(20.dp)
-                .fillMaxWidth(),
-            value = textState,
-            onValueChange = { textFieldValue -> textState = textFieldValue },
-            trailingIcon = {
-                painterResource(id = R.drawable.ic_baseline_search_24)
-            }
-        )*/
-
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()

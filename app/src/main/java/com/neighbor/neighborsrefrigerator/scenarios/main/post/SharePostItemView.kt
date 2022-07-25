@@ -33,7 +33,7 @@ import java.util.concurrent.CountDownLatch
 @Composable
 fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { navHostController.navigate(route = "${route.routeName}/${product.productData.productID}") },
+        onClick= { navHostController.navigate(route = "${route.routeName}/${product.productData.id}") },
         modifier = Modifier
             .fillMaxWidth()
             .height(230.dp),
@@ -61,7 +61,7 @@ fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */, 
 @Composable
 fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { navHostController.navigate("${route.routeName}/${product.productData.productID}") },
+        onClick= { navHostController.navigate("${route.routeName}/${product.productData.id}") },
         modifier = Modifier
             .padding(end = 20.dp)
             .fillMaxWidth(),
