@@ -1,9 +1,7 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat

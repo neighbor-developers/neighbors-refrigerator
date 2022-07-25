@@ -11,16 +11,17 @@ data class PostData(
     val type: Int,
     val mainAddr: String,
     val addrDetail: String,
-    val rate: Double?,
+    val rate: Int?,
     val review: String?,
     val validateType: Int,
-    val validateDate: Date,
+    val validateDate: String,
     val validateImg: String?,
     val productImg: String,
-    val createdAt: Date,
-    val updatedAt: Date?,
-    val completedAt: Date?,
+    val createdAt: String,
+    val updatedAt: String?,
+    val completedAt: String?,
     val latitude : Double,
     val longitude : Double,
-    val state : String
+    val state : String,
+    val distance : Double
 )

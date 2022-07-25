@@ -1,8 +1,9 @@
 package com.neighbor.neighborsrefrigerator.data
 
+import com.google.gson.annotations.SerializedName
 import java.util.*
 
-data class PersonData(
+data class UserData(
     val id: Int,
     val fbID: String,
     val email: String,
@@ -11,5 +12,5 @@ data class PersonData(
     val reportPoint: Int = 0,
     val latitude : Double,
     val longitude : Double,
-    val createdAt: Date
+    val createdAt: String
 )

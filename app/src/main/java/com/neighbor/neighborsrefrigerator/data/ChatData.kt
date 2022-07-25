@@ -6,5 +6,5 @@ data class ChatData(
     val id: String,
     val postId: Int,
     val userId: Int,
-    val updatedAt: Date
+    val updatedAt: String
 )
