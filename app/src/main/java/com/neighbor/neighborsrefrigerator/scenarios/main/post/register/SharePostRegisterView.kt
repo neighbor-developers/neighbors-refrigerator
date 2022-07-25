@@ -2,6 +2,8 @@ package com.neighbor.neighborsrefrigerator.scenarios.main.post.register
 
 import android.os.Build
 import android.widget.CalendarView
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.foundation.*
@@ -26,8 +28,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -45,12 +48,12 @@ var sampleList: List<Pair<String, String>> = listOf(Pair("100", "과일"), Pair(
 fun SharePostRegisterScreen(
     navHostController: NavHostController
 ) {
-    val locationType = remember { mutableStateOf("") }
-    val periodType = remember { mutableStateOf("") }
-    val title by remember { mutableStateOf("") }
-    val content by remember { mutableStateOf("") }
+    var viewModel = SharePostRegisterViewModel()
 
-    val viewModel = SharePostRegisterViewModel()
+    val selectImageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.imgUriState = uri
+    }
+    var periodButtonState by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -65,7 +68,7 @@ fun SharePostRegisterScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = { viewModel.registerData() }) {
                         Icon(
                             imageVector = Icons.Filled.Send,
                             contentDescription = "등록"
@@ -84,24 +87,30 @@ fun SharePostRegisterScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = R.drawable.icon_google),
+                    painter = if (viewModel.imgUriState != null)
+                        rememberAsyncImagePainter(
+                        ImageRequest
+                            .Builder(LocalContext.current)
+                            .data(data = viewModel.imgUriState)
+                            .build()
+                        ) else painterResource(R.drawable.icon_google),
                     contentDescription = "상품 사진",
                     modifier = Modifier
-                        .width(150.dp)
-                        .height(150.dp)
                         .clickable(
                             enabled = true,
                             onClickLabel = "Clickable image",
-                            onClick = { }
+                            onClick = { selectImageLauncher.launch("image/*") }
                         )
+                        .width(150.dp)
+                        .height(150.dp)
                 )
                 Column() {
                     Row(modifier = Modifier.padding(bottom = 5.dp)) {
 
                         Text(text = "상품명", fontSize = 20.sp)
                         TextField(
-                            value = title,
-                            onValueChange = { title },
+                            value = viewModel.title,
+                            onValueChange = { input -> viewModel.title = input },
                             modifier = Modifier
                                 .height(20.dp)
                                 .padding(start = 5.dp),
@@ -110,39 +119,59 @@ fun SharePostRegisterScreen(
                     }
                     Row(modifier = Modifier.padding(bottom = 5.dp)) {
                         Text(text = "위치", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
-                        LocationButton("홈", locationType)
-                        LocationButton("내위치", locationType)
-                    }
-                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                        Text(text = "기간", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
-                        PeriodButton("제조", periodType)
-                        PeriodButton("구매", periodType)
-                        PeriodButton("유통", periodType)
+                        LocationButton("홈", viewModel.locationType)
+                        LocationButton("내위치", viewModel.locationType)
                     }
                     Row(
-                        modifier = Modifier.border(width = 1.dp, color = Color.Black).clickable {
-                            /* DatePicker(onDateSelected = { }, onDismissRequest = {}) */
-                        },
+                        modifier = Modifier.padding(bottom = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "2022.07.30", fontSize = 12.sp)
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "뒤로가기 버튼"
-                        )
+                        Text(text = "기간", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
+                        Column() {
+                            Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                                PeriodButton("제조", viewModel.validateTypeName)
+                                PeriodButton("구매", viewModel.validateTypeName)
+                                PeriodButton("유통", viewModel.validateTypeName)
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .border(width = 1.dp, color = Color.Black)
+                                    .clickable {
+                                        periodButtonState = true
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = viewModel.validateDate,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.width(150.dp).padding(start = 10.dp)
+                                )
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "달력 버튼"
+                                )
+
+                                if (periodButtonState) {
+                                    DatePicker(onDateSelected = {}, onDismissRequest = {})
+                                    periodButtonState = false
+                                }
+                            }
+                        }
                     }
                 }
             }
             Column() {
-                Row() {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("카테고리")
-                    SampleSpinner(sampleList, Pair("100", "과일"))
+                    CategorySpinner(sampleList, Pair("100", "과일"), viewModel)
                 }
                 Box() {
                     TextField(
-                        value = content,
-                        onValueChange = { content },
-                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                        value = viewModel.content,
+                        onValueChange = { input -> viewModel.content = input },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
                     )
                     IconButton(
                         modifier = Modifier.align(Alignment.BottomEnd),
@@ -166,7 +195,10 @@ fun LocationButton(name: String, locationType: MutableState<String>) {
         },
         onClick = { locationType.value = name },
         colors = ChangeButtonColor(locationType.value == name),
-        modifier = Modifier.height(30.dp).width(90.dp).padding(end = 5.dp)
+        modifier = Modifier
+            .height(30.dp)
+            .width(90.dp)
+            .padding(end = 5.dp)
     )
 }
 
@@ -178,7 +210,10 @@ fun PeriodButton(name: String, periodType: MutableState<String>) {
         },
         onClick = { periodType.value = name },
         colors = ChangeButtonColor(periodType.value == name),
-        modifier = Modifier.height(30.dp).width(60.dp).padding(end = 5.dp)
+        modifier = Modifier
+            .height(30.dp)
+            .width(60.dp)
+            .padding(end = 5.dp)
     )
 }
 
@@ -299,9 +334,10 @@ fun CustomCalendarView(onDateSelected: (LocalDate) -> Unit) {
 }
 
 @Composable
-fun SampleSpinner(
+fun CategorySpinner(
     list: List<Pair<String, String>>,
     preselected: Pair<String, String>,
+    viewModel: SharePostRegisterViewModel
 ) {
 
     var selected by remember { mutableStateOf(preselected) }
@@ -327,6 +363,8 @@ fun SampleSpinner(
                         onClick = {
                             selected = entry
                             expanded = false
+
+                            viewModel.category = selected.first
                         },
                         content = {
                             Text(
