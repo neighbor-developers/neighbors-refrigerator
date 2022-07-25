@@ -1,5 +1,7 @@
 package com.neighbor.neighborsrefrigerator.utilities
 
+import com.neighbor.neighborsrefrigerator.data.PostData
+
 class CalDistance() {
     var theta: Double = 0.0
     var dist: Double = 0.0
@@ -20,6 +22,9 @@ class CalDistance() {
         dist *= 1000.0;      // 단위  km 에서 m 로 변환
 
         return dist; // 단위 m
+    }
+    fun sendPostData(postArray : ArrayList<PostData>) :  ArrayList<PostData>{
+        return postArray
     }
 
     // 주어진 도(degree) 값을 라디언으로 변환

@@ -19,6 +19,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import java.util.*
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 

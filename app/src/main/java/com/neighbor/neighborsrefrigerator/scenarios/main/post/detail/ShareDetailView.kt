@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import com.neighbor.neighborsrefrigerator.scenarios.main.compose.ItemImage
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
@@ -23,7 +24,7 @@ fun SharePostDetail(navHostController: NavHostController, productID: String?) {
 
     // val post = PostData(1, "헬로미스터 마이 예스터데이", "100_10", 1, "어쩌고저쩌고어쩌고저쩌고쩌고저쩌고어쩌고저쩌고쩌고저쩌고어쩌고저쩌고~~~~~~~~~~~~~~~~₩", 1, "ㅇㅇ", 0.4, "!!!!", Date(2022, 3, 4), Date(2022, 3, 4), Date(2022, 3, 4))
     val product = ProductIncludeDistanceData(
-        ProductData(",", 1, "감자랑 고구마", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4)
+        ProductData(1, 1, "감자랑 고구마", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4)
 
     val day = "${product.productData.validateDate.year}년 ${product.productData.validateDate.month}월 ${product.productData.validateDate.day}일"
     val valiType = when (product.productData.validateType) {

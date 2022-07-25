@@ -3,6 +3,7 @@ package com.neighbor.neighborsrefrigerator.network
 import android.util.Log
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
+import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -14,11 +15,17 @@ class DBAccessModule {
         dbAccessApi.getPostByUserId(2).enqueue(object :
             Callback<ReturnObjectForPost> {
             override fun onResponse(call: Call<ReturnObjectForPost>, response: Response<ReturnObjectForPost>) {
-                Log.d("test","onResponse")
+                if(response.isSuccessful){
+                   val test =  response.body()!!.result[0]
+                    Log.d("test",test.title!!)
+                }
+                else{
+
+                }
             }
 
             override fun onFailure(call: Call<ReturnObjectForPost>, t: Throwable) {
-                Log.d("test","onfailure")
+                Log.d("test",t.localizedMessage)
             }
 
         })

@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
@@ -26,25 +27,25 @@ class SharePostViewModel : ViewModel() {
     val products = MutableStateFlow<List<ProductIncludeDistanceData>?>(
         listOf(
             ProductIncludeDistanceData(
-            ProductData(",", 1, "감자", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4),
+            ProductData(1, 1, "감자", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4),
             ProductIncludeDistanceData(
-            ProductData(",", 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
+            ProductData(2, 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
             ProductIncludeDistanceData(
-            ProductData(",", 1, "대파", 3, Date(2022, 6, 9), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://www.nongmin.com/upload/old/www_data/photo/2017/0203/20170202145824.jpg"), 2.1),
+            ProductData(3, 1, "대파", 3, Date(2022, 6, 9), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://www.nongmin.com/upload/old/www_data/photo/2017/0203/20170202145824.jpg"), 2.1),
             ProductIncludeDistanceData(
-            ProductData(",", 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 3.3),
+            ProductData(4, 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 3.3),
             ProductIncludeDistanceData(
-                ProductData(",", 1, "감자", 1, Date(2022, 3, 4), "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg", "https://cdn.mindgil.com/news/photo/202007/69482_3679_1449.jpg"), 3.4),
+                ProductData(5, 1, "감자", 1, Date(2022, 3, 4), "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg", "https://cdn.mindgil.com/news/photo/202007/69482_3679_1449.jpg"), 3.4),
             ProductIncludeDistanceData(
-                ProductData(",", 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
+                ProductData(6, 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
             ProductIncludeDistanceData(
-                ProductData(",", 1, "감자", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4),
+                ProductData(7, 1, "감자", 1, Date(2022, 3, 4), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://mediahub.seoul.go.kr/wp-content/uploads/2016/09/61a2981f41200ac8c513a3cbc0010efe.jpg"), 3.4),
             ProductIncludeDistanceData(
-                ProductData(",", 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
+                ProductData(8, 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 5.7),
             ProductIncludeDistanceData(
-                ProductData(",", 1, "대파", 3, Date(2022, 6, 9), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://www.nongmin.com/upload/old/www_data/photo/2017/0203/20170202145824.jpg"), 2.1),
+                ProductData(9, 1, "대파", 3, Date(2022, 6, 9), "https://avatars.githubusercontent.com/u/72335632?s=64&v=4", "https://www.nongmin.com/upload/old/www_data/photo/2017/0203/20170202145824.jpg"), 2.1),
             ProductIncludeDistanceData(
-                ProductData(",", 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 3.3)
+                ProductData(10, 1, "고구마", 2, Date(2022, 3, 4), null, "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg"), 3.3)
             )
     )
     fun search(item: String, type : String) {
