@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
+import com.neighbor.neighborsrefrigerator.scenarios.intro.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.ShowDialogViewModel
 

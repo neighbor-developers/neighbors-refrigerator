@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
+import com.neighbor.neighborsrefrigerator.scenarios.intro.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 
