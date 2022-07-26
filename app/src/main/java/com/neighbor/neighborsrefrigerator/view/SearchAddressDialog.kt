@@ -1,7 +1,9 @@
-package com.neighbor.neighborsrefrigerator.view
+package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.util.Log
+import android.view.WindowManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun SearchAddressDialog(
@@ -25,6 +29,7 @@ fun SearchAddressDialog(
     onDismiss: () -> Unit,
     viewModel: RegisterInfoViewModel
 ) {
+    val useState = viewModel.useState.collectAsState()
     // https://blog.logrocket.com/adding-alertdialog-jetpack-compose-android-apps/
     if (dialogState) {
         AlertDialog(
@@ -48,10 +53,19 @@ fun SearchAddressDialog(
             },
             buttons = {
                 Row(){
-                    TextButton(onClick = onDismiss) {
+                    TextButton(
+                        onClick = {
+
+                            viewModel.checkNickname("yahoo")
+
+                            onDismiss}
+                    ) {
                         Text(text = "확인")
                     }
-                    TextButton(onClick = onDismiss) {
+                    TextButton(onClick = {
+
+                        onDismiss })
+                    {
                         Text(text = "Calcel")
                     }
                 }
@@ -109,14 +123,18 @@ fun DialogUI(viewModel: RegisterInfoViewModel) {
 @SuppressLint("RememberReturnType", "StateFlowValueCalledInComposition")
 @Composable
 fun AddressList(viewModel: RegisterInfoViewModel) {
-    val addressList = viewModel.addressList.collectAsState()
+    val addressList = viewModel.addressList.collectAsState()    // 바로, 계속 변화 감지, 통로
     addressList.value?.let { address ->
         LazyColumn(userScrollEnabled = true) {
             itemsIndexed(
                 address
             ) { index, item ->
                 Log.d("실행", "있음")
-                Card(onClick = {}) {
+                Card(onClick = {
+//                    viewModel.addressMain.let {
+//                        it
+//                    }
+                }) {
                     Text(text = item, modifier = Modifier.padding(5.dp))
                 }
             }
