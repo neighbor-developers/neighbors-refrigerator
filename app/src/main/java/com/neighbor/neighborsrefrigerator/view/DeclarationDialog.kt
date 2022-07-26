@@ -50,9 +50,7 @@ fun DeclarationDialog(type: Int, onChangeState: () -> Unit) {
 
 @Composable
 fun RadioButtons(declaration: List<String>){
-    val selectedValue = remember {
-        mutableStateOf("")
-    }
+    val selectedValue = remember { mutableStateOf("") }
     val isSelectedItem: (String) -> Boolean = {selectedValue.value == it}
     val onChangeState : (String) -> Unit = { selectedValue.value = it}
 

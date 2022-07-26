@@ -10,14 +10,32 @@ import retrofit2.Response
 import retrofit2.create
 
 class DBAccessModule {
-    val dbAccessApi:  DBAccessInterface = DBApiClient.getApiClient().create()
-    fun getPostByUserId(userId :Int) {
-        dbAccessApi.getPostByUserId(2).enqueue(object :
+    private val dbAccessApi:  DBAccessInterface = DBApiClient.getApiClient().create()
+    fun getPostByUserId(userId :Int, applyPostDatas: (ArrayList<PostData>) -> Unit) {
+        dbAccessApi.getPostByUserId(userId).enqueue(object :
             Callback<ReturnObjectForPost> {
             override fun onResponse(call: Call<ReturnObjectForPost>, response: Response<ReturnObjectForPost>) {
                 if(response.isSuccessful){
-                   val test =  response.body()!!.result[0]
-                    Log.d("test",test.title!!)
+                    applyPostDatas(response.body()!!.result)
+                }
+                else{
+
+                }
+            }
+
+            override fun onFailure(call: Call<ReturnObjectForPost>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+
+        })
+    }
+
+    fun getPostOrderByTime(reqType :Int, postType: Int, currentIndex: Int, num: Int, categoryId: Int?, productName: String?, currentTime: String, applyPostDatas: (ArrayList<PostData>) -> Unit) {
+        dbAccessApi.getPostOrderByTime(reqType, postType, currentIndex, num, categoryId, productName, currentTime).enqueue(object :
+            Callback<ReturnObjectForPost> {
+            override fun onResponse(call: Call<ReturnObjectForPost>, response: Response<ReturnObjectForPost>) {
+                if(response.isSuccessful){
+                    applyPostDatas(response.body()!!.result)
                 }
                 else{
 

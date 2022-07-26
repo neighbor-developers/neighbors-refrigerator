@@ -2,7 +2,6 @@ package com.neighbor.neighborsrefrigerator.scenarios.main
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -30,22 +29,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
-import com.neighbor.neighborsrefrigerator.network.DBAccessModule
-import com.neighbor.neighborsrefrigerator.network.DBApiObject
-import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
+import com.neighbor.neighborsrefrigerator.data.serializableNavType
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
-import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostDetail
-import com.neighbor.neighborsrefrigerator.scenarios.main.compose.SeekPostScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
-import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -67,7 +61,8 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
     CHAT("CHAT", "채팅화면"),
     SETTING("SETTING", "설정화면"),
     TRADE_HISTORY("TRADE_HISTORY", "거래 내역"),
-    REVIEW("REVIEW", "리뷰작성")
+    REVIEW("REVIEW", "리뷰작성"),
+    SEARCH_POST("SEARCH_POST", "검색된 리스트화면")
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -83,11 +78,11 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
         composable(NAV_ROUTE.MAIN.routeName){
             MainScreen(navController)
         }
-        composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{productID}", arguments = listOf(navArgument("productID"){type = NavType.StringType})){
-            SharePostDetail(navController, it.arguments?.getString("productID"))
+        composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{post}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
+            SharePostDetail(navController, it.arguments?.getSerializable("post") as PostData)
         }
-        composable("${NAV_ROUTE.SEEK_DETAIL.routeName}/{postID}", arguments = listOf(navArgument("postID"){type = NavType.StringType})){
-            SeekPostDetail(navController, it.arguments?.getString("postID"))
+        composable("${NAV_ROUTE.SEEK_DETAIL.routeName}/{postID}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
+            SeekPostDetail(navController, it.arguments?.getSerializable("post") as PostData)
         }
         composable(NAV_ROUTE.SHARE_REGISTER.routeName){
             SharePostRegisterScreen(navController)
@@ -99,7 +94,8 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
 
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
-            ChatListScreen(navController)
+            //ChatListScreen(navController)
+            ReviewScreen(navController)
         }
         composable(NAV_ROUTE.SETTING.routeName){
             Setting()
@@ -110,6 +106,9 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
         composable(NAV_ROUTE.REVIEW.routeName){
             ReviewScreen(navController)
         }
+        composable("${NAV_ROUTE.SEARCH_POST.routeName}/{item}/{type}", arguments = listOf(navArgument("item"){type = NavType.StringType}, navArgument("type"){type = NavType.StringType})){
+            SearchPostView(item = it.arguments?.getString("item")?:"", type = it.arguments?.getString("type")?:"share", navController = navController)
+        }
     }
 }
 
@@ -119,7 +118,7 @@ fun MainScreen(navController: NavHostController) {
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
-    var types by remember { mutableStateOf("share") }
+    val types = remember { mutableStateOf("share") }
 
     val scope = rememberCoroutineScope()
 
@@ -136,7 +135,7 @@ fun MainScreen(navController: NavHostController) {
             ) {
                 Text("Category")
             }
-             categoryView()
+             CategoryView(navController, types)
         },
         scaffoldState = scaffoldState,
         topBar = {
@@ -194,12 +193,10 @@ fun MainScreen(navController: NavHostController) {
             Row(){
                 Button(
                     onClick = {
-                        val testObject : DBAccessModule = DBAccessModule()
-                        testObject.getPostByUserId(2)
-                        types = "share" },
+                        types.value = "share" },
                     modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
-                    enabled = when(types){
+                    enabled = when(types.value){
                         "share" -> false
                         "seek" -> true
                         else -> true
@@ -208,10 +205,10 @@ fun MainScreen(navController: NavHostController) {
                     Text(text = "나눔")
                 }
                 Button(
-                    onClick = { types = "seek" },
+                    onClick = { types.value = "seek" },
                     modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
-                    enabled = when(types){
+                    enabled = when(types.value){
                         "share" -> true
                         "seek" -> false
                         else -> true
@@ -220,14 +217,14 @@ fun MainScreen(navController: NavHostController) {
                     Text(text = "구함")
                 }
             }
-            when(types){
+            when(types.value){
                 "share" -> SharePostScreen(
-                    sharePostViewModel = SharePostViewModel(),
+                    postViewModel = PostViewModel(),
                     route = NAV_ROUTE.SHARE_DETAIL,
-                    navHostController = navController
+                    navController = navController
                 )
                 "seek" -> SeekPostScreen(
-                    sharePostViewModel = SharePostViewModel(),
+                    postViewModel = PostViewModel(),
                     route = NAV_ROUTE.SEEK_DETAIL,
                     navHostController = navController
                 )
@@ -238,8 +235,10 @@ fun MainScreen(navController: NavHostController) {
 }
 
  @Composable
- fun categoryView(){
-     val categoryList = listOf("채소","과일", "정육", "수산", "냉동식품", "간편식품")
+ fun CategoryView(navController: NavHostController, types: MutableState<String>){
+     val viewModel = PostViewModel()
+
+     val categoryList = mapOf(100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -247,20 +246,42 @@ fun MainScreen(navController: NavHostController) {
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.padding(20.dp)
     ) {
-        items(categoryList){ item ->
-            CategoryItemView(item)
-        }
+        items(categoryList.keys.toList()){ categorysKey ->
 
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                IconButton(onClick = {
+                    // 카테고리 코드로 검색
+                    viewModel.search(
+                        item = null,
+                        category = categorysKey,
+                        reqType = "category",
+                        postType = types.value,
+                        currentIndex = 0,
+                        num = 20)
+                    { viewModel.sharePostsByTime.value = it }
+
+                    // 검색페이지로 이동
+                    navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/${categoryList.getValue(categorysKey)}")
+                }) {
+                    Icon(Icons.Filled.Favorite, contentDescription = categoryList.getValue(categorysKey))
+                }
+                Text(text = categoryList.getValue(categorysKey))
+            }
+        }
     }
  }
- @Composable
- fun CategoryItemView(item: String){
-     val viewModel = SharePostViewModel()
-     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-         IconButton(onClick = {viewModel.search(item = item, type = "categoty")}) {
-             Icon(Icons.Filled.Favorite, contentDescription = item)
-         }
-         Text(text = item)
-     }
-
- }
+// @Composable
+// fun CategoryItemView(item: String, navController: NavHostController, types: MutableState<String>){
+//     val sharePostViewModel = SharePostViewModel()
+//     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//         IconButton(onClick = {
+//             sharePostViewModel.search(item = null, category = item, reqType = "category", postType = types.value, currentIndex = 0, num = 20)
+//             navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/$item")
+//         // 검색페이지로 이동
+//         }) {
+//             Icon(Icons.Filled.Favorite, contentDescription = item)
+//         }
+//         Text(text = item)
+//     }
+//
+// }

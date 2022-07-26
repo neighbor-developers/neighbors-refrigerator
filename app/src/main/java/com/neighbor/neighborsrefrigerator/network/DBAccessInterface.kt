@@ -16,10 +16,22 @@ interface DBAccessInterface {
 
     @GET("/post/getPostOrderByTime")
     fun getPostOrderByTime(
+        @Query("reqType") reqType: Int,
+        @Query("postType") postType: Int,
+        @Query("currentIndex") currentIndex: Int,
+        @Query("num") num: Int,
+        @Query("categoryId") categoryId: Int?,
+        @Query("productName") productName: String?,
+        @Query("currentTime") currentTime: String
     ): retrofit2.Call<ReturnObjectForPost>
 
     @POST("/user/join")
     fun userJoin(
         @Body userData: UserData
+    ): retrofit2.Call<ReturnObjectForPost>
+
+    @GET("/user/checkNickname")
+    fun checkNickname(
+        @Query("nickname") nickname: String
     ): retrofit2.Call<ReturnObjectForPost>
 }

@@ -1,4 +1,4 @@
-package com.neighbor.neighborsrefrigerator.scenarios.main.compose
+package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -20,15 +20,16 @@ import coil.request.ImageRequest
 import java.util.*
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.ProductData
-import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
+import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import java.text.SimpleDateFormat
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController) {
+fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { navHostController.navigate(route = "${route.routeName}/${product.productData.id}") },
+        onClick= { navHostController.navigate(route = "${route.routeName}/$post") },
         modifier = Modifier
             .fillMaxWidth()
             .height(230.dp),
@@ -38,15 +39,18 @@ fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */, 
         Box(Modifier.fillMaxSize()) {
             Column() {
                 val modifier = Modifier.fillMaxHeight(0.6f)
-                ItemImage(productImg = product.productData.productImg, modifier = modifier)
-                ItemText(product = product.productData, product.distance)
+                post.productImg?.let {
+                    ItemImage(productImg = post.productImg, modifier = modifier)
+                }
+
+                ItemText(post = post)
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth(),
                 contentAlignment = Alignment.TopEnd)
             {
-                IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
+                IsTrustMark(isTrust = !post.validateImg.isNullOrEmpty())
             }
         }
     }
@@ -54,9 +58,9 @@ fun ItemCardByTime(product: ProductIncludeDistanceData/* onClick: ()-> Unit */, 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, navHostController: NavHostController) {
+fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { navHostController.navigate("${route.routeName}/${product.productData.id}") },
+        onClick= { navHostController.navigate("${route.routeName}/$post") },
         modifier = Modifier
             .padding(end = 20.dp)
             .fillMaxWidth(),
@@ -67,14 +71,16 @@ fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, na
             Row(verticalAlignment = Alignment.Bottom) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                     val modifier = Modifier.size(100.dp)
-                    ItemImage(productImg = product.productData.productImg, modifier = modifier)
+                    post.productImg?.let {
+                        ItemImage(productImg = post.productImg, modifier = modifier)
+                    }
 
                 }
                 Box(contentAlignment = Alignment.TopEnd) {
-                    IsTrustMark(isTrust = !product.productData.validateImg.isNullOrEmpty())
+                    IsTrustMark(isTrust = !post.validateImg.isNullOrEmpty())
                     Column(horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom, modifier = Modifier
                         .height(100.dp)) {
-                        ItemText(product = product.productData, distance = product.distance)
+                        ItemText(post = post)
                     }
                 }
             }
@@ -82,18 +88,24 @@ fun ItemCardByDistance(product: ProductIncludeDistanceData, route: NAV_ROUTE, na
     }
 }
 @Composable
-fun ItemText(product: ProductData, distance: Double){
-    val day = "${product.validateDate.year}년 ${product.validateDate.month}월 ${product.validateDate.day}일"
-    val valiType = when (product.validateType) {
+fun ItemText(post: PostData){
+
+    val formatter = SimpleDateFormat("yyyy-mm-dd hh:mm:ss")
+    val postTime = post.validateDate?.let { formatter.parse(it) }
+
+    val day = "${postTime?.year}년 ${postTime?.month}월 ${postTime?.day}일"
+    val validateType = when (post.validateType) {
         1 -> "유통기한"
         2 -> "제조일자"
         3 -> "구매일자"
         else -> { "" }
     }
     Column(Modifier.padding(10.dp)) {
-        Text(text = product.productName, fontSize = 15.sp, color = Color.Black, modifier = Modifier.padding(bottom = 10.dp))
-        Text(text = "$valiType : $day", fontSize = 10.sp, color = Color.Black)
-        Text(text = "내 위치에서 ${distance}km", fontSize = 10.sp, color = Color.Black)
+        Text(text = post.title, fontSize = 15.sp, color = Color.Black, modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = "$validateType : $day", fontSize = 10.sp, color = Color.Black)
+        post.distance?.let {
+            Text(text = "내 위치에서 ${post.distance}km", fontSize = 10.sp, color = Color.Black)
+        }
         Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.Black)
     }
 }
@@ -112,8 +124,6 @@ fun ItemImage(productImg:String, modifier: Modifier){
         )
     }
 }
-
-
 
 @Composable
 fun IsTrustMark(isTrust: Boolean) {

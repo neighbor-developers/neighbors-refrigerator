@@ -19,25 +19,72 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.neighbor.neighborsrefrigerator.data.ProductIncludeDistanceData
+import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
-import com.neighbor.neighborsrefrigerator.scenarios.main.compose.ItemCardByDistance
-import com.neighbor.neighborsrefrigerator.scenarios.main.compose.ItemCardByTime
-import com.neighbor.neighborsrefrigerator.viewmodels.SharePostViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 
 @Composable
 fun SharePostScreen(
-    sharePostViewModel: SharePostViewModel,
+    postViewModel: PostViewModel,
     route: NAV_ROUTE,
-    navHostController: NavHostController
+    navController: NavHostController
 ) {
     val state = rememberScrollState()
     LaunchedEffect(Unit) { state.animateScrollTo(0) }
     Column(
-        modifier = Modifier.verticalScroll(state).height(1000.dp)
+        modifier = Modifier
+            .verticalScroll(state)
+            .height(1000.dp)
     ) {
-        SearchBox(sharePostViewModel, "share")
-        SharePostListByDistance(productData = sharePostViewModel.products.collectAsState(), route, navHostController)
+        SearchBox(postViewModel, "share", navController)
+        SharePostListByDistance(posts = postViewModel.sharePostsByTime.collectAsState(), route, navController)
+
+        SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsState(), route, navController)
+    }
+
+}
+
+
+@Composable
+fun SharePostListByTime(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController) {
+
+    val scrollState = rememberLazyGridState()
+    LazyVerticalGrid(
+        state = scrollState,
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(40.dp),
+        horizontalArrangement = Arrangement.spacedBy(40.dp),
+        modifier = Modifier
+            .padding(top = 10.dp, start = 30.dp, end = 30.dp),
+        userScrollEnabled = true
+    ) {
+        posts.value?.let {
+            items(it) { item ->
+                ItemCardByTime(item, route, navHostController)
+            }
+        }
+    }
+}
+
+@Composable
+fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController){
+    if (!posts.value.isNullOrEmpty()){
+        Text(
+            text = "# 어쩌고님 위치에서 가까운 나눔",
+            modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
+            fontSize = 15.sp
+        )
+        Row (modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 10.dp))
+        {
+            posts.value?.let {
+                it.forEach {
+                    ItemCardByDistance(post = it, route, navHostController)
+                }
+            }
+        }
         androidx.compose.foundation.Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,59 +98,12 @@ fun SharePostScreen(
                 strokeWidth = 1F
             )
         }
-        SharePostListByTime(productData = sharePostViewModel.products.collectAsState(), route, navHostController, state)
-    }
-
-}
-
-
-@Composable
-fun SharePostListByTime(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController, state: ScrollState) {
-
-    val scrollState = rememberLazyGridState()
-
-    LazyVerticalGrid(
-        state = scrollState,
-        columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(40.dp),
-        horizontalArrangement = Arrangement.spacedBy(40.dp),
-        modifier = Modifier
-            .padding(top = 10.dp, start = 30.dp, end = 30.dp),
-        userScrollEnabled = true
-    ) {
-        productData.value?.let {
-            items(productData.value!!) { item ->
-                ItemCardByTime(item, route, navHostController)
-            }
-        }
-    }
-
-
-}
-
-@Composable
-fun SharePostListByDistance(productData: State<List<ProductIncludeDistanceData>?>, route: NAV_ROUTE, navHostController: NavHostController){
-    Text(
-        text = "# 어쩌고님 위치에서 가까운 나눔",
-        modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
-        fontSize = 15.sp
-    )
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .horizontalScroll(rememberScrollState())
-        .padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 10.dp))
-    {
-        productData.value?.let {
-            it.forEach {
-                ItemCardByDistance(product = it, route, navHostController)
-            }
-        }
     }
 }
 
 @Composable
-fun SearchBox(sharePostViewModel: SharePostViewModel, type: String) {
-    var content by remember { mutableStateOf("") }
+fun SearchBox(postViewModel: PostViewModel, type: String, navController: NavHostController) {
+    var item by remember { mutableStateOf("") }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -111,11 +111,24 @@ fun SearchBox(sharePostViewModel: SharePostViewModel, type: String) {
         contentAlignment = Alignment.CenterEnd
     ) {
         val cornerSize = CornerSize(20.dp)
-        OutlinedTextField(value = content, onValueChange = { content = it }, modifier = Modifier
+        OutlinedTextField(value = item, onValueChange = { item = it }, modifier = Modifier
             .fillMaxWidth()
             .size(45.dp), shape = MaterialTheme.shapes.large.copy(cornerSize))
 
-        IconButton(onClick = {sharePostViewModel.search(content, type)}) {
+        IconButton(
+            onClick = {
+                if(item.isNotEmpty() && item != " ") {
+                    postViewModel.search(
+                        item = item,
+                        category = null,
+                        reqType = "search",
+                        postType = type,
+                        currentIndex = 0,
+                        num = 20)
+                    { postViewModel.searchedPosts.value = it}
+                    navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/$item/$type")
+                }
+        }) {
             Icon(Icons.Filled.Search, contentDescription = null)
         }
     }

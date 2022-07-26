@@ -103,10 +103,8 @@ fun PostBox(){
                 Text(text = "어쩌구저쩌구", fontSize = 13.sp)
             }
         }
-
     }
 }
-
 
 @Composable
 fun RatingBar(){
