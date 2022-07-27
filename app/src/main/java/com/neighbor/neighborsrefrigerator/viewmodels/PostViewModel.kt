@@ -37,6 +37,7 @@ class PostViewModel : ViewModel() {
                 "justTime" -> 3
                 else -> 1
             },
+
             postType = when(postType){
                 "share" -> 1
                 "seek" -> 2

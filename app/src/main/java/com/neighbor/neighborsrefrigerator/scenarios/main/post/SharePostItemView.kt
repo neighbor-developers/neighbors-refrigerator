@@ -23,6 +23,8 @@ import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -90,10 +92,10 @@ fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavH
 @Composable
 fun ItemText(post: PostData){
 
-    val formatter = SimpleDateFormat("yyyy-mm-dd hh:mm:ss")
-    val postTime = post.validateDate?.let { formatter.parse(it) }
+    val postTime = post.validateDate
+    var token = postTime!!.split("T")[0].split("-")
 
-    val day = "${postTime?.year}년 ${postTime?.month}월 ${postTime?.day}일"
+    val day = "${token[0]}년 ${token[1]}월 ${token[2]}일"
     val validateType = when (post.validateType) {
         1 -> "유통기한"
         2 -> "제조일자"

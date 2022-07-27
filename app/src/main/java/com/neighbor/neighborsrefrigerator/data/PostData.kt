@@ -27,17 +27,17 @@ data class PostData(
     val review: String?,
     @SerializedName("validate_type")
     val validateType: Int,
-//    @SerializedName("validate_date")
+    @SerializedName("validate_date")
     val validateDate: String?,
     @SerializedName("validate_img")
     val validateImg: String?,
     @SerializedName("product_img")
     val productImg: String?,
-//    @SerializedName("created_at")
+    @SerializedName("created_at")
     val createdAt: String,
-//    @SerializedName("updated_at")
+    @SerializedName("updated_at")
     val updatedAt: String?,
-//    @SerializedName("completed_at")
+    @SerializedName("completed_at")
     val completedAt: String?,
     @SerializedName("latitude")
     val latitude : Double,
