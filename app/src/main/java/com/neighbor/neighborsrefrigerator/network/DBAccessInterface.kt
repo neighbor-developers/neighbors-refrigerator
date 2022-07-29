@@ -1,10 +1,7 @@
 package com.neighbor.neighborsrefrigerator.network
 
 import ReturnObjectForWrite
-import com.neighbor.neighborsrefrigerator.data.AddressDetail
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForNickname
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
-import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.data.*
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -36,4 +33,9 @@ interface DBAccessInterface {
     fun checkNickname(
         @Query("nickname") nickname: String
     ): retrofit2.Call<ReturnObjectForNickname>
+
+    @GET("/user/hasFbId")
+    fun hasFbId(
+        @Query("id") id: String
+    ): retrofit2.Call<ReturnObjectForHasFbId>
 }

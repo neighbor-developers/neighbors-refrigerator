@@ -19,6 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
@@ -27,7 +30,7 @@ import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 
 
 @Composable
-fun RegisterInfo(){
+fun RegisterInfo(navController: NavHostController){
     Scaffold() {
         Column(
             modifier = Modifier
@@ -40,7 +43,10 @@ fun RegisterInfo(){
 
             GetNickname(registerInfoViewModel)
             GetMainAddress(registerInfoViewModel)
-            TextButton( onClick = { registerInfoViewModel.registerPersonDB() })
+            TextButton( onClick = {
+                registerInfoViewModel.registerPersonDB()
+                navController.navigate(NAV_ROUTE.MAIN.routeName)
+            })
             {
                 Text(text = "확인")
             }

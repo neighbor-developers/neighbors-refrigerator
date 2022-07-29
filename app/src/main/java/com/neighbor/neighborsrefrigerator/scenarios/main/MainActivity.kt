@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -22,14 +23,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.serializableNavType
+import com.neighbor.neighborsrefrigerator.network.DBAccessModule
+import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
@@ -38,16 +45,36 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
+import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val dbAccessModule = DBAccessModule()
+    private val auth = FirebaseAuth.getInstance()
+    private val viewModel by viewModels<MainViewModel>()
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            Screen()
+        auth.currentUser?.let {
+           viewModel.checkUserAccount(it.uid)
+        }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.hasFbId.collect{ hasFbId ->
+                val route = if(hasFbId){
+                    NAV_ROUTE.MAIN.routeName
+                }else{
+                    NAV_ROUTE.REGISTER_INFO.routeName
+                }
+                setContent {
+                    Screen(startRoute = route)
+                }
+            }
         }
     }
 }
@@ -62,12 +89,13 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
     SETTING("SETTING", "설정화면"),
     TRADE_HISTORY("TRADE_HISTORY", "거래 내역"),
     REVIEW("REVIEW", "리뷰작성"),
-    SEARCH_POST("SEARCH_POST", "검색된 리스트화면")
+    SEARCH_POST("SEARCH_POST", "검색된 리스트화면"),
+    REGISTER_INFO("REGISTER_INFO", "계정등록")
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
+fun Screen(startRoute: String){
 
     // 네비게이션 컨트롤러
     val navController = rememberNavController()
@@ -78,6 +106,11 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
         composable(NAV_ROUTE.MAIN.routeName){
             MainScreen(navController)
         }
+
+        composable(NAV_ROUTE.REGISTER_INFO.routeName){
+            RegisterInfo(navController)
+        }
+
         composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{post}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
             SharePostDetail(navController, it.arguments?.getSerializable("post") as PostData)
         }

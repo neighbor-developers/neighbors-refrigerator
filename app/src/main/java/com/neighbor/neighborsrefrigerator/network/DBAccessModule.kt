@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.network
 
 import android.util.Log
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.ReturnObjectForHasFbId
 import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
 import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import retrofit2.Call
@@ -38,7 +39,7 @@ class DBAccessModule {
                     applyPostDatas(response.body()!!.result)
                 }
                 else{
-
+                    /*no-op*/
                 }
             }
 
@@ -48,4 +49,24 @@ class DBAccessModule {
 
         })
     }
+    fun hasFbId(id : String, applyResult: (Boolean) -> Unit){
+        dbAccessApi.hasFbId(id).enqueue(object :
+            Callback<ReturnObjectForHasFbId>{
+                override fun onResponse(
+                    call: Call<ReturnObjectForHasFbId>,
+                    response: Response<ReturnObjectForHasFbId>
+                ) {
+                    if(response.isSuccessful){
+                        applyResult(response.body()!!.hasfFb)
+                    }
+                }
+
+                override fun onFailure(call: Call<ReturnObjectForHasFbId>, t: Throwable) {
+                    Log.d("hasFb Failure",t.localizedMessage)
+                }
+            }
+        )
+
+    }
+
 }

@@ -22,6 +22,8 @@ import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_DATE_TIME
@@ -29,7 +31,7 @@ import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController) {
+fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController){
     Card(
         onClick= { navHostController.navigate(route = "${route.routeName}/$post") },
         modifier = Modifier
