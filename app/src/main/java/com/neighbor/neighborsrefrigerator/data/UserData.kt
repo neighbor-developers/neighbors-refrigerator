@@ -13,8 +13,10 @@ data class UserData(
     val email: String,
     @SerializedName("nickname")
     val nickname: String,
-    @SerializedName("home_addr")
-    val homeAddr: String,
+    @SerializedName("home_addr")    //  메인주소랑 상세주소 나누기
+    val addressMain: String,
+    @SerializedName("") //  이름 보준님과 상의 후 결정
+    val addressDetail: String,
     @SerializedName("report_point")
     val reportPoint: Int = 0,
     @SerializedName("latitude")

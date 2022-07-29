@@ -151,21 +151,3 @@ fun GetMainAddress(viewModel: RegisterInfoViewModel) {
         Text(text = "상세주소를 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
     }
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    Scaffold() {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(16.dp)
-        ) {
-            var viewModel = RegisterInfoViewModel()
-            GetNickname(viewModel)
-            GetMainAddress(viewModel = viewModel)
-
-        }
-    }
-}

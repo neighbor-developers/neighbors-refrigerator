@@ -17,7 +17,8 @@ class UserSharedPreference(context: Context) {
             fbID = prefs.getString("fbID", "")!!,
             email = prefs.getString("email", "")!!,
             nickname = prefs.getString("nickname", "")!!,
-            homeAddr = prefs.getString("homeAddr", "")!!,
+            addressMain = prefs.getString("addressMain", "")!!,
+            addressDetail = prefs.getString("addressDetail", "")!!,
             reportPoint = prefs.getString("reportPoint", "")!!.toInt(),
             latitude = prefs.getString("latitude", "")!!.toDouble(),
             longitude = prefs.getString("longitude", "")!!.toDouble(),
@@ -34,7 +35,8 @@ class UserSharedPreference(context: Context) {
         prefs.edit().putString("fbId", person.fbID)
         prefs.edit().putString("email", person.email)
         prefs.edit().putString("nickname", person.nickname)
-        prefs.edit().putString("homeAddr", person.homeAddr)
+        prefs.edit().putString("addressMain", person.addressMain)
+        prefs.edit().putString("addressDetail", person.addressDetail)
         prefs.edit().putString("reportPoint", person.reportPoint.toString())
         prefs.edit().putString("latitude", person.latitude.toString())
         prefs.edit().putString("longitude", person.longitude.toString())
