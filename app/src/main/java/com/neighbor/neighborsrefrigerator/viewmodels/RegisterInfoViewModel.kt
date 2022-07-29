@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.neighbor.neighborsrefrigerator.data.*
@@ -38,7 +39,7 @@ class RegisterInfoViewModel(): ViewModel() {
     var addressDetail by mutableStateOf("")
 
     val time = System.currentTimeMillis()
-    val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(time))
+    private val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(time))
 
     fun checkNickname(){
         // 0일때만 등록 ->
@@ -63,9 +64,9 @@ class RegisterInfoViewModel(): ViewModel() {
     // db 모듈 만들기
     fun registerPersonDB(){
 
-        var coordinateData: CoordinateData = UseGeocoder().addressToLatLng(addressMain + addressDetail)
+        val coordinateData: LatLng = UseGeocoder().addressToLatLng(addressMain + addressDetail)
         val auth: FirebaseAuth = FirebaseAuth.getInstance()
-        var uID:String = if(auth.uid!=null){
+        val uID:String = if(auth.uid!=null){
             auth.uid!!
         } else{ "" }
         val email: String? = if(auth.currentUser?.email !=null){

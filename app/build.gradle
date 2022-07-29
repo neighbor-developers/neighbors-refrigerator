@@ -49,6 +49,8 @@ android {
 
 dependencies {
 
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'com.google.android.libraries.maps:maps:3.1.0-beta'
     def nav_version = "2.5.0"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation 'androidx.core:core-ktx:1.7.0'
