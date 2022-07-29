@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -22,14 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.serializableNavType
+import com.neighbor.neighborsrefrigerator.network.DBAccessModule
+import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
@@ -38,12 +43,12 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
+import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val dbAccessModule = DBAccessModule()
     private val auth = FirebaseAuth.getInstance()
     private val viewModel by viewModels<MainViewModel>()
 
