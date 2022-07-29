@@ -21,7 +21,9 @@ import com.neighbor.neighborsrefrigerator.R
 fun LoginScreen(content: () -> Unit) {
     Surface(color = Color.White) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 15.dp, end = 15.dp),
             verticalArrangement = Arrangement.Center
 
         ) {
@@ -39,7 +41,9 @@ fun Greeting(text: String) {
 @Composable
 fun SignInGoogleButton(onClick: () -> Unit) {
     Surface(
-        modifier = Modifier.clickable(onClick = onClick).fillMaxWidth(),
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .fillMaxWidth(),
         // border = BorderStroke(width = 1.dp, color = Color.LightGray),
         color = MaterialTheme.colors.surface,
         shape = MaterialTheme.shapes.small,

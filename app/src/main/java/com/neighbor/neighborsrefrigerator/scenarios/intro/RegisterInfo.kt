@@ -1,9 +1,8 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import android.annotation.SuppressLint
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -20,9 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.neighbor.neighborsrefrigerator.scenarios.intro.SearchAddressDialog
+import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
+import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
-import com.neighbor.neighborsrefrigerator.viewmodels.ShowDialogViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 
 
 @Composable
@@ -35,25 +36,23 @@ fun RegisterInfo(){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            GetNickname()
-            GetAddress()
+            val registerInfoViewModel = RegisterInfoViewModel()
+
+            GetNickname(registerInfoViewModel)
+            GetMainAddress(registerInfoViewModel)
+            TextButton( onClick = { registerInfoViewModel.registerPersonDB() })
+            {
+                Text(text = "확인")
+            }
         }
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun GetNickname() {
+fun GetNickname(viewModel:RegisterInfoViewModel) {
+    val availableNickname = viewModel.availableNickname.collectAsState()
     // remember: 상태를 가지고 있음
-    var userNicknameInput by remember { mutableStateOf(TextFieldValue()) }
-    var availableNickname by remember { mutableStateOf(false) }
-    val passwordResource: (Boolean) -> Int = {
-        if (it) { // DB에서 Nickname 확인 후 존재한다면
-            R.drawable.ic_check_green
-        } else { //  DB에서 Nickname 확인 후 존재하지 않는다면
-            R.drawable.ic_check_red
-        }
-    }
-
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -62,17 +61,22 @@ fun GetNickname() {
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = userNicknameInput,
-            onValueChange = { newValue -> userNicknameInput = newValue },
+            value = viewModel.userNicknameInput,
+            onValueChange = { viewModel.userNicknameInput = it },
             label = { Text("닉네임") },
             placeholder = { Text("작성해 주세요") },
             singleLine = true,
             leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
             trailingIcon = {
                 // 참고: https://www.charlezz.com/?p=45513
-                IconButton(onClick = { /*입력한 valule값을 DB에서 Nickname 확인*/ }) {
+                IconButton(onClick = { viewModel.checkNickname() }) {
                     // Nickname 확인 후 존재하지 않는다면 등록 버튼 클릭 가능하게 하기
-                    Icon(painter = painterResource(id = passwordResource(availableNickname/*.value */)), contentDescription = null)
+                    if (availableNickname.value!!) { // DB에서 Nickname 확인 후 존재한다면
+                        Icon(painter = painterResource(id = R.drawable.ic_check_green), tint = Color.Green, contentDescription = null)
+                    }else { //  DB에서 Nickname 확인 후 존재하지 않는다면
+                        Icon(painter = painterResource(id = R.drawable.ic_check_red), tint = Color.Red, contentDescription = null)
+                    }
+                    // Icon(painter = painterResource(id = passwordResource(viewModel.availableNickname.value!!)), tint = Color.Red, contentDescription = null)
                 }
             },
             colors = TextFieldDefaults.textFieldColors(
@@ -85,11 +89,10 @@ fun GetNickname() {
 }
 
 @Composable
-fun GetAddress() {
-    var userAddressInput by remember { mutableStateOf(TextFieldValue()) }
+fun GetMainAddress(viewModel: RegisterInfoViewModel) {
     var dialogState by remember { mutableStateOf(false) }
-    val showDialogviewModel: ShowDialogViewModel by viewModel()
-    val showDialogState: Boolean by showDialogviewModel.showDialog.collectAsState()
+    var searchAddressDialogViewModel = SearchAddressDialogViewModel()
+
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -98,19 +101,23 @@ fun GetAddress() {
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = userAddressInput,
-            onValueChange = { newValue -> userAddressInput = newValue },
+            value = viewModel.addressMain,
+            onValueChange = { viewModel.addressMain = it },
             label = { Text("집 주소") },
-
             placeholder = { Text("작성해 주세요") },
             singleLine = true,
             leadingIcon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             trailingIcon = {
                 IconButton(onClick = { dialogState = true }) {
                     SearchAddressDialog(
-                        dialogState = showDialogState,
-                        onDismiss = showDialogviewModel::onmDialogDismiss,
-                        viewModel = RegisterInfoViewModel())
+                        dialogState = dialogState,
+                        onConfirm = {
+                            viewModel.addressMain = searchAddressDialogViewModel.userAddressInput
+                            dialogState = false
+                        },
+                        onDismiss = { dialogState = false },
+                        viewModel = searchAddressDialogViewModel
+                    )
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
                 }
@@ -121,12 +128,24 @@ fun GetAddress() {
             )
         )
         Text(text = "동까지 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = viewModel.addressDetail,
+            onValueChange = { viewModel.addressDetail = it },
+            label = { Text("상세 주소") },
+
+            placeholder = { Text("작성해 주세요") },
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(
+                // 기본 테마 색 지정
+                backgroundColor = Color.White
+            )
+        )
+        Text(text = "상세주소를 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
     }
 }
 
-@Composable
-fun SaveDataButton() {
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -137,8 +156,10 @@ fun DefaultPreview() {
                 .padding(it)
                 .padding(16.dp)
         ) {
-            GetNickname()
-            GetAddress()
+            var viewModel = RegisterInfoViewModel()
+            GetNickname(viewModel)
+            GetMainAddress(viewModel = viewModel)
+
         }
     }
 }
