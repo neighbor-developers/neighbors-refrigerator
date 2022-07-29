@@ -35,7 +35,7 @@ fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, na
     Card(
         onClick= {
             navHostController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = post)
-            navHostController.navigate(route = "${route.routeName}/post")
+            navHostController.navigate(route = route.routeName)
          },
         modifier = Modifier
             .fillMaxWidth()
