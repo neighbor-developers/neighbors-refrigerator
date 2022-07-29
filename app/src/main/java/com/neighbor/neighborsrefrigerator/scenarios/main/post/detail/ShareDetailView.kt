@@ -21,10 +21,10 @@ import java.text.SimpleDateFormat
 @Composable
 fun SharePostDetail(navHostController: NavHostController, post: PostData) {
 
-    val formatter = SimpleDateFormat("yyyy-mm-dd hh:mm:ss")
-    val postTime = formatter.parse(post.validateDate)
+    val postTime = post.validateDate
+    var token = postTime!!.split("T")[0].split("-")
 
-    val day = "${postTime?.year}년 ${postTime?.month}월 ${postTime?.day}일"
+    val day = "${token[0]}년 ${token[1]}월 ${token[2]}일"
     val validateType = when (post.validateType) {
         1 -> "유통기한"
         2 -> "제조일자"
