@@ -78,8 +78,9 @@ fun Screen(startRoute: String= NAV_ROUTE.MAIN.routeName){
         composable(NAV_ROUTE.MAIN.routeName){
             MainScreen(navController)
         }
-        composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{post}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
-            SharePostDetail(navController, it.arguments?.getSerializable("post") as PostData)
+        composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/post"){
+            val post = navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
+            SharePostDetail(navController, post!!)
         }
         composable("${NAV_ROUTE.SEEK_DETAIL.routeName}/{postID}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
             SeekPostDetail(navController, it.arguments?.getSerializable("post") as PostData)

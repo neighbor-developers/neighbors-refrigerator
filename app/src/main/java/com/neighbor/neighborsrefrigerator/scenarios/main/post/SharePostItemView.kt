@@ -31,7 +31,10 @@ import java.time.format.DateTimeFormatter.ISO_DATE_TIME
 @Composable
 fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { navHostController.navigate(route = "${route.routeName}/$post") },
+        onClick= {
+            navHostController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = post)
+            navHostController.navigate(route = "${route.routeName}/post")
+         },
         modifier = Modifier
             .fillMaxWidth()
             .height(230.dp),

@@ -1,9 +1,11 @@
 package com.neighbor.neighborsrefrigerator.data
 
+import android.os.Parcelable
 import java.io.Serializable
 import com.google.gson.annotations.SerializedName
-import java.util.*
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class PostData(
     @SerializedName("id")
     val id: Int,
@@ -46,4 +48,4 @@ data class PostData(
     @SerializedName("state")
     val state : String,
     val distance : Double?
-): Serializable
+): Serializable, Parcelable
