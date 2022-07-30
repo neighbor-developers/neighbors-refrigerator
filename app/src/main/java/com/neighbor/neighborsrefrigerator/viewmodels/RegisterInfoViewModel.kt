@@ -44,6 +44,10 @@ class RegisterInfoViewModel(): ViewModel() {
     fun checkNickname(){
         // 0일때만 등록 ->
         // 1일때는 거부 ->
+        if (userNicknameInput.isEmpty()){
+            availableNickname.value = false
+            return
+        }
         val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
 
         dbAccessApi.checkNickname(userNicknameInput).enqueue(object :

@@ -2,7 +2,6 @@ package com.neighbor.neighborsrefrigerator.view
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,15 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import com.neighbor.neighborsrefrigerator.scenarios.intro.GetMainAddress
-import com.neighbor.neighborsrefrigerator.scenarios.intro.GetNickname
-import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 
 @Composable
@@ -39,13 +34,13 @@ fun SearchAddressDialog(
             onDismissRequest = onDismiss,
             title = null,
             text = {
-                Column() {
+                Column(){
                     Text(
-                        "찾으시려는 동(읍/면/리)과 번지수or건물명을 정확하게 입력해 주세요.",
+                        "동(읍/면/리)과 번지수 또는 건물명을 정확하게 입력해 주세요.",
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
+                            .height(70.dp),
                         fontSize = 16.sp,
                         lineHeight = 17.sp
                     )
@@ -53,18 +48,20 @@ fun SearchAddressDialog(
                 }
             },
             buttons = {
-                    Box(modifier = Modifier.padding()) {
-                        Row(){
-                            TextButton( onClick = onConfirm )
-                            {
-                                Text(text = "확인")
-                            }
-                            TextButton(onClick = onDismiss)
-                            {
-                                Text(text = "Calcel")
-                            }
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement =  Arrangement.Center
+                ) {
+                    TextButton( onClick = onConfirm )
+                    {
+                        Text(text = "확인")
                     }
+                    TextButton(onClick = onDismiss)
+                    {
+                        Text(text = "Calcel")
+                    }
+                }
             },
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
             shape = RoundedCornerShape(9.dp),
@@ -87,8 +84,7 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
         )*/
         OutlinedTextField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
+                .fillMaxWidth(),
             value = viewModel.userAddressInput,
             onValueChange = { viewModel.userAddressInput = it },
             singleLine = true,
@@ -105,7 +101,11 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
                 backgroundColor = Color.White
             )
         )
-        AddressList(viewModel)
+        Box(
+            modifier = Modifier.height(150.dp)
+        ) {
+            AddressList(viewModel)
+        }
     }
 }
 
@@ -119,7 +119,7 @@ fun AddressList(viewModel: SearchAddressDialogViewModel){
         LazyColumn(userScrollEnabled = true) {
             itemsIndexed(
                 address
-            ) { index, item ->
+            ) { _, item ->
                 Log.d("실행", "있음")
                 Card(onClick = {
                     viewModel.userAddressInput = item
@@ -132,7 +132,7 @@ fun AddressList(viewModel: SearchAddressDialogViewModel){
 }
 
 
-/*
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
@@ -141,7 +141,7 @@ fun DefaultPreview() {
             modifier = Modifier
                 .padding(it)
         ) {
-            var dialogState by remember { mutableStateOf(false) }
+            var dialogState by remember { mutableStateOf(true) }
             var searchAddressDialogViewModel = SearchAddressDialogViewModel()
 
             SearchAddressDialog(
@@ -155,4 +155,4 @@ fun DefaultPreview() {
         }
     }
 }
-*/
+

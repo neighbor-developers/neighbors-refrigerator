@@ -20,15 +20,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun RegisterInfo(navController: NavHostController){
     Scaffold() {
@@ -40,13 +44,18 @@ fun RegisterInfo(navController: NavHostController){
             verticalArrangement = Arrangement.Center
         ) {
             val registerInfoViewModel = RegisterInfoViewModel()
+            var enabled by remember { mutableStateOf(false) }
 
             GetNickname(registerInfoViewModel)
             GetMainAddress(registerInfoViewModel)
+            /*if(registerInfoViewModel.availableNickname.collectAsState().value == true
+            ){
+                enabled = true
+            }*/
             TextButton( onClick = {
                 registerInfoViewModel.registerPersonDB()
-                navController.navigate(NAV_ROUTE.MAIN.routeName)
-            })
+                navController.navigate(NAV_ROUTE.MAIN.routeName)},
+                enabled = enabled)
             {
                 Text(text = "확인")
             }
@@ -65,31 +74,36 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = viewModel.userNicknameInput,
-            onValueChange = { viewModel.userNicknameInput = it },
-            label = { Text("닉네임") },
-            placeholder = { Text("작성해 주세요") },
-            singleLine = true,
-            leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            trailingIcon = {
-                // 참고: https://www.charlezz.com/?p=45513
-                IconButton(onClick = { viewModel.checkNickname() }) {
-                    // Nickname 확인 후 존재하지 않는다면 등록 버튼 클릭 가능하게 하기
+        Row(){
+            OutlinedTextField(
+                value = viewModel.userNicknameInput,
+                onValueChange = { viewModel.userNicknameInput = it },
+                label = { Text("닉네임") },
+                placeholder = { Text("작성해 주세요") },
+                singleLine = true,
+                leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
+                trailingIcon = {
+                    // 아이콘 두 개 만들지 말고 하나로 색 변경하게 수정하기
                     if (availableNickname.value!!) { // DB에서 Nickname 확인 후 존재한다면
                         Icon(painter = painterResource(id = R.drawable.ic_check_green), tint = Color.Green, contentDescription = null)
                     }else { //  DB에서 Nickname 확인 후 존재하지 않는다면
                         Icon(painter = painterResource(id = R.drawable.ic_check_red), tint = Color.Red, contentDescription = null)
                     }
-                    // Icon(painter = painterResource(id = passwordResource(viewModel.availableNickname.value!!)), tint = Color.Red, contentDescription = null)
-                }
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                // 기본 테마 색 지정
-                backgroundColor = Color.White
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    // 기본 테마 색 지정
+                    backgroundColor = Color.White
+                )
             )
-        )
+            OutlinedButton(
+                modifier = Modifier.padding(5.dp)
+                    .wrapContentWidth(),
+                onClick = { viewModel.checkNickname() }) {
+                Text(text = "Check")
+            }
+
+        }
+        
         Text(text = "닉네임은 중복될 수 없습니다", color = Color.Gray, textAlign = TextAlign.Right)
     }
 }
@@ -151,3 +165,18 @@ fun GetMainAddress(viewModel: RegisterInfoViewModel) {
         Text(text = "상세주소를 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    Scaffold() {
+        Column(
+            modifier = Modifier
+                .padding(it)
+        ) {
+            RegisterInfo(rememberNavController())
+        }
+    }
+}
+

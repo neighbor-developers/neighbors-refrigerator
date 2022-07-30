@@ -5,6 +5,7 @@ import android.location.Geocoder
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 
+
 class UseGeocoder() {
     private var geocoder: Geocoder = Geocoder(App.context())
     lateinit var list:List<Address>
