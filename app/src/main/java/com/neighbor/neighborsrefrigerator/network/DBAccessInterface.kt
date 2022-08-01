@@ -24,6 +24,11 @@ interface DBAccessInterface {
         @Query("currentTime") currentTime: String
     ): retrofit2.Call<ReturnObjectForPost>
 
+    @POST("/post/create")
+    fun entryPost(
+        @Body postData: PostData
+    ): retrofit2.Call<ReturnObjectForWrite>
+
     @POST("/user/join")
     fun userJoin(
         @Body userData: UserData
