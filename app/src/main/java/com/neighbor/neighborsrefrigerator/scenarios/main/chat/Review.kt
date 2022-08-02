@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -12,21 +11,29 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun ReviewScreen(navController: NavHostController){
+fun ReviewScreen(postData: PostData, navController: NavHostController){
     var review by remember {
         mutableStateOf("")
+    }
+    val rating = remember{
+        mutableStateOf(0)
     }
     var dialogState by remember {
         mutableStateOf(false)
@@ -59,7 +66,7 @@ fun ReviewScreen(navController: NavHostController){
             }
 
             Column(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
-                PostBox()
+                PostBox(postData)
 
                 Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(bottom = 20.dp)) {
                     Text(text = "진키키", fontSize = 18.sp, color = Color.Blue)
@@ -69,7 +76,7 @@ fun ReviewScreen(navController: NavHostController){
                 Text(text = "후기를 남겨주세요!", style = MaterialTheme.typography.h2, fontSize = 13.sp)
                 Spacer(modifier = Modifier.height(30.dp))
 
-                RatingBar()
+                RatingBar(rating)
                 OutlinedTextField(
                     value = review,
                     onValueChange = {review = it},
@@ -80,7 +87,9 @@ fun ReviewScreen(navController: NavHostController){
                 )
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Button(
-                        onClick = { navController.navigate(NAV_ROUTE.MAIN.routeName) }
+                        onClick = {
+                            //chatViewModel.postReview(postData.id!!, rating.value, review)
+                            navController.navigate(NAV_ROUTE.MAIN.routeName) }
                     ) {
                         Text(text = "작성 완료")
                     }
@@ -92,25 +101,32 @@ fun ReviewScreen(navController: NavHostController){
 }
 
 @Composable
-fun PostBox(){
+fun PostBox(postData: PostData){
     Card(elevation = 5.dp, modifier = Modifier
         .padding(top = 35.dp, bottom = 35.dp)) {
         Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth().padding(7.dp)
         ) {
-            Image(painter = painterResource(id = R.drawable.icon_google), contentDescription = "상품 사진", modifier = Modifier.size(50.dp))
+            postData.productImg?.let { imgUrl ->
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imgUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.icon_google),
+                )
+            }
             Column(horizontalAlignment = Alignment.Start, modifier = Modifier.height(50.dp).padding(start = 5.dp)) {
-                Text(text = "감자", fontSize = 17.sp)
-                Text(text = "어쩌구저쩌구", fontSize = 13.sp)
+                Text(text = postData.title, fontSize = 17.sp)
+                Text(text = postData.content, fontSize = 13.sp)
             }
         }
     }
 }
 
 @Composable
-fun RatingBar(){
-    var ratingState by remember{
-        mutableStateOf(5)
-    }
+fun RatingBar(ratingState: MutableState<Int>){
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(50.dp)) {
@@ -121,9 +137,9 @@ fun RatingBar(){
                 modifier = Modifier
                     .size(50.dp)
                     .clickable {
-                        ratingState = i
+                        ratingState.value = i
                     },
-                tint = if(i <= ratingState) Color.Red else Color.LightGray
+                tint = if(i <= ratingState.value) Color.Red else Color.LightGray
             )
         }
     }
@@ -132,5 +148,5 @@ fun RatingBar(){
 @Composable
 @Preview
 fun ReviewPreview(){
-    ReviewScreen(navController = rememberNavController())
+    //ReviewScreen(navController = rememberNavController())
 }

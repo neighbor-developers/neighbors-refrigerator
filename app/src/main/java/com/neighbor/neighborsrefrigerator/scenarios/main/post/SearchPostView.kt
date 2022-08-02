@@ -17,8 +17,14 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 
 @Composable
-fun SearchPostView(item: String, type: String, navController: NavHostController) {
+fun SearchPostView(
+    item: String,
+    type: String,
+    navController: NavHostController
+) {
     val viewModel = PostViewModel()
+    Get(viewModel, item, type)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -47,4 +53,16 @@ fun SearchPostView(item: String, type: String, navController: NavHostController)
             }
         }
     }
+}
+
+@Composable
+fun Get(viewModel: PostViewModel, item: String, type: String){
+    viewModel.getPosts(
+        item = item,
+        category = null,
+        reqType = "search",
+        postType = type,
+        currentIndex = 0,
+        num = 20)
+    { viewModel.searchedPosts.value = it}
 }

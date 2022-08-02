@@ -1,22 +1,18 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
 import ReturnObjectForWrite
-import android.app.Application
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.neighbor.neighborsrefrigerator.data.*
+import com.neighbor.neighborsrefrigerator.data.ReturnObjectForNickname
+import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessInterface
 import com.neighbor.neighborsrefrigerator.network.DBApiClient
-import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +28,7 @@ import java.util.*
 // address의 경우 dialog에서 선택한 address를 클릭 시 textfield의 address에 자동으로 넣기
 // dialog에서 address 검색 구성하기
 
-class RegisterInfoViewModel(): ViewModel() {
+class RegisterInfoViewModel: ViewModel() {
     var userNicknameInput by mutableStateOf("")
     val availableNickname = MutableStateFlow<Boolean?>(false)
     var addressMain by mutableStateOf("")

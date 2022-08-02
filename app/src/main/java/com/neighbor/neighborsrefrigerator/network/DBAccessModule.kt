@@ -3,10 +3,7 @@ package com.neighbor.neighborsrefrigerator.network
 import ReturnObjectForWrite
 import android.util.Log
 import android.widget.Toast
-import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForHasFbId
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
-import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,7 +23,7 @@ class DBAccessModule {
                     applyPostDatas(response.body()!!.result)
                 }
                 else{
-
+                    /*no-op*/
                 }
             }
 
@@ -57,6 +54,11 @@ class DBAccessModule {
             }
         })
     }
+    // 리뷰 작성 (포스트 데이터 데이터 베이스 rate, review 입력)
+    fun postReview(postId: Int, rate: Int, review: String){
+
+
+    }
 
     //포스트 데이터 데이터베이스에 입력
     fun entryPost(postData: PostData){
@@ -85,7 +87,9 @@ class DBAccessModule {
             Callback<ReturnObjectForPost> {
             override fun onResponse(call: Call<ReturnObjectForPost>, response: Response<ReturnObjectForPost>) {
                 if(response.isSuccessful){
-                    applyPostDatas(response.body()!!.result)
+                    response.body()?.let {
+                        applyPostDatas(it.result)
+                    }
                 }
                 else{
                     /*no-op*/
@@ -117,6 +121,9 @@ class DBAccessModule {
                 }
             }
         )
+
     }
+
+
 
 }

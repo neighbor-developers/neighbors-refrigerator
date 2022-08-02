@@ -67,7 +67,10 @@ fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, na
 @Composable
 fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavHostController) {
     Card(
-        onClick= { navHostController.navigate("${route.routeName}/$post") },
+        onClick= {
+            navHostController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = post)
+            navHostController.navigate(route = route.routeName) },
+
         modifier = Modifier
             .padding(end = 20.dp)
             .fillMaxWidth(),

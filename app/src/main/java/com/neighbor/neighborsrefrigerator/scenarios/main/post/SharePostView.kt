@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,11 +38,10 @@ fun SharePostScreen(
             .height(1000.dp)
     ) {
         SearchBox(postViewModel, "share", navController)
-        SharePostListByDistance(posts = postViewModel.sharePostsByTime.collectAsState(), route, navController)
-
+        SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
+        CategoryView(postViewModel)
         SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsState(), route, navController)
     }
-
 }
 
 
@@ -88,7 +88,7 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
         androidx.compose.foundation.Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 30.dp, end = 30.dp, top = 20.dp, bottom = 20.dp)
+                .padding(start = 30.dp, end = 30.dp, top = 20.dp)
         ) {
             val canvasHeight = size.height
             drawLine(
@@ -97,6 +97,44 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
                 color = Color.DarkGray,
                 strokeWidth = 1F
             )
+        }
+    }
+}
+
+@Composable
+fun CategoryView(postViewModel: PostViewModel){
+    val categoryList = mapOf(null to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
+    ) {
+        categoryList.forEach { it ->
+            TextButton(
+                border = BorderStroke(1.dp, Color.Green),
+                modifier = Modifier.size(50.dp),
+                onClick = {
+                    if(it.value == "전체"){
+                        postViewModel.getPosts(null, null, "justTime", "share", 0, 12){ postViewModel.sharePostsByTime.value = it }
+                    }else {
+                        postViewModel.getPosts(
+                            item = null,
+                            category = it.key,
+                            reqType = "category",
+                            postType = "share",
+                            currentIndex = 0,
+                            num = 20
+                        )
+                        { postViewModel.sharePostsByTime.value = it }
+
+                    }
+                }
+            ){
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.Favorite, contentDescription = it.value, modifier = Modifier.size(20.dp))
+                    Text(text = it.value, fontSize = 8.sp)
+                }
+            }
         }
     }
 }
@@ -118,14 +156,6 @@ fun SearchBox(postViewModel: PostViewModel, type: String, navController: NavHost
         IconButton(
             onClick = {
                 if(item.isNotEmpty() && item != " ") {
-                    postViewModel.search(
-                        item = item,
-                        category = null,
-                        reqType = "search",
-                        postType = type,
-                        currentIndex = 0,
-                        num = 20)
-                    { postViewModel.searchedPosts.value = it}
                     navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/$item/$type")
                 }
         }) {
