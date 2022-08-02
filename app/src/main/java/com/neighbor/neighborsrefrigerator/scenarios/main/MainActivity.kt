@@ -7,18 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
@@ -32,17 +26,18 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.serializableNavType
-import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
+import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetail
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
@@ -74,6 +69,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 enum class NAV_ROUTE(val routeName:String, val description:String){
     MAIN("MAIN","나눔/구함 리스트 화면"),
     SHARE_DETAIL("SHARE_DETAIL", "나눔 상세페이지"),
@@ -107,15 +103,17 @@ fun Screen(startRoute: String){
             RegisterInfo(navController)
         }
 
-        composable("${NAV_ROUTE.SHARE_DETAIL.routeName}/{post}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
-            SharePostDetail(navController, it.arguments?.getSerializable("post") as PostData)}
-
         composable(NAV_ROUTE.SHARE_DETAIL.routeName){
-            val post = remember { navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post") }
+            val post = remember {
+                navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
+            }
             SharePostDetail(navController, post!!)
         }
-        composable("${NAV_ROUTE.SEEK_DETAIL.routeName}/{postID}", arguments = listOf(navArgument("post"){type = serializableNavType<PostData>() })){
-            SeekPostDetail(navController, it.arguments?.getSerializable("post") as PostData)
+        composable(NAV_ROUTE.SEEK_DETAIL.routeName){
+            val post = remember {
+                navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
+            }
+            SeekPostDetail(navController, post!!)
         }
         composable(NAV_ROUTE.SHARE_REGISTER.routeName){
             SharePostRegisterScreen(navController)
@@ -124,11 +122,10 @@ fun Screen(startRoute: String){
 
         }
         composable(NAV_ROUTE.CHAT.routeName){
-
+            ChatScreen(navController)
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
-            //ChatListScreen(navController)
-            ReviewScreen(navController)
+            ChatListScreen(navController)
         }
         composable(NAV_ROUTE.SETTING.routeName){
             Setting()
@@ -137,39 +134,27 @@ fun Screen(startRoute: String){
 
         }
         composable(NAV_ROUTE.REVIEW.routeName){
-            ReviewScreen(navController)
+            val post = remember {
+                navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
+            }
+            ReviewScreen(post!!, navController)
         }
         composable("${NAV_ROUTE.SEARCH_POST.routeName}/{item}/{type}", arguments = listOf(navArgument("item"){type = NavType.StringType}, navArgument("type"){type = NavType.StringType})){
-            SearchPostView(item = it.arguments?.getString("item")?:"", type = it.arguments?.getString("type")?:"share", navController = navController)
+            SearchPostView(item = it.arguments?.getString("item")?:"", type = it.arguments?.getString("type")?:"share", navController = navController,)
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
 
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val scaffoldState = rememberScaffoldState()
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
     val types = remember { mutableStateOf("share") }
 
     val scope = rememberCoroutineScope()
 
-    BottomSheetScaffold(
-        sheetBackgroundColor = Color.LightGray,
-        sheetContentColor = Color.Black,
-        sheetShape = MaterialTheme.shapes.small.copy(topStart = CornerSize(40.dp), topEnd = CornerSize(40.dp)),
-        sheetContent = {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(30.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Category")
-            }
-             CategoryView(navController, types)
-        },
+    Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
@@ -213,7 +198,6 @@ fun MainScreen(navController: NavHostController) {
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-        sheetPeekHeight = 35.dp,
         drawerContent = {
             Drawer(navController)
         },
@@ -266,55 +250,3 @@ fun MainScreen(navController: NavHostController) {
         }
     }
 }
-
- @Composable
- fun CategoryView(navController: NavHostController, types: MutableState<String>){
-     val viewModel = PostViewModel()
-
-     val categoryList = mapOf(100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.padding(20.dp)
-    ) {
-        items(categoryList.keys.toList()){ categorysKey ->
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                IconButton(onClick = {
-                    // 카테고리 코드로 검색
-                    viewModel.search(
-                        item = null,
-                        category = categorysKey,
-                        reqType = "category",
-                        postType = types.value,
-                        currentIndex = 0,
-                        num = 20)
-                    { viewModel.sharePostsByTime.value = it }
-
-                    // 검색페이지로 이동
-                    navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/${categoryList.getValue(categorysKey)}")
-                }) {
-                    Icon(Icons.Filled.Favorite, contentDescription = categoryList.getValue(categorysKey))
-                }
-                Text(text = categoryList.getValue(categorysKey))
-            }
-        }
-    }
- }
-// @Composable
-// fun CategoryItemView(item: String, navController: NavHostController, types: MutableState<String>){
-//     val sharePostViewModel = SharePostViewModel()
-//     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//         IconButton(onClick = {
-//             sharePostViewModel.search(item = null, category = item, reqType = "category", postType = types.value, currentIndex = 0, num = 20)
-//             navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/$item")
-//         // 검색페이지로 이동
-//         }) {
-//             Icon(Icons.Filled.Favorite, contentDescription = item)
-//         }
-//         Text(text = item)
-//     }
-//
-// }

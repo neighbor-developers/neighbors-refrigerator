@@ -15,9 +15,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.data.ChatData
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun ChatScreen(navController : NavHostController, chatData: ChatData){
+fun ChatScreen(navController : NavHostController){
+
     var declarationDialogState by remember {
         mutableStateOf(false)
     }
@@ -25,7 +27,7 @@ fun ChatScreen(navController : NavHostController, chatData: ChatData){
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = chatData.id.toString(), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 17.sp) },
+                title = { Text(text = "", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 17.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")

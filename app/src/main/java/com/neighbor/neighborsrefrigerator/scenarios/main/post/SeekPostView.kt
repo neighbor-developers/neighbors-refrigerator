@@ -43,7 +43,7 @@ fun SeekPostList(posts : State<List<PostData>?>,
         .padding(start = 30.dp, end = 30.dp)) {
         posts.value?.let {
             it.forEach {
-                SeekItem(postData = it, distance = 3.4, route = route, navHostController = navHostController)
+                SeekItem(post = it, route = route, navHostController = navHostController)
             }
         }
     }
@@ -51,18 +51,21 @@ fun SeekPostList(posts : State<List<PostData>?>,
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SeekItem(postData: PostData, distance : Double,
+fun SeekItem(post: PostData,
              route: NAV_ROUTE,
              navHostController: NavHostController){
     Card(
-        onClick = {navHostController.navigate(route = "${route.routeName}/${postData.title}")},
+        onClick = {
+            navHostController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = post)
+            navHostController.navigate(route = route.routeName)
+        },
         modifier = Modifier
             .padding(top = 10.dp, bottom = 10.dp)
             .fillMaxWidth(), elevation = 0.dp) {
         Column() {
-        Text(text = postData.title, fontSize = 15.sp, modifier = Modifier.padding(bottom = 7.dp))
-        Text(text = postData.content!!, fontSize = 12.sp, color = Color.DarkGray, maxLines = 1,modifier = Modifier.padding(bottom = 10.dp))
-        Text(text = "내 위치에서 ${distance}km", fontSize = 10.sp, color = Color.DarkGray)
+        Text(text = post.title, fontSize = 15.sp, modifier = Modifier.padding(bottom = 7.dp))
+        Text(text = post.content, fontSize = 12.sp, color = Color.DarkGray, maxLines = 1,modifier = Modifier.padding(bottom = 10.dp))
+        Text(text = "내 위치에서 ${post.distance}km", fontSize = 10.sp, color = Color.DarkGray)
         Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.DarkGray)
         }
     }

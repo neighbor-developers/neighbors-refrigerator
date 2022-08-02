@@ -1,17 +1,11 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.icu.text.StringSearch
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.sql.Time
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class PostViewModel : ViewModel() {
 
@@ -28,7 +22,7 @@ class PostViewModel : ViewModel() {
         dbAccessModule.getPostOrderByTime(3, 2, 0, 12, null, null, timeStamp) { seekPostsByTime.value = it }
     }
 
-    fun search(item: String?, category:Int?, reqType: String, postType: String, currentIndex: Int, num: Int, applyPostData : (ArrayList<PostData>) -> Unit){
+    fun getPosts(item: String?, category:Int?, reqType: String, postType: String, currentIndex: Int, num: Int, applyPostData : (ArrayList<PostData>) -> Unit){
 
         dbAccessModule.getPostOrderByTime(
             reqType = when(reqType){

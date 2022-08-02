@@ -23,7 +23,7 @@ class DBAccessModule {
                     applyPostDatas(response.body()!!.result)
                 }
                 else{
-                    /*no - op*/
+                    /*no-op*/
                 }
             }
 
@@ -82,7 +82,9 @@ class DBAccessModule {
             Callback<ReturnObjectForPost> {
             override fun onResponse(call: Call<ReturnObjectForPost>, response: Response<ReturnObjectForPost>) {
                 if(response.isSuccessful){
-                    applyPostDatas(response.body()!!.result)
+                    response.body()?.let {
+                        applyPostDatas(it.result)
+                    }
                 }
                 else{
                     /*no-op*/

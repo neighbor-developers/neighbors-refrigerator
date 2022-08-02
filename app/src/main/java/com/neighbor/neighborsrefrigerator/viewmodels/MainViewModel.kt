@@ -10,7 +10,7 @@ class MainViewModel: ViewModel() {
 
     private val dbAccessModule = DBAccessModule()
 
-    val hasFbId = MutableStateFlow(false)
+    val hasFbId = MutableStateFlow(true)
 
     fun checkUserAccount(fbId : String){
         dbAccessModule.hasFbId(fbId){ hasFbId.value = it}

@@ -8,12 +8,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.ChatData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
@@ -30,11 +30,13 @@ data class ChatCard(val nickname : String, val msg: String, val type: String)
 
 @Composable
 fun ChatListScreen(navController: NavHostController){
-    val viewModel = ChatViewModel()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "채팅목록", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(end = 50.dp), fontSize = 17.sp) },
+                title = { Text(text = "채팅목록", textAlign = TextAlign.Center, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 50.dp), fontSize = 17.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }, modifier = Modifier.size(50.dp) ) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")}
@@ -46,26 +48,27 @@ fun ChatListScreen(navController: NavHostController){
         }
     ) {
         Surface(modifier = Modifier.padding(it)) {
-            val route = NAV_ROUTE.CHAT
-//            ChatList(chatList = )
+            //ChatList(chatList = viewModel.chatList.collectAsState(), navController, viewModel)
         }
 
     }
 }
 
 @Composable
-fun ChatList(chatList: List<ChatCard>, navController: NavController, route: NAV_ROUTE){
-    LazyColumn{
-        items(chatList){ chat ->
-            ChatCard(chat = chat, navController, route)
-        }
-    }
+fun ChatList(chatList: ArrayList<ChatData>?, navController: NavController) {
+    LazyColumn {
+//        items(chatList.value){ chat ->
+//            // 채팅 데이터 불러오기 (마지막 채팅, 닉네임)
+//            ChatCard(chat = chat, navController, viewModel)
+//    }
+}
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatCard(chat: ChatCard, navController: NavController, route: NAV_ROUTE){
-    Card(onClick = {navController.navigate(route = route.routeName)}) {
+fun ChatCard(chat: ChatCard, navController: NavController, viewModel: ChatViewModel){
+    navController.currentBackStackEntry?.savedStateHandle?.set(key = "chatViewModel", value = viewModel)
+    Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {
         Row() {
             Image(
                 painter = painterResource(id = R.drawable.sprout2),
