@@ -5,7 +5,7 @@ import java.util.*
 
 data class ChatData(
     @SerializedName("id")
-    val id: String,
+    val id: Int?,
     @SerializedName("post_id")
     val postId: Int,
     @SerializedName("user_id")

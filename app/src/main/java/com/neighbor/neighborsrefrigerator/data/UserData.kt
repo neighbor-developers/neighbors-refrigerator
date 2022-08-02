@@ -6,7 +6,7 @@ import java.util.*
 
 data class UserData(
     @SerializedName("id")
-    val id: Int,
+    val id: Int?,
     @SerializedName("fb_id")
     val fbID: String,
     @SerializedName("email")
@@ -15,7 +15,7 @@ data class UserData(
     val nickname: String,
     @SerializedName("home_addr")    //  메인주소랑 상세주소 나누기
     val addressMain: String,
-    @SerializedName("") //  이름 보준님과 상의 후 결정
+    @SerializedName("addr_detail") //  이름 보준님과 상의 후 결정
     val addressDetail: String,
     @SerializedName("report_point")
     val reportPoint: Int = 0,

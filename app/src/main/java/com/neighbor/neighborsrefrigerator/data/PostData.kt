@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class PostData(
     @SerializedName("id")
-    val id: Int,
+    val id: Int?,
     @SerializedName("title")
     val title: String,
     @SerializedName("category_id")
