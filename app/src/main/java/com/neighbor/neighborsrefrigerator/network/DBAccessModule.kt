@@ -3,10 +3,7 @@ package com.neighbor.neighborsrefrigerator.network
 import ReturnObjectForWrite
 import android.util.Log
 import android.widget.Toast
-import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForHasFbId
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
-import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,7 +23,7 @@ class DBAccessModule {
                     applyPostDatas(response.body()!!.result)
                 }
                 else{
-
+                    /*no - op*/
                 }
             }
 
@@ -93,6 +90,46 @@ class DBAccessModule {
             }
 
             override fun onFailure(call: Call<ReturnObjectForPost>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+
+        })
+    }
+
+    //review 등록하기
+    fun reviewPost(id : Int, review: String, rate:Int){
+        val reviewData = ReviewData(id,review,rate)
+        dbAccessApi.reviewPost(reviewData).enqueue(object : Callback<ReturnObjectForWrite>{
+            override fun onResponse(
+                call: Call<ReturnObjectForWrite>,
+                response: Response<ReturnObjectForWrite>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("test",response.body()!!.msg)
+                }
+
+            }
+
+            override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
+    }
+
+    //id로 UserData 불러오기
+    fun getUserInfoById(id: Int, applyUserDatas: (ArrayList<UserData> /* = java.util.ArrayList<com.neighbor.neighborsrefrigerator.data.PostData> */) -> Unit){
+        dbAccessApi.getUserInfoById(id).enqueue(object :
+            Callback<ReturnObjectForUser> {
+            override fun onResponse(call: Call<ReturnObjectForUser>, response: Response<ReturnObjectForUser>) {
+                if(response.isSuccessful){
+                    applyUserDatas(response.body()!!.result)
+                }
+                else{
+                    /*no-op*/
+                }
+            }
+
+            override fun onFailure(call: Call<ReturnObjectForUser>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
 

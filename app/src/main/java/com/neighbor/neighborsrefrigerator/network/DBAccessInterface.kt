@@ -29,6 +29,16 @@ interface DBAccessInterface {
         @Body postData: PostData
     ): retrofit2.Call<ReturnObjectForWrite>
 
+    @POST("/post/review")
+    fun reviewPost(
+        @Body reviewData: ReviewData
+    ): retrofit2.Call<ReturnObjectForWrite>
+
+    @GET("/user/getInfoById")
+    fun getUserInfoById(
+        @Query("id") id : Int
+    ) : retrofit2.Call<ReturnObjectForUser>
+
     @POST("/user/join")
     fun userJoin(
         @Body userData: UserData
