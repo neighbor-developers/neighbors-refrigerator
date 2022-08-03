@@ -29,6 +29,7 @@ import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
 fun ReviewScreen(postData: PostData, navController: NavHostController){
+    val chatViewModel = ChatViewModel()
     var review by remember {
         mutableStateOf("")
     }
@@ -88,7 +89,7 @@ fun ReviewScreen(postData: PostData, navController: NavHostController){
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Button(
                         onClick = {
-                            //chatViewModel.postReview(postData.id!!, rating.value, review)
+                            chatViewModel.reviewPost(postData.id!!, review, rating.value)
                             navController.navigate(NAV_ROUTE.MAIN.routeName) }
                     ) {
                         Text(text = "작성 완료")
