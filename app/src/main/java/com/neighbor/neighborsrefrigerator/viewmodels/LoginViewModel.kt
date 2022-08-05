@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -39,4 +42,8 @@ class LoginViewModel : ViewModel() {
             _loginResult.emit(isLogin)
         }
     }
+
+    /*fun signOut() = viewModelScope.launch {
+        Firebase.auth.signOut()
+    }*/
 }
