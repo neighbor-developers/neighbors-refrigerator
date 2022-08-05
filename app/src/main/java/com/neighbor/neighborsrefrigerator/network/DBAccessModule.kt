@@ -80,8 +80,8 @@ class DBAccessModule {
     }
 
     //시간순으로 포스트 데이터 불러오기
-    fun getPostOrderByTime(reqType :Int, postType: Int, currentIndex: Int, num: Int, categoryId: Int?, productName: String?, currentTime: String, applyPostDatas: (ArrayList<PostData>) -> Unit) {
-        dbAccessApi.getPostOrderByTime(reqType, postType, currentIndex, num, categoryId, productName, currentTime).enqueue(object :
+    fun getPostOrderByTime(reqType :Int, postType: Int, currentIndex: Int, num: Int, categoryId: Int?, title: String?, currentTime: String, applyPostDatas: (ArrayList<PostData>) -> Unit) {
+        dbAccessApi.getPostOrderByTime(reqType, postType, currentIndex, num, categoryId, title, currentTime).enqueue(object :
             Callback<ReturnObject<ArrayList<PostData>>> {
             override fun onResponse(call: Call<ReturnObject<ArrayList<PostData>>>, response: Response<ReturnObject<ArrayList<PostData>>>) {
                 if(response.isSuccessful){

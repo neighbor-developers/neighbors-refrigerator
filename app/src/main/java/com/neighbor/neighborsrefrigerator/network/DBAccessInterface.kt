@@ -20,7 +20,7 @@ interface DBAccessInterface {
         @Query("currentIndex") currentIndex: Int,
         @Query("num") num: Int,
         @Query("categoryId") categoryId: Int?,
-        @Query("productName") productName: String?,
+        @Query("title") title: String?,
         @Query("currentTime") currentTime: String
     ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
 

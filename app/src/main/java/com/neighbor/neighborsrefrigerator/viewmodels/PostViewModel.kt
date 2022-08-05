@@ -40,7 +40,7 @@ class PostViewModel : ViewModel() {
             currentIndex = currentIndex,
             num = num,
             categoryId = category, // null일수 있음
-            productName = item,
+            title = item,
             currentTime = timeStamp)
         {
             applyPostData(it)
