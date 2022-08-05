@@ -56,14 +56,17 @@ class DBAccessModule {
     }
 
     //포스트 데이터 데이터베이스에 입력
-    fun entryPost(postData: PostData){
+    fun entryPost(postData: PostData, resultCode: (Int) -> Unit){
         dbAccessApi.entryPost(postData).enqueue(object : Callback<ReturnObjectForWrite>{
             override fun onResponse(
                 call: Call<ReturnObjectForWrite>,
                 response: Response<ReturnObjectForWrite>
             ) {
-                if(response.isSuccessful){
+                if(response.isSuccessful) {
                     Log.d("test","entry successful")
+                    response.body()?.let {
+                        resultCode(it.resultCode)
+                    }
                 }
                 else{
                     Log.d("test","entry post response failed")
