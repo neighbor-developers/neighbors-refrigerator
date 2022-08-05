@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.network
 
-import ReturnObjectForWrite
 import android.util.Log
 import android.widget.Toast
 import com.neighbor.neighborsrefrigerator.data.*
@@ -17,8 +16,8 @@ class DBAccessModule {
     //id로 포스트 데이터 불러오기
     fun getPostByUserId(userId :Int, applyPostDatas: (ArrayList<PostData>) -> Unit) {
         dbAccessApi.getPostByUserId(userId).enqueue(object :
-            Callback<ReturnObjectForPost> {
-            override fun onResponse(call: Call<ReturnObjectForPost>, response: Response<ReturnObjectForPost>) {
+            Callback<ReturnObject<ArrayList<PostData>>> {
+            override fun onResponse(call: Call<ReturnObject<ArrayList<PostData>>>, response: Response<ReturnObject<ArrayList<PostData>>>) {
                 if(response.isSuccessful){
                     applyPostDatas(response.body()!!.result)
                 }
@@ -27,7 +26,7 @@ class DBAccessModule {
                 }
             }
 
-            override fun onFailure(call: Call<ReturnObjectForPost>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<ArrayList<PostData>>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
 
@@ -36,10 +35,10 @@ class DBAccessModule {
 
     //유저 데이터 데이터 베이스에 입력
     fun joinUser(userData: UserData){
-        dbAccessApi.userJoin(userData).enqueue(object : Callback<ReturnObjectForWrite>{
+        dbAccessApi.userJoin(userData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
-                call: Call<ReturnObjectForWrite>,
-                response: Response<ReturnObjectForWrite>
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
             ) {
                 if(response.isSuccessful){
                     Log.d("test","joined successfully")
@@ -49,7 +48,7 @@ class DBAccessModule {
                 }
             }
 
-            override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
         })
@@ -57,10 +56,10 @@ class DBAccessModule {
 
     //포스트 데이터 데이터베이스에 입력
     fun entryPost(postData: PostData, resultCode: (Int) -> Unit){
-        dbAccessApi.entryPost(postData).enqueue(object : Callback<ReturnObjectForWrite>{
+        dbAccessApi.entryPost(postData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
-                call: Call<ReturnObjectForWrite>,
-                response: Response<ReturnObjectForWrite>
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
             ) {
                 if(response.isSuccessful) {
                     Log.d("test","entry successful")
@@ -73,7 +72,7 @@ class DBAccessModule {
                 }
             }
 
-            override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
         })
@@ -104,10 +103,10 @@ class DBAccessModule {
     //review 등록하기
     fun reviewPost(id : Int, review: String, rate:Int){
         val reviewData = ReviewData(id,review,rate)
-        dbAccessApi.reviewPost(reviewData).enqueue(object : Callback<ReturnObjectForWrite>{
+        dbAccessApi.reviewPost(reviewData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
-                call: Call<ReturnObjectForWrite>,
-                response: Response<ReturnObjectForWrite>
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
             ) {
                 if(response.isSuccessful){
                     Log.d("test",response.body()!!.msg)
@@ -115,7 +114,7 @@ class DBAccessModule {
 
             }
 
-            override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
         })
@@ -124,8 +123,8 @@ class DBAccessModule {
     //id로 UserData 불러오기
     fun getUserInfoById(id: Int, applyUserDatas: (ArrayList<UserData> /* = java.util.ArrayList<com.neighbor.neighborsrefrigerator.data.PostData> */) -> Unit){
         dbAccessApi.getUserInfoById(id).enqueue(object :
-            Callback<ReturnObjectForUser> {
-            override fun onResponse(call: Call<ReturnObjectForUser>, response: Response<ReturnObjectForUser>) {
+            Callback<ReturnObject<ArrayList<UserData>>> {
+            override fun onResponse(call: Call<ReturnObject<ArrayList<UserData>>>, response: Response<ReturnObject<ArrayList<UserData>>>) {
                 if(response.isSuccessful){
                     applyUserDatas(response.body()!!.result)
                 }
@@ -134,7 +133,7 @@ class DBAccessModule {
                 }
             }
 
-            override fun onFailure(call: Call<ReturnObjectForUser>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<ArrayList<UserData>>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
 
@@ -144,17 +143,17 @@ class DBAccessModule {
     //fb아이디에 등록된 유저 아이디인지 확인
     fun hasFbId(id : String, applyResult: (Boolean) -> Unit){
         dbAccessApi.hasFbId(id).enqueue(object :
-            Callback<ReturnObjectForHasFbId>{
+            Callback<ReturnObject<Boolean>>{
                 override fun onResponse(
-                    call: Call<ReturnObjectForHasFbId>,
-                    response: Response<ReturnObjectForHasFbId>
+                    call: Call<ReturnObject<Boolean>>,
+                    response: Response<ReturnObject<Boolean>>
                 ) {
                     if(response.isSuccessful){
-                        applyResult(response.body()!!.hasfFb)
+                        applyResult(response.body()!!.result)
                     }
                 }
 
-                override fun onFailure(call: Call<ReturnObjectForHasFbId>, t: Throwable) {
+                override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
                     Log.d("hasFb Failure",t.localizedMessage)
                 }
             }

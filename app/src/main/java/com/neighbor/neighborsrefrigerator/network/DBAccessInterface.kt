@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.network
 
-import ReturnObjectForWrite
 import com.neighbor.neighborsrefrigerator.data.*
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -11,7 +10,7 @@ interface DBAccessInterface {
     @GET("/post/getPostByUserId")
     fun getPostByUserId(
         @Query("userId") userId: Int
-    ): retrofit2.Call<ReturnObjectForPost>
+    ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
 
     @GET("/post/getPostOrderByTime")
     fun getPostOrderByTime(
@@ -27,30 +26,30 @@ interface DBAccessInterface {
     @POST("/post/create")
     fun entryPost(
         @Body postData: PostData
-    ): retrofit2.Call<ReturnObjectForWrite>
+    ): retrofit2.Call<ReturnObject<Int>>
 
     @POST("/post/review")
     fun reviewPost(
         @Body reviewData: ReviewData
-    ): retrofit2.Call<ReturnObjectForWrite>
+    ): retrofit2.Call<ReturnObject<Int>>
 
     @GET("/user/getInfoById")
     fun getUserInfoById(
         @Query("id") id : Int
-    ) : retrofit2.Call<ReturnObjectForUser>
+    ) : retrofit2.Call<ReturnObject<ArrayList<UserData>>>
 
     @POST("/user/join")
     fun userJoin(
         @Body userData: UserData
-    ): retrofit2.Call<ReturnObjectForWrite>
+    ): retrofit2.Call<ReturnObject<Int>>
 
     @GET("/user/checkNickname")
     fun checkNickname(
         @Query("nickname") nickname: String
-    ): retrofit2.Call<ReturnObjectForNickname>
+    ): retrofit2.Call<ReturnObject<Boolean>>
 
     @GET("/user/hasFbId")
     fun hasFbId(
         @Query("id") id: String
-    ): retrofit2.Call<ReturnObjectForHasFbId>
+    ): retrofit2.Call<ReturnObject<Boolean>>
 }

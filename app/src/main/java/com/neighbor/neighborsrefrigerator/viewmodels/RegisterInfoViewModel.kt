@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import ReturnObjectForWrite
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -61,15 +60,15 @@ class RegisterInfoViewModel(): ViewModel() {
         val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
 
         dbAccessApi.checkNickname(userNicknameInput).enqueue(object :
-            Callback<ReturnObjectForNickname> {
+            Callback<ReturnObject<Boolean>> {
             override fun onResponse(
-                call: Call<ReturnObjectForNickname>,
-                response: Response<ReturnObjectForNickname>
+                call: Call<ReturnObject<Boolean>>,
+                response: Response<ReturnObject<Boolean>>
             ) {
-                availableNickname.value = !response.body()!!.isExist
+                availableNickname.value = !response.body()!!.result
                 buttonEnabled.value = availableNickname.value!! && fillAddressMain.value!!
             }
-            override fun onFailure(call: Call<ReturnObjectForNickname>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
                 Log.d("실패", t.localizedMessage)
             }
         })
@@ -107,13 +106,13 @@ class RegisterInfoViewModel(): ViewModel() {
 
         dbAccessApi.userJoin(
             userdata!!
-        ).enqueue(object : Callback<ReturnObjectForWrite> {
+        ).enqueue(object : Callback<ReturnObject<Int>> {
 
             override fun onResponse(
-                call: Call<ReturnObjectForWrite>,
-                response: Response<ReturnObjectForWrite>
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
             ) {
-                userdata.id = response.body()?.msg?.toInt()
+                userdata.id = response.body()?.result!!.toInt()
                 // sharedPreference에 저장하기
                 UserSharedPreference(App.context()).setUserPrefs(userdata)
 
@@ -121,7 +120,7 @@ class RegisterInfoViewModel(): ViewModel() {
                 UserSharedPreference(App.context()).getUserPrefs("id")?.let { Log.d("성공", it) }
                 Log.d("DB 값", userdata.toString())
             }
-            override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
                 Log.d("실패", t.localizedMessage)
             }
         })

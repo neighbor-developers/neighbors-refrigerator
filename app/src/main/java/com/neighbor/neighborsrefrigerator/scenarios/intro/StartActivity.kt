@@ -20,13 +20,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForPost
-import com.neighbor.neighborsrefrigerator.network.DBApiObject
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class StartActivity : ComponentActivity() {
     // Firebase
