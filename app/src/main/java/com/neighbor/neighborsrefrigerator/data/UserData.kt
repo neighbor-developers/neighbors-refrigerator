@@ -6,7 +6,7 @@ import java.util.*
 
 data class UserData(
     @SerializedName("id")
-    val id: Int?,
+    var id: Int?,
     @SerializedName("fb_id")
     val fbID: String,
     @SerializedName("email")

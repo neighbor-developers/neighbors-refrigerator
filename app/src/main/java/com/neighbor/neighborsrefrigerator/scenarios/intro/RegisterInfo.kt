@@ -1,6 +1,7 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -22,17 +23,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.LatLng
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.observeOn
 
 
-@SuppressLint("StateFlowValueCalledInComposition")
+@SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
 @Composable
 fun RegisterInfo(navController: NavHostController){
     Scaffold() {
@@ -43,19 +47,25 @@ fun RegisterInfo(navController: NavHostController){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val registerInfoViewModel = RegisterInfoViewModel()
-            var enabled by remember { mutableStateOf(false) }
+            val registerInfoViewModel = remember{RegisterInfoViewModel()}
+            var enabled = registerInfoViewModel.buttonEnabled.collectAsState()
+            var available = registerInfoViewModel.availableNickname.collectAsState()
+            //var enabled by remember { mutableStateOf(false) }
+            //var enabled = registerInfoViewModel.buttonEnabled
+
+
 
             GetNickname(registerInfoViewModel)
             GetMainAddress(registerInfoViewModel)
-            /*if(registerInfoViewModel.availableNickname.collectAsState().value == true
-            ){
-                enabled = true
-            }*/
+
+
+            //registerInfoViewModel.check()
+
             TextButton( onClick = {
                 registerInfoViewModel.registerPersonDB()
                 navController.navigate(NAV_ROUTE.MAIN.routeName)},
-                enabled = enabled)
+                enabled = enabled.value!!
+            )
             {
                 Text(text = "확인")
             }
@@ -96,14 +106,15 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
                 )
             )
             OutlinedButton(
-                modifier = Modifier.padding(5.dp)
+                modifier = Modifier
+                    .padding(5.dp)
                     .wrapContentWidth(),
-                onClick = { viewModel.checkNickname() }) {
+                onClick = {
+                    viewModel.checkNickname()
+                    viewModel.check()}) {
                 Text(text = "Check")
             }
-
         }
-        
         Text(text = "닉네임은 중복될 수 없습니다", color = Color.Gray, textAlign = TextAlign.Right)
     }
 }
@@ -126,6 +137,7 @@ fun GetMainAddress(viewModel: RegisterInfoViewModel) {
             label = { Text("집 주소") },
             placeholder = { Text("작성해 주세요") },
             singleLine = true,
+            enabled = false,
             leadingIcon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             trailingIcon = {
                 IconButton(onClick = { dialogState = true }) {
@@ -133,6 +145,8 @@ fun GetMainAddress(viewModel: RegisterInfoViewModel) {
                         dialogState = dialogState,
                         onConfirm = {
                             viewModel.addressMain = searchAddressDialogViewModel.userAddressInput
+                            viewModel.fillAddressMain.value = viewModel.addressMain.isNotEmpty()
+                            viewModel.buttonEnabled.value = viewModel.availableNickname.value!! && viewModel.fillAddressMain.value!!
                             dialogState = false
                         },
                         onDismiss = { dialogState = false },
@@ -154,7 +168,6 @@ fun GetMainAddress(viewModel: RegisterInfoViewModel) {
             value = viewModel.addressDetail,
             onValueChange = { viewModel.addressDetail = it },
             label = { Text("상세 주소") },
-
             placeholder = { Text("작성해 주세요") },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(

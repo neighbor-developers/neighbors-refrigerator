@@ -22,7 +22,7 @@ interface DBAccessInterface {
         @Query("categoryId") categoryId: Int?,
         @Query("productName") productName: String?,
         @Query("currentTime") currentTime: String
-    ): retrofit2.Call<ReturnObjectForPost>
+    ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
 
     @POST("/post/create")
     fun entryPost(

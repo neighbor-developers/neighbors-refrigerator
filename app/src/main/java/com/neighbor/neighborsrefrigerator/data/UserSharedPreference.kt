@@ -31,15 +31,15 @@ class UserSharedPreference(context: Context) {
     }
 
     fun setUserPrefs(person: UserData) {
-        prefs.edit().putString("id", person.id.toString())
-        prefs.edit().putString("fbId", person.fbID)
-        prefs.edit().putString("email", person.email)
-        prefs.edit().putString("nickname", person.nickname)
-        prefs.edit().putString("addressMain", person.addressMain)
-        prefs.edit().putString("addressDetail", person.addressDetail)
-        prefs.edit().putString("reportPoint", person.reportPoint.toString())
-        prefs.edit().putString("latitude", person.latitude.toString())
-        prefs.edit().putString("longitude", person.longitude.toString())
-        prefs.edit().putString("createdAt", person.createdAt)
+        prefs.edit().putString("id", person.id.toString()).apply()
+        prefs.edit().putString("fbId", person.fbID).apply()
+        prefs.edit().putString("email", person.email).apply()
+        prefs.edit().putString("nickname", person.nickname).apply()
+        prefs.edit().putString("addressMain", person.addressMain).apply()
+        prefs.edit().putString("addressDetail", person.addressDetail).apply()
+        prefs.edit().putString("reportPoint", person.reportPoint.toString()).apply()
+        prefs.edit().putString("latitude", person.latitude.toString()).apply()
+        prefs.edit().putString("longitude", person.longitude.toString()).apply()
+        prefs.edit().putString("createdAt", person.createdAt).apply()
     }
 }

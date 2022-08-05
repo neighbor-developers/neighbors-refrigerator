@@ -1,21 +1,27 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
 import ReturnObjectForWrite
+import android.app.Application
+import android.content.Context
+import android.content.Intent
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
-import com.neighbor.neighborsrefrigerator.data.ReturnObjectForNickname
-import com.neighbor.neighborsrefrigerator.data.UserData
-import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.google.firebase.auth.FirebaseUser
+import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.network.DBAccessInterface
 import com.neighbor.neighborsrefrigerator.network.DBApiClient
+import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,11 +34,19 @@ import java.util.*
 // address의 경우 dialog에서 선택한 address를 클릭 시 textfield의 address에 자동으로 넣기
 // dialog에서 address 검색 구성하기
 
-class RegisterInfoViewModel: ViewModel() {
+class RegisterInfoViewModel(): ViewModel() {
     var userNicknameInput by mutableStateOf("")
-    val availableNickname = MutableStateFlow<Boolean?>(false)
     var addressMain by mutableStateOf("")
     var addressDetail by mutableStateOf("")
+    val availableNickname = MutableStateFlow<Boolean?>(false)
+    val fillAddressMain = MutableStateFlow<Boolean?>(false)
+
+    var buttonEnabled = MutableStateFlow<Boolean?>(false)
+
+    fun check(){
+        buttonEnabled.value = availableNickname.value!!
+    }
+
 
     val time = System.currentTimeMillis()
     private val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(time))
@@ -53,6 +67,7 @@ class RegisterInfoViewModel: ViewModel() {
                 response: Response<ReturnObjectForNickname>
             ) {
                 availableNickname.value = !response.body()!!.isExist
+                buttonEnabled.value = availableNickname.value!! && fillAddressMain.value!!
             }
             override fun onFailure(call: Call<ReturnObjectForNickname>, t: Throwable) {
                 Log.d("실패", t.localizedMessage)
@@ -75,19 +90,18 @@ class RegisterInfoViewModel: ViewModel() {
 
 
         val userdata =
-            UserData(0,
-                uID,
-                email!!,  //  파이어베이스에서 가져오기
-                userNicknameInput,
-                addressMain,
-                addressDetail,
-                0,   //  모듈 만들기
-                coordinateData.latitude,
-                coordinateData.longitude,
-                timeStamp
+            UserData(
+                id = null,
+                fbID = uID,
+                email = email!!,  //  파이어베이스에서 가져오기
+                nickname = userNicknameInput,
+                addressMain = addressMain,
+                addressDetail = addressDetail,
+                reportPoint = 0,   //  모듈 만들기
+                latitude = coordinateData.latitude,
+                longitude = coordinateData.longitude,
+                createdAt = timeStamp
             )
-        // sharedPreference에 저장하기
-        UserSharedPreference(App.context()).setUserPrefs(userdata)
 
         val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
 
@@ -99,7 +113,12 @@ class RegisterInfoViewModel: ViewModel() {
                 call: Call<ReturnObjectForWrite>,
                 response: Response<ReturnObjectForWrite>
             ) {
-                Log.d("성공", "PersonDB에 데이터 입력")
+                userdata.id = response.body()?.msg?.toInt()
+                // sharedPreference에 저장하기
+                UserSharedPreference(App.context()).setUserPrefs(userdata)
+
+
+                UserSharedPreference(App.context()).getUserPrefs("id")?.let { Log.d("성공", it) }
                 Log.d("DB 값", userdata.toString())
             }
             override fun onFailure(call: Call<ReturnObjectForWrite>, t: Throwable) {
