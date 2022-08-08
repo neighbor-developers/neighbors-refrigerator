@@ -20,7 +20,9 @@ interface DBAccessInterface {
         @Query("num") num: Int,
         @Query("categoryId") categoryId: Int?,
         @Query("title") title: String?,
-        @Query("currentTime") currentTime: String
+        @Query("currentTime") currentTime: String,
+        @Query("latitude") latitude: Double?,
+        @Query("longitude") longitude: Double?
     ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
 
     @POST("/post/create")

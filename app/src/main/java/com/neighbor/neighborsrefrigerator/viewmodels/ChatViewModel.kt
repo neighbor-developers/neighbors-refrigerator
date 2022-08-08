@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class ChatViewModel : ViewModel() {
 
-    val dbAccessModule = DBAccessModule()
+    private val dbAccessModule = DBAccessModule()
 
     fun reviewPost(id: Int, review: String, rate: Int){
         dbAccessModule.reviewPost(id, review, rate)

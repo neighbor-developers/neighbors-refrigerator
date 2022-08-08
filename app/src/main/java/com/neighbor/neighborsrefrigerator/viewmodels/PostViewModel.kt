@@ -1,8 +1,11 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
+import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
 import java.util.*
@@ -17,9 +20,12 @@ class PostViewModel : ViewModel() {
 
     var timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(System.currentTimeMillis()))
 
+//    private val userLat = UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble()
+//    private val userLng = UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble()
+
     init {
-        dbAccessModule.getPostOrderByTime(3, 1,0, 12, null, null, timeStamp) { sharePostsByTime.value = it }
-        dbAccessModule.getPostOrderByTime(3, 2, 0, 12, null, null, timeStamp) { seekPostsByTime.value = it }
+        dbAccessModule.getPostOrderByTime(3, 1,0, 12, null, null, timeStamp, 133.4, 80.6) { sharePostsByTime.value = it }
+        dbAccessModule.getPostOrderByTime(3, 2, 0, 12, null, null, timeStamp, 144.3, 80.6) { seekPostsByTime.value = it }
     }
 
     fun getPosts(item: String?, category:Int?, reqType: String, postType: String, currentIndex: Int, num: Int, applyPostData : (ArrayList<PostData>) -> Unit){
@@ -41,7 +47,9 @@ class PostViewModel : ViewModel() {
             num = num,
             categoryId = category, // null일수 있음
             title = item,
-            currentTime = timeStamp)
+            currentTime = timeStamp,
+            133.4, 80.6
+            )
         {
             applyPostData(it)
         }

@@ -24,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
@@ -37,27 +36,32 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
-import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val auth = FirebaseAuth.getInstance()
     private val viewModel by viewModels<MainViewModel>()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        auth.currentUser?.let {
-           viewModel.checkUserAccount(it.uid)
-        }
+//        viewModel.hasFbId {
+//            val route = if(it){
+//                    NAV_ROUTE.MAIN.routeName
+//                }else{
+//                    NAV_ROUTE.REGISTER_INFO.routeName
+//                }
+//                setContent {
+//                    Screen(startRoute = route)
+//                }
+//        }
 
-        lifecycleScope.launchWhenCreated {
-            viewModel.hasFbId.collect{ hasFbId ->
-                val route = if(hasFbId){
+        lifecycleScope.launch {
+            viewModel.hasId.collect{
+                val route = if(it){
                     NAV_ROUTE.MAIN.routeName
                 }else{
                     NAV_ROUTE.REGISTER_INFO.routeName
@@ -69,6 +73,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 enum class NAV_ROUTE(val routeName:String, val description:String){
     MAIN("MAIN","나눔/구함 리스트 화면"),

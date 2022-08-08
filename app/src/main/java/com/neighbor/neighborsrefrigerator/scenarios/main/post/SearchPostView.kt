@@ -42,6 +42,7 @@ fun SearchPostView(
         Surface(modifier = Modifier.padding(it)) {
             if (type == "share")
                 SharePostListByTime(
+                    postViewModel = viewModel,
                     posts = viewModel.searchedPosts.collectAsState(),
                     route = NAV_ROUTE.SHARE_DETAIL,
                     navHostController = navController)

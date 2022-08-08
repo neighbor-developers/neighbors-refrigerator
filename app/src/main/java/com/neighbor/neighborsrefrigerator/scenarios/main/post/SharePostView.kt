@@ -2,10 +2,7 @@ package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -31,24 +28,36 @@ fun SharePostScreen(
     navController: NavHostController
 ) {
     val state = rememberScrollState()
+    
     LaunchedEffect(Unit) { state.animateScrollTo(0) }
     Column(
         modifier = Modifier
             .verticalScroll(state)
             .height(1000.dp)
     ) {
-        SearchBox(postViewModel, "share", navController)
+        SearchBox("share", navController)
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
         CategoryView(postViewModel)
-        SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsState(), route, navController)
+        SharePostListByTime(postViewModel = postViewModel, posts = postViewModel.sharePostsByTime.collectAsState(),  route, navController)
     }
 }
 
 
 @Composable
-fun SharePostListByTime(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController) {
+fun SharePostListByTime(postViewModel: PostViewModel, posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController) {
 
     val scrollState = rememberLazyGridState()
+
+    val num by remember {
+        mutableStateOf(posts.value?.size)
+    }
+    
+    num?.let { num ->
+        if(scrollState.firstVisibleItemIndex > num - 4){
+            postViewModel.getPosts(null, null, "justTime", "share", num, 20) {postViewModel.sharePostsByTime.value?.plus(it)}
+        }
+    }
+    
     LazyVerticalGrid(
         state = scrollState,
         columns = GridCells.Fixed(2),
@@ -57,7 +66,7 @@ fun SharePostListByTime(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, na
         modifier = Modifier
             .padding(top = 10.dp, start = 30.dp, end = 30.dp),
         userScrollEnabled = true
-    ) {
+    ) { 
         posts.value?.let {
             items(it) { item ->
                 ItemCardByTime(item, route, navHostController)
@@ -85,7 +94,7 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
                 }
             }
         }
-        androidx.compose.foundation.Canvas(
+        Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, end = 30.dp, top = 20.dp)
@@ -140,7 +149,7 @@ fun CategoryView(postViewModel: PostViewModel){
 }
 
 @Composable
-fun SearchBox(postViewModel: PostViewModel, type: String, navController: NavHostController) {
+fun SearchBox(type: String, navController: NavHostController) {
     var item by remember { mutableStateOf("") }
     Box(
         modifier = Modifier
