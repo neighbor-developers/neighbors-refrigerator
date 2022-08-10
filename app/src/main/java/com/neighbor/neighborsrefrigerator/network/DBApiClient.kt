@@ -21,8 +21,4 @@ object DBApiClient {
             }
     }
 
-object DBApiObject{
 
-
-
-}

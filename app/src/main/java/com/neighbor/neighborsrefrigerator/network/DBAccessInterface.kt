@@ -54,4 +54,11 @@ interface DBAccessInterface {
     fun hasFbId(
         @Query("id") id: String
     ): retrofit2.Call<ReturnObject<Boolean>>
+
+    @POST("/user/updateNickname")
+    fun updateNickname(
+        @Query("id") id: Int,
+        @Query("nickname") nickname: String
+    ) : retrofit2.Call<ReturnObject<Int>>
+
 }
