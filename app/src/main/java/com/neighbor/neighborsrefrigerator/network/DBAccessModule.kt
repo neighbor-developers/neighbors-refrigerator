@@ -175,10 +175,31 @@ class DBAccessModule {
                 }
 
                 override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
-                    Log.d("hasFb Failure",t.localizedMessage)
+                    Log.d("test",t.localizedMessage)
                 }
             }
         )
     }
+
+    fun updateNickname(id : Int, nickname: String){
+        dbAccessApi.updateNickname(id, nickname).enqueue(object : Callback<ReturnObject<Int>>{
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("test",response.body()!!.msg)
+
+
+                }
+
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
+    }
+
 
 }

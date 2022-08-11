@@ -30,6 +30,10 @@ class UserSharedPreference(context: Context) {
         return prefs.edit().putString(key, value).apply()
     }
 
+    fun setNicknamePrefs(nickname : String) {
+        prefs.edit().putString("nickname", nickname).apply()
+    }
+
     fun setUserPrefs(person: UserData) {
         prefs.edit().putString("id", person.id.toString()).apply()
         prefs.edit().putString("fbId", person.fbID).apply()
