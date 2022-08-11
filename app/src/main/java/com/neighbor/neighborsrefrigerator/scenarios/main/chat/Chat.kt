@@ -1,9 +1,13 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
+import android.widget.ImageButton
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -14,13 +18,18 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import java.text.SimpleDateFormat
@@ -130,6 +139,11 @@ fun ChatSection(message: State<ArrayList<Message>>, modifier: Modifier = Modifie
 
 @Composable
 fun MessageItem(message: Message) {
+//    Image(
+//        painter = painterResource(R.drawable.sprout),
+//        contentDescription = "App icon",
+//        modifier = Modifier.clip(shape = CircleShape)
+//    )
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (!message.who) Arrangement.Start else Arrangement.End,
@@ -138,25 +152,38 @@ fun MessageItem(message: Message) {
         if (message.who) {
             Text(text = message.createdAt, color = Color.Gray, modifier = Modifier.padding(end = 7.dp), fontSize = 13.sp)
         }
-        if (message.text != "") {
-            Box(
-                modifier = if (!message.who) {
-                    Modifier
-                        .background(
-                            color = Color.LightGray,
-                            shape = RoundedCornerShape(0.dp, 10.dp, 10.dp, 10.dp)
-                        )
-                        .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
-                } else {
-                    Modifier
-                        .background(
-                            color = Color.Yellow,
-                            shape = RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp)
-                        )
-                        .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+
+        Column {
+            if (!message.who) {
+                Row{
+                    Text(text = "떼잉", color = Color.Black, fontSize = 13.sp, modifier = Modifier.padding(bottom = 5.dp, end = 5.dp))
+                    Image(
+                        painter = painterResource(R.drawable.sprout),
+                        contentDescription = "App icon",
+                        modifier = Modifier.clip(shape = CircleShape).size(17.dp)
+                    )
                 }
-            ) {
-                Text(text = message.text, color = Color.Black)
+            }
+            if (message.text != "") {
+                Box(
+                    modifier = if (!message.who) {
+                        Modifier
+                            .background(
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(0.dp, 10.dp, 10.dp, 10.dp)
+                            )
+                            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    } else {
+                        Modifier
+                            .background(
+                                color = Color.Yellow,
+                                shape = RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp)
+                            )
+                            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    }
+                ) {
+                    Text(text = message.text, color = Color.Black)
+                }
             }
         }
         if (!message.who) {
