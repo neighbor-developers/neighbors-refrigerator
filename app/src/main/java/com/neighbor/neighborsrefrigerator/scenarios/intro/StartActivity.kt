@@ -109,25 +109,11 @@ class StartActivity : ComponentActivity() {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
-                updateProfile()
                 toMainActivity(auth.currentUser)
             }
         }
     }
 
-    private fun updateProfile(){
-        val user = auth.currentUser
-        if(user != null){
-            FirebaseMessaging.getInstance().token.addOnCompleteListener( OnCompleteListener {
-                task ->  if(!task.isSuccessful){
-                Log.d("FetchingFCM registration token failed", task.exception.toString())
-                return@OnCompleteListener
-                }
-                val token = task.result
-                val msg = getString(R.string.msg_token_fmt, token)
-            })
-        }
-    }
 
     private fun toMainActivity(user: FirebaseUser?) {
         if (user != null) {
