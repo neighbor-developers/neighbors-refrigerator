@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.view.InquiryDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 
@@ -49,6 +50,7 @@ fun Drawer(
 ) {
     var flowerDialogState by remember { mutableStateOf(false) }
     var locationDialogState by remember { mutableStateOf(false) }
+    var inquiryDialogState by remember { mutableStateOf(false) }
     val showNicknameDialog = remember { mutableStateOf(false) }
     val flowerNum = remember { mutableStateOf(1) }
 
@@ -66,6 +68,10 @@ fun Drawer(
                     onDismiss = {locationDialogState = false},
                     viewModel = SearchAddressDialogViewModel()
                 )
+            if (inquiryDialogState)
+                InquiryDialog {
+                    inquiryDialogState = false
+                }
             Button(
                 onClick = {
                     flowerDialogState = true
@@ -121,6 +127,15 @@ fun Drawer(
                 fontSize = 20.sp,
                 modifier = Modifier
                     .clickable { locationDialogState = true }
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+            )
+            Text(
+                text = "문의하기",
+                style = MaterialTheme.typography.h4,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .clickable { inquiryDialogState = true }
                     .fillMaxWidth()
                     .padding(top = 20.dp)
             )

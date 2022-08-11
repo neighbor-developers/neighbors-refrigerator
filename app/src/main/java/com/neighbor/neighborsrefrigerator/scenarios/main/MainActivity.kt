@@ -48,19 +48,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        viewModel.hasFbId {
-//            val route = if(it){
-//                    NAV_ROUTE.MAIN.routeName
-//                }else{
-//                    NAV_ROUTE.REGISTER_INFO.routeName
-//                }
-//                setContent {
-//                    Screen(startRoute = route)
-//                }
-//        }
-
         lifecycleScope.launch {
             viewModel.hasId.collect{
+                // 아이디 존재할경우 메인, 존재하지 않을경우 등록 페이지
                 val route = if(it){
                     NAV_ROUTE.MAIN.routeName
                 }else{
@@ -218,7 +208,7 @@ fun MainScreen(navController: NavHostController) {
                     onClick = {
                         types.value = "share" },
                     modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray, contentColor = Color.White, disabledBackgroundColor = Color.Yellow, disabledContentColor = Color.Black),
                     enabled = when(types.value){
                         "share" -> false
                         "seek" -> true
@@ -230,7 +220,7 @@ fun MainScreen(navController: NavHostController) {
                 Button(
                     onClick = { types.value = "seek" },
                     modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow, contentColor = Color.Black, disabledBackgroundColor = Color.LightGray, disabledContentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray, contentColor = Color.White, disabledBackgroundColor = Color.Yellow, disabledContentColor = Color.Black),
                     enabled = when(types.value){
                         "share" -> true
                         "seek" -> false

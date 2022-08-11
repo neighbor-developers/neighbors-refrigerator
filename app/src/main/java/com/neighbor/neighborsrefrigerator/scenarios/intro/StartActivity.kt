@@ -1,7 +1,9 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,9 +18,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingService
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
@@ -47,6 +52,7 @@ class StartActivity : ComponentActivity() {
             viewModel.loginResult.collect { isLogin ->
                 if (isLogin) {
                     if (auth.currentUser != null) {
+                        Log.d("token", auth.currentUser!!.getIdToken(true).toString())
                         startActivity(Intent(this@StartActivity, MainActivity::class.java))
                     }
                 } else {
@@ -103,8 +109,23 @@ class StartActivity : ComponentActivity() {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
+                updateProfile()
                 toMainActivity(auth.currentUser)
             }
+        }
+    }
+
+    private fun updateProfile(){
+        val user = auth.currentUser
+        if(user != null){
+            FirebaseMessaging.getInstance().token.addOnCompleteListener( OnCompleteListener {
+                task ->  if(!task.isSuccessful){
+                Log.d("FetchingFCM registration token failed", task.exception.toString())
+                return@OnCompleteListener
+                }
+                val token = task.result
+                val msg = getString(R.string.msg_token_fmt, token)
+            })
         }
     }
 

@@ -14,10 +14,13 @@ interface DBAccessInterface {
 
     @GET("/post/getPostOrderByTime")
     fun getPostOrderByTime(
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int,
         @Query("reqType") reqType: Int,
         @Query("postType") postType: Int,
-        @Query("currentIndex") currentIndex: Int,
-        @Query("num") num: Int,
+//        @Query("currentIndex") currentIndex: Int,
+//        @Query("num") num: Int,
+
         @Query("categoryId") categoryId: Int?,
         @Query("title") title: String?,
         @Query("currentTime") currentTime: String,

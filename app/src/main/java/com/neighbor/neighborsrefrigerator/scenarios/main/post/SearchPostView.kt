@@ -63,7 +63,7 @@ fun Get(viewModel: PostViewModel, item: String, type: String){
         category = null,
         reqType = "search",
         postType = type,
-        currentIndex = 0,
-        num = 20)
+        page = 0,
+        pageSize = 20)
     { viewModel.searchedPosts.value = it}
 }

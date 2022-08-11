@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.isTraceInProgress
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +34,7 @@ fun DeclarationDialog(type: Int, onChangeState: () -> Unit) {
                },
         dismissButton = {
             TextButton(onClick = { onChangeState() }) {
-                Text(text = "취소")
+                Text(text = "취소", color = Color.Black)
             }
         },
         confirmButton = {
@@ -41,7 +43,7 @@ fun DeclarationDialog(type: Int, onChangeState: () -> Unit) {
                     onChangeState()
                     // 벌점 맥이기
                 }) {
-                Text(text = "신고")
+                Text(text = "신고", color = Color.Black)
             }
         }
     )

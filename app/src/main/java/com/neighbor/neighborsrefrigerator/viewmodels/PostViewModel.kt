@@ -2,13 +2,16 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagingData
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PostViewModel : ViewModel() {
 
@@ -24,13 +27,15 @@ class PostViewModel : ViewModel() {
 //    private val userLng = UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble()
 
     init {
-        dbAccessModule.getPostOrderByTime(3, 1,0, 12, null, null, timeStamp, 133.4, 80.6) { sharePostsByTime.value = it }
-        dbAccessModule.getPostOrderByTime(3, 2, 0, 12, null, null, timeStamp, 144.3, 80.6) { seekPostsByTime.value = it }
+        dbAccessModule.getPostOrderByTime(0, 12,3, 1,null, null, timeStamp, 133.4, 80.6) {  }
+        dbAccessModule.getPostOrderByTime(0, 12,3, 2, null, null, timeStamp, 144.3, 80.6) { seekPostsByTime.value = it }
     }
 
-    fun getPosts(item: String?, category:Int?, reqType: String, postType: String, currentIndex: Int, num: Int, applyPostData : (ArrayList<PostData>) -> Unit){
+    fun getPosts(item: String?, category:Int?, reqType: String, postType: String, page: Int, pageSize: Int, applyPostData : (ArrayList<PostData>) -> Unit){
 
         dbAccessModule.getPostOrderByTime(
+            page = page,
+            pageSize = pageSize,
             reqType = when(reqType){
                 "category" -> 1
                 "search" -> 2
@@ -43,8 +48,6 @@ class PostViewModel : ViewModel() {
                 "seek" -> 2
                 else -> 1
             },
-            currentIndex = currentIndex,
-            num = num,
             categoryId = category, // null일수 있음
             title = item,
             currentTime = timeStamp,
@@ -55,7 +58,6 @@ class PostViewModel : ViewModel() {
         }
 
     }
-
     fun changeTime(){
         timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(System.currentTimeMillis()))
     }

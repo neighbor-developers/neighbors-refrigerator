@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -57,7 +58,6 @@ fun SharePostListByTime(postViewModel: PostViewModel, posts: State<ArrayList<Pos
             postViewModel.getPosts(null, null, "justTime", "share", num, 20) {postViewModel.sharePostsByTime.value?.plus(it)}
         }
     }
-    
     LazyVerticalGrid(
         state = scrollState,
         columns = GridCells.Fixed(2),
@@ -83,6 +83,7 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
             modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
             fontSize = 15.sp
         )
+
         Row (modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
@@ -120,19 +121,19 @@ fun CategoryView(postViewModel: PostViewModel){
     ) {
         categoryList.forEach { it ->
             TextButton(
-                border = BorderStroke(1.dp, Color.Green),
-                modifier = Modifier.size(50.dp),
+                border = BorderStroke(1.dp, Color.Black),
+                modifier = Modifier.size(40.dp),
                 onClick = {
                     if(it.value == "전체"){
                         postViewModel.getPosts(null, null, "justTime", "share", 0, 12){ postViewModel.sharePostsByTime.value = it }
                     }else {
                         postViewModel.getPosts(
+                            page = 0,
+                            pageSize = 12,
                             item = null,
                             category = it.key,
                             reqType = "category",
                             postType = "share",
-                            currentIndex = 0,
-                            num = 20
                         )
                         { postViewModel.sharePostsByTime.value = it }
 
@@ -140,8 +141,8 @@ fun CategoryView(postViewModel: PostViewModel){
                 }
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.Favorite, contentDescription = it.value, modifier = Modifier.size(20.dp))
-                    Text(text = it.value, fontSize = 8.sp)
+                    //Icon(Icons.Filled.Favorite, contentDescription = it.value, modifier = Modifier.size(20.dp), tint =Color.Black)
+                    Text(text = it.value, fontSize = 10.sp, color = Color.Black)
                 }
             }
         }
