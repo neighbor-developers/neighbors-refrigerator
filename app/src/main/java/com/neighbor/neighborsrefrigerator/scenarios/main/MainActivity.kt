@@ -36,6 +36,7 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetail
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
@@ -121,7 +122,8 @@ fun Screen(startRoute: String){
             ChatScreen(navController)
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
-            ChatListScreen(navController)
+            ChatScreen(navController)
+            //ChatListScreen(navController, ChatViewModel())
         }
         composable(NAV_ROUTE.SETTING.routeName){
             Setting()

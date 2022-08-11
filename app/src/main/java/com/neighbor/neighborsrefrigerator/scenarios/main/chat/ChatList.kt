@@ -29,7 +29,7 @@ import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 data class ChatCard(val nickname : String, val msg: String, val type: String)
 
 @Composable
-fun ChatListScreen(navController: NavHostController){
+fun ChatListScreen(navController: NavHostController, viewModel: ChatViewModel){
 
     Scaffold(
         topBar = {
