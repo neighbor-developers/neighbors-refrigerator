@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.google.android.gms.maps.model.LatLng
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.utilities.CalDistance
+import com.neighbor.neighborsrefrigerator.viewmodels.ReqPostData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,6 +33,10 @@ class DBAccessModule {
             }
 
         })
+    }
+    //id로 포스트 데이터 불러오기
+    fun getPostByPostId(postId :Int, applyPostDatas: (ArrayList<PostData>) -> Unit) {
+
     }
 
     //유저 데이터 데이터 베이스에 입력
@@ -100,13 +105,14 @@ class DBAccessModule {
 //
 //        })
 //    }
-    fun getPostOrderByTime(page: Int, pageSize:Int, reqType :Int, postType: Int, categoryId: Int?, title: String?, currentTime: String, latitude: Double?, longitude: Double?, applyPostDatas: (ArrayList<PostData>) -> Unit){
-        dbAccessApi.getPostOrderByTime(page, pageSize, reqType, postType, categoryId, title, currentTime, latitude, longitude).enqueue(object :
+    fun getPostOrderByTime(page: Int, pageSize:Int, reqPostData: ReqPostData) : ArrayList<PostData>?{
+        var resultPosts: ArrayList<PostData>? = null
+        dbAccessApi.getPostOrderByTime(page, pageSize, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude).enqueue(object :
             Callback<ReturnObject<ArrayList<PostData>>> {
             override fun onResponse(call: Call<ReturnObject<ArrayList<PostData>>>, response: Response<ReturnObject<ArrayList<PostData>>>) {
                 if(response.isSuccessful){
                     response.body()?.let {
-                        applyPostDatas(it.result)
+                        resultPosts = it.result
                     }
                 }
                 else{
@@ -119,6 +125,7 @@ class DBAccessModule {
             }
 
         })
+        return resultPosts
     }
 
     //review 등록하기

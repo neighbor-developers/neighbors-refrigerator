@@ -7,16 +7,26 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.firebase.database.FirebaseDatabase
+import com.neighbor.neighborsrefrigerator.data.ChatData
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.RdbChatData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.ItemImage
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import java.text.SimpleDateFormat
+import java.util.*
+
 
 @Composable
 fun SharePostDetail(navHostController: NavHostController, post: PostData) {
@@ -74,8 +84,6 @@ fun SharePostDetail(navHostController: NavHostController, post: PostData) {
                     post.productImg?.let {
                         ItemImage(productImg = post.productImg, modifier = modifier)
                     }
-
-
                     Spacer(modifier = Modifier.width(30.dp))
                     Text(text = post.title, fontSize = 20.sp)
                 }
@@ -88,10 +96,26 @@ fun SharePostDetail(navHostController: NavHostController, post: PostData) {
                         Text(text = "$validateType : $day", fontSize = 20.sp, color = Color.White)
                     }
                 }
+                val contactUserId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+                if(post.userId != contactUserId) {
+                    Button(onClick = {
+                        val chatId = post.id.toString() + contactUserId.toString()
+
+                        // RDB 로직
+                        val viewModel = ChatViewModel()
+                        viewModel.newChatRoom(chatId, post.id!!, contactUserId)
+
+                        navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
+                    }) {
+                        Text(text = "채팅하기")
+                    }
+                }
             }
         }
     }
 }
+
+
 
 @Composable
 fun Detail(){

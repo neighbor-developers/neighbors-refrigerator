@@ -14,9 +14,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun SeekPostScreen(
@@ -31,20 +35,20 @@ fun SeekPostScreen(
             modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
             fontSize = 20.sp
         )
-        SeekPostList(postViewModel.seekPostsByTime.collectAsState(), route = route, navHostController = navHostController)
+        SeekPostList(postViewModel.seekPostsByTime.collectAsLazyPagingItems(), route = route, navHostController = navHostController)
     }
 }
 @Composable
-fun SeekPostList(posts : State<List<PostData>?>,
+fun SeekPostList(posts: LazyPagingItems<PostData>?,
                  route: NAV_ROUTE,
                  navHostController: NavHostController){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 30.dp, end = 30.dp)) {
-        posts.value?.let {
-            it.forEach {
-                SeekItem(post = it, route = route, navHostController = navHostController)
-            }
+        posts?.let {
+//            it. {
+//                SeekItem(post = it, route = route, navHostController = navHostController)
+//            }
         }
     }
 }

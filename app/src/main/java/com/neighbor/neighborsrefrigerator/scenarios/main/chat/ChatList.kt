@@ -23,13 +23,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.ChatData
+import com.neighbor.neighborsrefrigerator.data.RdbChatData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
-data class ChatCard(val nickname : String, val msg: String, val type: String)
-
 @Composable
-fun ChatListScreen(navController: NavHostController, viewModel: ChatViewModel){
+fun ChatListScreen(navController: NavHostController){
+    val chatViewModel = ChatViewModel()
+    chatViewModel.initChatList()
 
     Scaffold(
         topBar = {
@@ -46,27 +47,24 @@ fun ChatListScreen(navController: NavHostController, viewModel: ChatViewModel){
                 elevation = 0.dp
             )
         }
-    ) {
-        Surface(modifier = Modifier.padding(it)) {
-            //ChatList(chatList = viewModel.chatList.collectAsState(), navController, viewModel)
+    ) { padding ->
+        Surface(modifier = Modifier.padding(padding)) {
+            val chatList = chatViewModel.chatList.collectAsState()
+            LazyColumn {
+                chatList.value?.let { chatList ->
+                    items(chatList){ chat ->
+                        ChatCard(chat = chat, navController, chatViewModel)
+                    }
+                }
+            }
         }
-
     }
 }
 
-@Composable
-fun ChatList(chatList: ArrayList<ChatData>?, navController: NavController) {
-    LazyColumn {
-//        items(chatList.value){ chat ->
-//            // 채팅 데이터 불러오기 (마지막 채팅, 닉네임)
-//            ChatCard(chat = chat, navController, viewModel)
-//    }
-}
-}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatCard(chat: ChatCard, navController: NavController, viewModel: ChatViewModel){
+fun ChatCard(chat: RdbChatData, navController: NavController, viewModel: ChatViewModel){
     navController.currentBackStackEntry?.savedStateHandle?.set(key = "chatViewModel", value = viewModel)
     Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {
         Row() {
@@ -79,12 +77,12 @@ fun ChatCard(chat: ChatCard, navController: NavController, viewModel: ChatViewMo
             Spacer(modifier = Modifier.width(8.dp))
             Column() {
                 Text(
-                    text = chat.nickname,
+                    text = "상대방 닉네임",
                     color = MaterialTheme.colors.secondaryVariant,
                     style = MaterialTheme.typography.subtitle2)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = chat.msg,
+                    text = "마지막 채팅 메세지",
                     style = MaterialTheme.typography.body2)
             }
         }

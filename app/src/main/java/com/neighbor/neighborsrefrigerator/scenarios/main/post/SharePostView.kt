@@ -2,7 +2,9 @@ package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,10 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun SharePostScreen(
@@ -39,25 +47,16 @@ fun SharePostScreen(
         SearchBox("share", navController)
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
         CategoryView(postViewModel)
-        SharePostListByTime(postViewModel = postViewModel, posts = postViewModel.sharePostsByTime.collectAsState(),  route, navController)
+        SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsLazyPagingItems(),  route, navController)
     }
 }
 
 
 @Composable
-fun SharePostListByTime(postViewModel: PostViewModel, posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController) {
+fun SharePostListByTime(posts: LazyPagingItems<PostData>?, route: NAV_ROUTE, navHostController: NavHostController) {
 
     val scrollState = rememberLazyGridState()
 
-    val num by remember {
-        mutableStateOf(posts.value?.size)
-    }
-    
-    num?.let { num ->
-        if(scrollState.firstVisibleItemIndex > num - 4){
-            postViewModel.getPosts(null, null, "justTime", "share", num, 20) {postViewModel.sharePostsByTime.value?.plus(it)}
-        }
-    }
     LazyVerticalGrid(
         state = scrollState,
         columns = GridCells.Fixed(2),
@@ -66,10 +65,12 @@ fun SharePostListByTime(postViewModel: PostViewModel, posts: State<ArrayList<Pos
         modifier = Modifier
             .padding(top = 10.dp, start = 30.dp, end = 30.dp),
         userScrollEnabled = true
-    ) { 
-        posts.value?.let {
-            items(it) { item ->
-                ItemCardByTime(item, route, navHostController)
+    ) {
+        posts?.let {
+            items(posts.itemCount) { index ->
+                posts[index]?.let { item ->
+                    ItemCardByTime(item, route, navHostController)
+                }
             }
         }
     }
@@ -84,14 +85,14 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
             fontSize = 15.sp
         )
 
-        Row (modifier = Modifier
+        LazyRow (modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
             .padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 10.dp))
         {
             posts.value?.let {
-                it.forEach {
-                    ItemCardByDistance(post = it, route, navHostController)
+                items(it){ item ->
+                    ItemCardByDistance(post = item, route, navHostController)
                 }
             }
         }
@@ -125,7 +126,7 @@ fun CategoryView(postViewModel: PostViewModel){
                 modifier = Modifier.size(40.dp),
                 onClick = {
                     if(it.value == "전체"){
-                        postViewModel.getPosts(null, null, "justTime", "share", 0, 12){ postViewModel.sharePostsByTime.value = it }
+                        postViewModel.getPosts(null, null, "justTime", "share", 0, 12, 1)
                     }else {
                         postViewModel.getPosts(
                             page = 0,
@@ -134,8 +135,9 @@ fun CategoryView(postViewModel: PostViewModel){
                             category = it.key,
                             reqType = "category",
                             postType = "share",
+                            varType = 1
                         )
-                        { postViewModel.sharePostsByTime.value = it }
+
 
                     }
                 }

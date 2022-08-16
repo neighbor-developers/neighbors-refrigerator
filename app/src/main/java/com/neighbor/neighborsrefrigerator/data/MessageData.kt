@@ -11,3 +11,10 @@ data class MessageData(
     @SerializedName("message")
     val message: String
 )
+
+data class RdbMessageData(
+    val content: String,
+    val is_read: Boolean,
+    val createdAt: String,
+    val from: Int
+)

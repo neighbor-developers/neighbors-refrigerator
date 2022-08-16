@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 
@@ -42,13 +43,12 @@ fun SearchPostView(
         Surface(modifier = Modifier.padding(it)) {
             if (type == "share")
                 SharePostListByTime(
-                    postViewModel = viewModel,
-                    posts = viewModel.searchedPosts.collectAsState(),
+                    posts = viewModel.searchedPosts?.collectAsLazyPagingItems(),
                     route = NAV_ROUTE.SHARE_DETAIL,
                     navHostController = navController)
             else{
                 SeekPostList(
-                    posts = viewModel.searchedPosts.collectAsState(),
+                    posts = viewModel.searchedPosts?.collectAsLazyPagingItems(),
                     route = NAV_ROUTE.SEEK_DETAIL,
                     navHostController = navController)
             }
@@ -64,6 +64,7 @@ fun Get(viewModel: PostViewModel, item: String, type: String){
         reqType = "search",
         postType = type,
         page = 0,
-        pageSize = 20)
-    { viewModel.searchedPosts.value = it}
+        pageSize = 20,
+        varType = 3
+    )
 }

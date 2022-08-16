@@ -118,12 +118,11 @@ fun Screen(startRoute: String){
         composable(NAV_ROUTE.SEEK_REGISTER.routeName){
 
         }
-        composable(NAV_ROUTE.CHAT.routeName){
-            ChatScreen(navController)
+        composable("${NAV_ROUTE.CHAT.routeName}/{chatID}", arguments = listOf(navArgument("chatId"){type = NavType.StringType})) {
+            ChatScreen(navController, it.arguments?.getString("chatId")?:"")
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
-            ChatScreen(navController)
-            //ChatListScreen(navController, ChatViewModel())
+            ChatListScreen(navController)
         }
         composable(NAV_ROUTE.SETTING.routeName){
             Setting()

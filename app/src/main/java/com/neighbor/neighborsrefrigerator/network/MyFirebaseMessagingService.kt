@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.network
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.media.RingtoneManager
 import android.os.Build
@@ -19,15 +20,21 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     // 메세지 받을때 호출
-    override fun onMessageReceived(message: RemoteMessage) { // 메세지 수신
-        if(message.data.isNotEmpty()){
-            sendNotification(message)
+    override fun onMessageReceived(remoteMessage: RemoteMessage) { // 메세지 수신
+        if(remoteMessage.data.isNotEmpty()){
+            val title = remoteMessage.notification?.title
+            val body = remoteMessage.notification?.body
+            val data = remoteMessage.data
+
+            if(title != null && body != null){
+                Log.d(TAG, "sendNotification: title: $title, body: $body, data: $data")
+                sendNotification(title, body, data)
+            }
         }
-        Log.d("title", message.data["title"].toString())
-        Log.d("body", message.data["body"].toString())
     }
 
-    private fun sendNotification(message: RemoteMessage) {
+    private fun sendNotification(title: String?, body: String?, data: Map<String, String>) {
+
         // 알림 채널 이름
         val channelId = getString(R.string.default_notification_channel_id)
 
@@ -36,8 +43,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher) // 아이콘 설정
-            .setContentTitle(message.data["title"].toString()) // 제목
-            .setContentText(message.data["body"].toString()) // 메시지 내용
+            .setContentTitle(title) // 제목
+            .setContentText(body) // 메시지 내용
             .setAutoCancel(true)
             .setSound(soundUri) // 알림 소리
             //.setContentIntent() // 알림 실행 시 Intent

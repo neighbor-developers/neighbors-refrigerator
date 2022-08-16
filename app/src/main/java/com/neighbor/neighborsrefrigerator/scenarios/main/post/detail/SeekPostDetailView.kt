@@ -15,6 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
 fun SeekPostDetail(navHostController: NavHostController, post: PostData) {
@@ -26,6 +30,20 @@ fun SeekPostDetail(navHostController: NavHostController, post: PostData) {
             Button(onClick = { navHostController.navigateUp() }) {
                 Text(text = "뒤로가기", Modifier.size(width = 100.dp, height = 40.dp))
             }
+        }
+
+        Button(onClick = {
+            val viewModel = ChatViewModel()
+
+            val contactUserId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+            val chatId = post.id.toString() + contactUserId.toString()
+
+            // RDB 로직
+            viewModel.newChatRoom(chatId, post.id!!, contactUserId)
+
+            navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
+        }){
+            Text(text = "채팅하기")
         }
     }
 }
