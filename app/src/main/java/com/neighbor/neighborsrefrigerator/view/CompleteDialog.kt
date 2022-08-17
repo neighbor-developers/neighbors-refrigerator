@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun CompleteShareDialog(onChangeState: () -> Unit, completeShare: () -> Unit) {
+fun CompleteDialog(type: String, onChangeState: () -> Unit, completeShare: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onChangeState() },
         title = {
@@ -23,7 +23,11 @@ fun CompleteShareDialog(onChangeState: () -> Unit, completeShare: () -> Unit) {
         },
         text = {
             Column {
-                Text(text = "거래를 완료하시겠습니까?")
+                if(type == "거래"){
+                    Text(text = "거래를 완료하시겠습니까?")
+                }else{
+                    Text(text = "등록하시겠습니까?")
+                }
             }
         },
         dismissButton = {

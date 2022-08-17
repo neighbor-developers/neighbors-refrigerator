@@ -27,7 +27,7 @@ import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.view.CompleteShareDialog
+import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import java.text.SimpleDateFormat
@@ -78,7 +78,7 @@ fun ChatScreen(navController : NavHostController, chatId:String){
                     chatViewModel.completeShare(chatViewModel.postData.value?.id)}
             }
 
-            TopBarSection(navController, chatViewModel.postData.collectAsState(), userId)
+            TopBarSection(chatViewModel, navController, chatViewModel.postData.collectAsState(), userId)
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -93,7 +93,7 @@ fun ChatScreen(navController : NavHostController, chatId:String){
 }
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TopBarSection(navController: NavHostController, postData: State<PostData?>, userId: Int, alignment: Alignment.Vertical = Alignment.Top) {
+fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController, postData: State<PostData?>, userId: Int, alignment: Alignment.Vertical = Alignment.Top) {
 
     var completeShareDialog by remember {
         mutableStateOf(false)
@@ -102,9 +102,11 @@ fun TopBarSection(navController: NavHostController, postData: State<PostData?>, 
      postData 가져와서 보여주고, 거래 완료 null에, 작성자면 판매완료 버튼 생성하고, 실시간으로 변경도 가능하게끔 해야함
     */
     if(completeShareDialog){
-//        CompleteShareDialog {
-//            completeShareDialog = false
-//        }
+        CompleteDialog(
+            type = "거래",
+            { completeShareDialog = false },
+            { chatViewModel.completeShare(postData.value?.id) }
+        )
     }
     postData.value?.let { postData ->
         Card(
