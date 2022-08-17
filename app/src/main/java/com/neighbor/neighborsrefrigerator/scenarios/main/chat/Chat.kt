@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -101,9 +102,9 @@ fun TopBarSection(navController: NavHostController, postData: State<PostData?>, 
      postData 가져와서 보여주고, 거래 완료 null에, 작성자면 판매완료 버튼 생성하고, 실시간으로 변경도 가능하게끔 해야함
     */
     if(completeShareDialog){
-        CompleteShareDialog {
-            completeShareDialog = false
-        }
+//        CompleteShareDialog {
+//            completeShareDialog = false
+//        }
     }
     postData.value?.let { postData ->
         Card(
@@ -227,22 +228,27 @@ fun MessageItem(message: RdbMessageData, userId: Int) {
 
 @Composable
 fun SendSection(viewModel: ChatViewModel, userId: Int, chatId: String) {
-    var sendMessage by remember {
+    val sendMessage = remember {
+        mutableStateOf("")
+    }
+    val timestamp = remember {
         mutableStateOf("")
     }
     Card(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
-            value = sendMessage,
-            onValueChange = { sendMessage = it },
+            value = sendMessage.value,
+            onValueChange = { sendMessage.value = it },
             placeholder = { Text(text = "메세지를 작성해주세요") },
             trailingIcon = {
                 IconButton(
                     onClick = {
                         // 메세지 보내기
-                        if (sendMessage.isNotEmpty()) {
-                            val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
-                            val message = RdbMessageData(sendMessage, false, timeStamp, userId)
+                        if (sendMessage.value.isNotEmpty()) {
+                            Log.d("새로운 메세지", sendMessage.value)
+                            timestamp.value = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
+                            val message = RdbMessageData(sendMessage.value, false, timestamp.value, userId)
                             viewModel.newMessage(chatId, message)
+                            sendMessage.value = ""
                         }
                     }
                 ){

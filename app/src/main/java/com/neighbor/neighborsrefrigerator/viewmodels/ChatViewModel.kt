@@ -13,17 +13,18 @@ import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatViewModel() : ViewModel() {
 
     private val dbAccessModule = DBAccessModule()
     private val firebaseDB = FirebaseDatabase.getInstance()
 
-    var chatMessages = MutableStateFlow<List<RdbMessageData>?>(null)
+    var chatMessages = MutableStateFlow<ArrayList<RdbMessageData>?>(null)
     var chatData = MutableStateFlow<RdbChatData?>(null)
     var postData = MutableStateFlow<PostData?>(null)
 
-    var chatList = MutableStateFlow<List<RdbChatData>?>(null) // 임시로 String으로 설정
+    var chatList = MutableStateFlow<ArrayList<RdbChatData>?>(null) // 임시로 String으로 설정
 
     // chatList
     fun initChatList(){
@@ -54,14 +55,15 @@ class ChatViewModel() : ViewModel() {
 
     }
     private fun getUserData(postId: Int){
-        dbAccessModule.getPostByPostId(postId)
+        //dbAccessModule.getPostByPostId(postId)
     }
 
     fun enterChatRoom(chatId: String){
         // 와이파이 되는지 확인 후 되면 파이어베이스, 안되면 룸디비
         firebaseDB.reference.child(chatId).get()
             .addOnSuccessListener {
-                chatData.value = it.value as RdbChatData
+                Log.d("채팅방 정보", it.value.toString())
+                //chatData.value = it.value as RdbChatData
             }
             .addOnFailureListener{
                 Log.d("채팅룸 정보 가져오기 실패", it.toString())
@@ -69,7 +71,8 @@ class ChatViewModel() : ViewModel() {
 
         val chatListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                chatMessages.value = snapshot.value as List<RdbMessageData>?
+                Log.d("현재 채팅 목록", snapshot.value.toString())
+                //chatMessages.value = snapshot.value as List<RdbMessageData>?
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -109,7 +112,14 @@ class ChatViewModel() : ViewModel() {
 
     fun newMessage(chatId: String, messageData: RdbMessageData){
         // 아직 RDB 사용법을 제대로 파악 못해서 어떤 형식으로 저장할지 미정, 배열로 할지
-        chatMessages.value?.plus(messageData)
+        if(chatMessages.value == null) {
+            chatMessages.value = arrayListOf(messageData)
+            Log.d("빈 리스트에 추가됨", chatMessages.value!!.toString())
+        }else{
+            chatMessages.value!!.add(messageData)
+            Log.d("추가됨", chatMessages.value!!.toString())
+        }
+        Log.d("newChat", chatMessages.value.toString())
         firebaseDB.reference.child(chatId).child("message").setValue(chatMessages.value)
             .addOnSuccessListener {
                 Log.d("newChatRoomSuccess", "채팅룸 메세지 목록 생성 완료")
