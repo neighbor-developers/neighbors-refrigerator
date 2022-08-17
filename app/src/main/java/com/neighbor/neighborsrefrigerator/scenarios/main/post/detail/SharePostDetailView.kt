@@ -29,7 +29,7 @@ import java.util.*
 
 
 @Composable
-fun SharePostDetail(navHostController: NavHostController, post: PostData) {
+fun SharePostDetailScreen(navHostController: NavHostController, post: PostData) {
 
     val postTime = post.validateDate
     var token = postTime!!.split("T")[0].split("-")

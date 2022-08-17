@@ -21,7 +21,7 @@ import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun SeekPostDetail(navHostController: NavHostController, post: PostData) {
+fun SeekPostDetailScreen(navHostController: NavHostController, post: PostData) {
 
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -36,9 +36,10 @@ fun SeekPostDetail(navHostController: NavHostController, post: PostData) {
             val viewModel = ChatViewModel()
 
             val contactUserId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+            // chatId는 포스트 아이디와 접근한 유저 아이디를 합쳐서 만듬
             val chatId = post.id.toString() + contactUserId.toString()
 
-            // RDB 로직
+            // RDB, room에 채팅 저장
             viewModel.newChatRoom(chatId, post.id!!, contactUserId)
 
             navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")

@@ -26,7 +26,7 @@ import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.view.CompleteShare
+import com.neighbor.neighborsrefrigerator.view.CompleteShareDialog
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import java.text.SimpleDateFormat
@@ -37,7 +37,9 @@ import java.util.*
 fun ChatScreen(navController : NavHostController, chatId:String){
     val chatViewModel = ChatViewModel()
 
+    // 채팅창 들어가서 정보 가져오기- 채팅 데이터, 채팅 내용
     chatViewModel.enterChatRoom(chatId)
+    // 채팅 생성한 post 정보 가져오기
     chatViewModel.getPostData()
 
     val userId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
@@ -72,7 +74,7 @@ fun ChatScreen(navController : NavHostController, chatId:String){
             if(declarationDialogState){
                 DeclarationDialog(type = 2) {
                     declarationDialogState = false
-                }
+                    chatViewModel.completeShare(chatViewModel.postData.value?.id)}
             }
 
             TopBarSection(navController, chatViewModel.postData.collectAsState(), userId)
@@ -99,7 +101,7 @@ fun TopBarSection(navController: NavHostController, postData: State<PostData?>, 
      postData 가져와서 보여주고, 거래 완료 null에, 작성자면 판매완료 버튼 생성하고, 실시간으로 변경도 가능하게끔 해야함
     */
     if(completeShareDialog){
-        CompleteShare {
+        CompleteShareDialog {
             completeShareDialog = false
         }
     }
@@ -140,6 +142,7 @@ fun TopBarSection(navController: NavHostController, postData: State<PostData?>, 
                     Text(text = "${postData.userId}", color = Color.DarkGray, fontSize = 12.sp)
                 }
                 if (postData.userId == userId) {
+                    // 포스트 작성자일때 완료 버튼
                     Button(onClick = { completeShareDialog = true }) {
                         Text(text = "나눔 완료")
                     }
@@ -171,6 +174,7 @@ fun MessageItem(message: RdbMessageData, userId: Int) {
     val formattedTime = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).parse(message.createdAt)
     val time = SimpleDateFormat("hh:MM", Locale.KOREA).format(formattedTime!!)
 
+    // 본인일때 true
     val isMe = message.from == userId
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -234,8 +238,9 @@ fun SendSection(viewModel: ChatViewModel, userId: Int, chatId: String) {
             trailingIcon = {
                 IconButton(
                     onClick = {
+                        // 메세지 보내기
                         if (sendMessage.isNotEmpty()) {
-                            val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(System.currentTimeMillis()))
+                            val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
                             val message = RdbMessageData(sendMessage, false, timeStamp, userId)
                             viewModel.newMessage(chatId, message)
                         }

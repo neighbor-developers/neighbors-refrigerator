@@ -33,10 +33,9 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetail
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetail
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetailScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetailScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
-import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
@@ -104,13 +103,13 @@ fun Screen(startRoute: String){
             val post = remember {
                 navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
             }
-            SharePostDetail(navController, post!!)
+            SharePostDetailScreen(navController, post!!)
         }
         composable(NAV_ROUTE.SEEK_DETAIL.routeName){
             val post = remember {
                 navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
             }
-            SeekPostDetail(navController, post!!)
+            SeekPostDetailScreen(navController, post!!)
         }
         composable(NAV_ROUTE.SHARE_REGISTER.routeName){
             SharePostRegisterScreen(navController)

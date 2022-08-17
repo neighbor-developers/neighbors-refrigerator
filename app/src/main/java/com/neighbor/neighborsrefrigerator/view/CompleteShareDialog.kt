@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun CompleteShare(onChangeState: () -> Unit) {
+fun CompleteShareDialog(onChangeState: () -> Unit, completeShare: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onChangeState() },
         title = {
@@ -35,7 +35,7 @@ fun CompleteShare(onChangeState: () -> Unit) {
             TextButton(
                 onClick = {
                     onChangeState()
-                    // 벌점 맥이기
+                    // postData에 판매완료 처리 로직
                 }) {
                 Text(text = "확인")
             }
