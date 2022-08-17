@@ -14,6 +14,25 @@ import retrofit2.create
 class DBAccessModule {
     private val dbAccessApi:  DBAccessInterface = DBApiClient.getApiClient().create()
 
+    fun completeTrade(postData: PostData){
+        dbAccessApi.completeTrade(postData).enqueue(object : Callback<ReturnObject<Int>>{
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("test",response.body()!!.msg)
+                }
+                else{
+                    /**/
+                }
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
+    }
 
     //id로 포스트 데이터 불러오기
     fun getPostByUserId(userId :Int, applyPostDatas: (ArrayList<PostData>) -> Unit) {
@@ -35,8 +54,23 @@ class DBAccessModule {
         })
     }
     //id로 포스트 데이터 불러오기
-    fun getPostByPostId(postId :Int, applyPostDatas: (ArrayList<PostData>) -> Unit) {
+    fun getPostByPostId(postId :Int, applyPostData: (ArrayList<PostData>) -> Unit) {
+        dbAccessApi.getPostById(postId).enqueue(object :Callback<ReturnObject<ArrayList<PostData>>>{
+            override fun onResponse(
+                call: Call<ReturnObject<ArrayList<PostData>>>,
+                response: Response<ReturnObject<ArrayList<PostData>>>
+            ) {
+                if(response.isSuccessful){
+                    response.body()?.let {
+                        applyPostData(it.result)
+                    }
+                }
+            }
 
+            override fun onFailure(call: Call<ReturnObject<ArrayList<PostData>>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
     }
 
     //유저 데이터 데이터 베이스에 입력

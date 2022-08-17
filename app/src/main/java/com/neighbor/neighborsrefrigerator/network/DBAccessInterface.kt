@@ -28,6 +28,16 @@ interface DBAccessInterface {
         @Query("longitude") longitude: Double?
     ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
 
+    @GET("/post/getInfoById")
+    fun getPostById(
+        @Query("id") id : Int
+    ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
+
+    @POST("/post/completeTrade")
+    fun completeTrade(
+        @Body postData : PostData
+    ): retrofit2.Call<ReturnObject<Int>>
+
     @POST("/post/create")
     fun entryPost(
         @Body postData: PostData
