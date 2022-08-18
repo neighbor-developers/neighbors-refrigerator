@@ -140,11 +140,8 @@ class ChatViewModel() : ViewModel() {
         }
     }
 
-    fun completeShare(postId: Int?){
-        postId?.let {
-            val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
-            //dbAccessModule
-        }
+    fun completeShare(postData: PostData){
+        dbAccessModule.completeTrade(postData)
     }
 
 }

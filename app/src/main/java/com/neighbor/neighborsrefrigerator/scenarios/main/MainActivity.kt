@@ -1,5 +1,7 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
@@ -43,25 +46,51 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
+    private val auth = FirebaseAuth.getInstance()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
-            viewModel.hasId.collect{
-                // 아이디 존재할경우 메인, 존재하지 않을경우 등록 페이지
-                val route = if(it){
-                    NAV_ROUTE.MAIN.routeName
-                }else{
-                    NAV_ROUTE.REGISTER_INFO.routeName
+            launch {
+                viewModel.hasId.collect {
+                    // 아이디 존재할경우 메인, 존재하지 않을경우 등록 페이지
+                    val route = if (it) {
+                        NAV_ROUTE.MAIN.routeName
+                    } else {
+                        NAV_ROUTE.REGISTER_INFO.routeName
+                    }
+                    setContent {
+                        Screen(startRoute = route)
+                    }
                 }
-                setContent {
-                    Screen(startRoute = route)
+            }
+            launch {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        MainViewModel.MainEvent.SendEmail -> sendEmail(viewModel.emailContent.value, viewModel.userEmail.value)
+                    }
                 }
             }
         }
     }
+
+    private fun sendEmail(content: String, userEmail: String){
+        val uId = auth.currentUser?.uid
+
+        val uri = Uri.parse("mailto:$userEmail")
+        val managerEmail = "haejinjung1110@gmail.com"
+
+        val intent = Intent(Intent.ACTION_SENDTO, uri)
+
+        intent.putExtra(Intent.EXTRA_SUBJECT, "이웃집 냉장고 문의")
+        intent.putExtra(Intent.EXTRA_TEXT, "email : $userEmail \n uId: $uId \n 문의 내용 : $content")
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(managerEmail))
+
+        startActivity(intent)
+    }
+
 }
 
 

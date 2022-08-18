@@ -9,9 +9,10 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import com.neighbor.neighborsrefrigerator.data.PostData
 
 @Composable
-fun CompleteDialog(type: String, onChangeState: () -> Unit, completeShare: () -> Unit) {
+fun CompleteDialog(type: String, onChangeState: () -> Unit, completeTrade: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onChangeState() },
         title = {
@@ -39,7 +40,7 @@ fun CompleteDialog(type: String, onChangeState: () -> Unit, completeShare: () ->
             TextButton(
                 onClick = {
                     onChangeState()
-                    // postData에 판매완료 처리 로직
+                    completeTrade()
                 }) {
                 Text(text = "확인")
             }

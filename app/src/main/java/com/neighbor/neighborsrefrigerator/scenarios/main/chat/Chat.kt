@@ -74,8 +74,7 @@ fun ChatScreen(navController : NavHostController, chatId:String){
         Column(modifier = Modifier.padding(it)) {
             if(declarationDialogState){
                 DeclarationDialog(type = 2) {
-                    declarationDialogState = false
-                    chatViewModel.completeShare(chatViewModel.postData.value?.id)}
+                    declarationDialogState = false}
             }
 
             TopBarSection(chatViewModel, navController, chatViewModel.postData.collectAsState(), userId)
@@ -102,11 +101,13 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
      postData 가져와서 보여주고, 거래 완료 null에, 작성자면 판매완료 버튼 생성하고, 실시간으로 변경도 가능하게끔 해야함
     */
     if(completeShareDialog){
-        CompleteDialog(
-            type = "거래",
-            { completeShareDialog = false },
-            { chatViewModel.completeShare(postData.value?.id) }
-        )
+        postData.value?.let {
+            CompleteDialog(
+                type = "거래",
+                { completeShareDialog = false },
+                { chatViewModel.completeShare(it) }
+            )
+        }
     }
     postData.value?.let { postData ->
         Card(

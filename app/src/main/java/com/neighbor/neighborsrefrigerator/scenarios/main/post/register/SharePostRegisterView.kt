@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 import java.util.*
 
@@ -51,6 +52,10 @@ fun SharePostRegisterScreen(
     var mMonth = mCalendar.get(Calendar.MONTH)
     var mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
 
+    var completeShareDialog by remember {
+        mutableStateOf(false)
+    }
+
     mCalendar.time = Date()
 
     Scaffold(
@@ -67,11 +72,10 @@ fun SharePostRegisterScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        viewModel.registerData()
-
-                        if (viewModel.isSuccessRegist.value) {
-
-                        }
+                        completeShareDialog = true
+//                        viewModel.registerData()
+//                        if (viewModel.isSuccessRegist.value) {
+//                        }
                     })
                     {
                         Icon(
@@ -90,6 +94,14 @@ fun SharePostRegisterScreen(
                 .padding(it)
                 .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp)
         ) {
+
+            if(completeShareDialog){
+                CompleteDialog(
+                    type = "등록",
+                    { completeShareDialog = false },
+                    { /*등록 눌렀을때 실행될 로직*/ }
+                )
+            }
             Image(
                 painter = if (viewModel.imgUriState != null)
                     rememberAsyncImagePainter(
