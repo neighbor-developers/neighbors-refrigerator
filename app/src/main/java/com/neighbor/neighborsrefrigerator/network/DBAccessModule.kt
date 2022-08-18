@@ -117,28 +117,6 @@ class DBAccessModule {
             }
         })
     }
-
-    //시간순으로 포스트 데이터 불러오기
-//    fun getPostOrderByTime(reqType :Int, postType: Int, currentIndex: Int, num: Int, categoryId: Int?, title: String?, currentTime: String, latitude: Double?, longitude: Double?, applyPostDatas: (ArrayList<PostData>) -> Unit) {
-//        dbAccessApi.getPostOrderByTime(reqType, postType, currentIndex, num, categoryId, title, currentTime, latitude, longitude).enqueue(object :
-//            Callback<ReturnObject<ArrayList<PostData>>> {
-//            override fun onResponse(call: Call<ReturnObject<ArrayList<PostData>>>, response: Response<ReturnObject<ArrayList<PostData>>>) {
-//                if(response.isSuccessful){
-//                    response.body()?.let {
-//                        applyPostDatas(it.result)
-//                    }
-//                }
-//                else{
-//                    /*no-op*/
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ReturnObject<ArrayList<PostData>>>, t: Throwable) {
-//                Log.d("test",t.localizedMessage)
-//            }
-//
-//        })
-//    }
     fun getPostOrderByTime(page: Int, pageSize:Int, reqPostData: ReqPostData) : ArrayList<PostData>?{
         var resultPosts: ArrayList<PostData>? = null
         dbAccessApi.getPostOrderByTime(page, pageSize, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude).enqueue(object :

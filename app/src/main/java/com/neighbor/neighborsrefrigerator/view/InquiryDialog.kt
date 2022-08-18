@@ -1,18 +1,25 @@
 package com.neighbor.neighborsrefrigerator.view
 
-import androidx.compose.foundation.background
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
+import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 
 @Composable
-fun InquiryDialog(onChangeState: () -> Unit) {
+fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
     var userEmail by remember {
         mutableStateOf("")
     }
@@ -45,11 +52,11 @@ fun InquiryDialog(onChangeState: () -> Unit) {
             TextButton(
                 onClick = {
                     onChangeState()
-                    // 벌점 맥이기
+                    viewModel.sendEmail(inquiryContent, userEmail)
+
                 }) {
                 Text(text = "문의")
             }
         }
     )
-
 }
