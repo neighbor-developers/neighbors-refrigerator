@@ -20,9 +20,11 @@ data class UserData(
     @SerializedName("report_point")
     val reportPoint: Int = 0,
     @SerializedName("latitude")
-    val latitude : Double,
+    val latitude: Double,
     @SerializedName("longitude")
-    val longitude : Double,
+    val longitude: Double,
     @SerializedName("created_at")
-    val createdAt: String
+    val createdAt: String,
+    @SerializedName("fcm")
+    var fcm: String?
 )

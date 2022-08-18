@@ -22,7 +22,8 @@ class UserSharedPreference(context: Context) {
             reportPoint = prefs.getString("reportPoint", "")!!.toInt(),
             latitude = prefs.getString("latitude", "")!!.toDouble(),
             longitude = prefs.getString("longitude", "")!!.toDouble(),
-            createdAt = prefs.getString("createdAt", "")!!
+            createdAt = prefs.getString("createdAt", "")!!,
+            fcm = null
         )
     }
 

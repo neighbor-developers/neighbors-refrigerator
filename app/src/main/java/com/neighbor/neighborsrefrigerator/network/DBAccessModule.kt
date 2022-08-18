@@ -242,5 +242,24 @@ class DBAccessModule {
         })
     }
 
+    fun updateFcmToken(userData: UserData){
+        dbAccessApi.updateFcmToken(userData).enqueue(object : Callback<ReturnObject<Int>>{
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("test",response.body()!!.msg)
+                }
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        }
+
+        )
+    }
+
 
 }

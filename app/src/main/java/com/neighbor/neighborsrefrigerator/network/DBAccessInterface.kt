@@ -68,6 +68,11 @@ interface DBAccessInterface {
         @Query("id") id: String
     ): retrofit2.Call<ReturnObject<Boolean>>
 
+    @POST("post/updateFcmToken")
+    fun updateFcmToken(
+        @Body userdata : UserData
+    ) : retrofit2.Call<ReturnObject<Int>>
+
     @POST("/user/updateNickname")
     fun updateNickname(
         @Query("id") id: Int,
