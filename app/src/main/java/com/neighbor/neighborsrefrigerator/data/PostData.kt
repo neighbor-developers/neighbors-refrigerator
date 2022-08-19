@@ -33,7 +33,7 @@ data class PostData(
     val validateDate: String?,
     @SerializedName("validate_img")
     val validateImg: String?,
-    @SerializedName("product_img")
+    @SerializedName("image1")
     val productImg: String?,
     @SerializedName("created_at")
     val createdAt: String,
