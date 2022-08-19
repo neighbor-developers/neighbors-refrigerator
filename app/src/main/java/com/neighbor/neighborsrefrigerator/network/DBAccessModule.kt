@@ -1,7 +1,10 @@
 package com.neighbor.neighborsrefrigerator.network
 
 import android.util.Log
+import android.widget.Toast
+import com.google.android.gms.maps.model.LatLng
 import com.neighbor.neighborsrefrigerator.data.*
+import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import com.neighbor.neighborsrefrigerator.viewmodels.ReqPostData
 import retrofit2.Call
 import retrofit2.Callback
@@ -92,7 +95,7 @@ class DBAccessModule {
     }
 
     //포스트 데이터 데이터베이스에 입력
-    fun entryPost(postData: PostData, result: (Int) -> Unit){
+    fun entryPost(postData: PostData, resultCode: (Int) -> Unit){
         dbAccessApi.entryPost(postData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
                 call: Call<ReturnObject<Int>>,
@@ -101,7 +104,7 @@ class DBAccessModule {
                 if(response.isSuccessful) {
                     Log.d("test","entry successful")
                     response.body()?.let {
-                        result(it.result)
+                        resultCode(it.resultCode)
                     }
                 }
                 else{
@@ -114,9 +117,9 @@ class DBAccessModule {
             }
         })
     }
-    fun getPostOrderByTime(page: Int, pageSize:Int, reqPostData: ReqPostData) : ArrayList<PostData>?{
-        var resultPosts: ArrayList<PostData>? = null
-        dbAccessApi.getPostOrderByTime(page, pageSize, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude).enqueue(object :
+    fun getPostOrderByTime(page: Int, pageSize:Int, reqPostData: ReqPostData) : ArrayList<PostData>{
+        var resultPosts: ArrayList<PostData> = arrayListOf()
+        dbAccessApi.getPostOrderByTime(page, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude).enqueue(object :
             Callback<ReturnObject<ArrayList<PostData>>> {
             override fun onResponse(call: Call<ReturnObject<ArrayList<PostData>>>, response: Response<ReturnObject<ArrayList<PostData>>>) {
                 if(response.isSuccessful){
@@ -226,14 +229,13 @@ class DBAccessModule {
                 if(response.isSuccessful){
                     Log.d("test",response.body()!!.msg)
                 }
+
             }
 
             override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
             }
-        }
-
-        )
+        })
     }
 
 

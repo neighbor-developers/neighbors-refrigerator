@@ -51,15 +51,14 @@ class ChatViewModel() : ViewModel() {
             }
         // roomDb 에서 채팅 ㄱ져오기
         // 룸db랑 비교 -> 안읽은 채팅 메세지 수 체크
-        // roomDB에는 채팅창 들어가서 조회하는 순간에 저장해야함
 
     }
-    private fun getUserData(postId: Int){
-        //dbAccessModule.getPostByPostId(postId)
+    private fun getUserData(id: Int){
+        dbAccessModule.getUserInfoById(id){}
     }
 
     fun enterChatRoom(chatId: String){
-        // 와이파이 되는지 확인 후 되면 파이어베이스, 안되면 룸디비
+        // 기본적으로 룸디비, 와이파이 될때 rdb와 비교??
         firebaseDB.reference.child(chatId).get()
             .addOnSuccessListener {
                 Log.d("채팅방 정보", it.value.toString())
@@ -135,8 +134,8 @@ class ChatViewModel() : ViewModel() {
     }
 
     fun getPostData(){
-        chatData.value?.let {
-            //dbAccessModule.getPostByPostId(it.postId){postData.value = it}
+        chatData.value?.let { data ->
+            dbAccessModule.getPostByPostId(data.postId){postData.value = it[0] }
         }
     }
 
