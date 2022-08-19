@@ -66,6 +66,7 @@ class RegisterInfoViewModel(): ViewModel() {
                 response: Response<ReturnObject<Boolean>>
             ) {
                 availableNickname.value = !response.body()!!.result
+                fillAddressMain.value = addressMain.isNotEmpty()
                 buttonEnabled.value = availableNickname.value!! && fillAddressMain.value!!
             }
             override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
