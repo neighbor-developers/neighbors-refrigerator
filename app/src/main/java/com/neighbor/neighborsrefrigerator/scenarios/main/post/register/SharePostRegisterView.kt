@@ -1,6 +1,7 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post.register
 
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,7 +30,7 @@ import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 import java.util.*
 
-var sampleList: List<Pair<String, String>> = listOf(Pair("100", "과일"), Pair("101", "채소"))
+private var sampleList: List<Pair<String, String>> = listOf(Pair("", "선택"), Pair("100", "과일"), Pair("101", "채소"))
 
 @Composable
 fun SharePostRegisterScreen(
@@ -73,9 +74,6 @@ fun SharePostRegisterScreen(
                 actions = {
                     IconButton(onClick = {
                         completeShareDialog = true
-//                        viewModel.registerData()
-//                        if (viewModel.isSuccessRegist.value) {
-//                        }
                     })
                     {
                         Icon(
@@ -94,103 +92,117 @@ fun SharePostRegisterScreen(
                 .padding(it)
                 .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp)
         ) {
-
             if(completeShareDialog){
                 CompleteDialog(
                     type = "등록",
                     { completeShareDialog = false },
-                    { /*등록 눌렀을때 실행될 로직*/ }
-                )
-            }
-            Image(
-                painter = if (viewModel.imgUriState != null)
-                    rememberAsyncImagePainter(
-                    ImageRequest
-                        .Builder(LocalContext.current)
-                        .data(data = viewModel.imgUriState)
-                        .build()
-                    ) else painterResource(R.drawable.icon_google),
-                contentDescription = "상품 사진",
-                modifier = Modifier
-                    .clickable(
-                        enabled = true,
-                        onClickLabel = "Clickable image",
-                        onClick = { selectImageLauncher.launch("image/*") }
-                    )
-                    .width(150.dp)
-                    .height(150.dp)
-            )
-            Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                Text(text = "상품명", fontSize = 20.sp)
-                TextField(
-                    value = viewModel.title.value,
-                    onValueChange = { input -> viewModel.title.value = input },
-                    modifier = Modifier
-                        .padding(start = 5.dp),
-                )
-            }
-            Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                Text(text = "위치", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
-                LocationButton("홈", viewModel.locationType)
-                LocationButton("내위치", viewModel.locationType)
-            }
-            Row(
-                modifier = Modifier.padding(bottom = 5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "기간", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
-                Column() {
-                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                        PeriodButton("제조", viewModel.validateTypeName)
-                        PeriodButton("구매", viewModel.validateTypeName)
-                        PeriodButton("유통", viewModel.validateTypeName)
-                    }
-                    Row() {
-                        Row(
-                            modifier = Modifier
-                                .border(width = 1.dp, color = Color.Black)
-                                .clickable {
-                                    periodButtonState = true
-                                },
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = viewModel.validateDate.value,
-                                fontSize = 12.sp,
-                                modifier = Modifier
-                                    .width(120.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "달력 버튼"
-                            )
-
-                            if (periodButtonState) {
-                                DatePickerDialog(
-                                    LocalContext.current,
-                                    { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-                                        viewModel.validateDate.value = "$mYear/${mMonth+1}/$mDayOfMonth"
-                                    }, mYear, mMonth, mDay
-                                ).show()
-                                periodButtonState = false
-                            }
+                    {
+                        if (viewModel.isSuccessRegist.value) {
+                            navHostController.navigateUp()
+                        } else {
+                            Log.d("실패", "상품 등록 실패")
                         }
-                        IconButton(
-                            onClick = { selectValidateImageLauncher.launch("image/*") }
-                        ){
-                            Icon(
-                                Icons.Filled.Refresh,
-                                contentDescription = "Localized description",
-                                tint = Color.Blue
-                            )
+                    }
+                )
+            }
+
+            Row() {
+                Image(
+                    painter = if (viewModel.imgUriState != null)
+                        rememberAsyncImagePainter(
+                            ImageRequest
+                                .Builder(LocalContext.current)
+                                .data(data = viewModel.imgUriState)
+                                .build()
+                        ) else painterResource(R.drawable.icon_google),
+                    contentDescription = "상품 사진",
+                    modifier = Modifier
+                        .clickable(
+                            enabled = true,
+                            onClickLabel = "Clickable image",
+                            onClick = { selectImageLauncher.launch("image/*") }
+                        )
+                        .width(150.dp)
+                        .height(150.dp)
+                )
+                Column(
+                    modifier = Modifier
+                        .padding(it)
+                        .padding(start = 10.dp)
+                ) {
+                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                        Text(text = "상품명", fontSize = 20.sp)
+                        TextField(
+                            value = viewModel.title.value,
+                            onValueChange = { input -> viewModel.title.value = input },
+                            modifier = Modifier
+                                .padding(start = 5.dp),
+                        )
+                    }
+                    Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                        Text(text = "위치", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
+                        LocationButton("홈", viewModel.locationType)
+                        LocationButton("내위치", viewModel.locationType)
+                    }
+                    Row(
+                        modifier = Modifier.padding(bottom = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "기간", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
+                        Column() {
+                            Row(modifier = Modifier.padding(bottom = 5.dp)) {
+                                PeriodButton("제조", viewModel.validateTypeName)
+                                PeriodButton("구매", viewModel.validateTypeName)
+                                PeriodButton("유통", viewModel.validateTypeName)
+                            }
+                            Row() {
+                                Row(
+                                    modifier = Modifier
+                                        .border(width = 1.dp, color = Color.Black)
+                                        .clickable {
+                                            periodButtonState = true
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = viewModel.validateDate.value,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier
+                                            .width(120.dp)
+                                            .padding(start = 10.dp)
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowBack,
+                                        contentDescription = "달력 버튼"
+                                    )
+
+                                    if (periodButtonState) {
+                                        DatePickerDialog(
+                                            LocalContext.current,
+                                            { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                                                viewModel.validateDate.value = "$mYear/${mMonth+1}/$mDayOfMonth"
+                                            }, mYear, mMonth, mDay
+                                        ).show()
+                                        periodButtonState = false
+                                    }
+                                }
+                                IconButton(
+                                    onClick = { selectValidateImageLauncher.launch("image/*") }
+                                ){
+                                    Icon(
+                                        Icons.Filled.Refresh,
+                                        contentDescription = "Localized description",
+                                        tint = Color.Blue
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("카테고리")
-                CategorySpinner(sampleList, Pair("100", "과일"), viewModel)
+                CategorySpinner(sampleList, Pair("", "선택"), viewModel)
             }
             TextField(
                 value = viewModel.content.value,
@@ -243,7 +255,7 @@ fun ChangeButtonColor(isSelect: Boolean): ButtonColors {
 }
 
 @Composable
-fun CategorySpinner(
+private fun CategorySpinner(
     list: List<Pair<String, String>>,
     preselected: Pair<String, String>,
     viewModel: SharePostRegisterViewModel
@@ -300,7 +312,7 @@ fun CategorySpinner(
 
 @Preview
 @Composable
-fun DefaultPreview() {
+fun SharePreview() {
     SharePostRegisterScreen(
         navHostController = NavHostController(context = LocalContext.current)
     )
