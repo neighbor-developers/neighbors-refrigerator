@@ -38,11 +38,10 @@ private val drawerMenu = listOf(
 
 @Composable
 fun Drawer(
+    viewModel: MainViewModel,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = MainViewModel()
-
     var flowerDialogState by remember { mutableStateOf(false) }
     var locationDialogState by remember { mutableStateOf(false) }
     var inquiryDialogState by remember { mutableStateOf(false) }

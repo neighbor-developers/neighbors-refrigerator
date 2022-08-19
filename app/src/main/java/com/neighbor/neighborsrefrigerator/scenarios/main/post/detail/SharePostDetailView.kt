@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.database.FirebaseDatabase
 import com.neighbor.neighborsrefrigerator.data.ChatData
@@ -29,7 +30,7 @@ import java.util.*
 
 
 @Composable
-fun SharePostDetailScreen(navHostController: NavHostController, post: PostData) {
+fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: ChatViewModel = viewModel(), post: PostData) {
 
     val postTime = post.validateDate
     var token = postTime!!.split("T")[0].split("-")
@@ -100,10 +101,7 @@ fun SharePostDetailScreen(navHostController: NavHostController, post: PostData) 
                 if(post.userId != contactUserId) {
                     Button(onClick = {
                         val chatId = post.id.toString() + contactUserId.toString()
-
-                        // RDB 로직
-                        val viewModel = ChatViewModel()
-                        viewModel.newChatRoom(chatId, post.id!!, contactUserId)
+                        chatViewModel.newChatRoom(chatId, post.id!!, contactUserId)
 
                         navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
                     }) {

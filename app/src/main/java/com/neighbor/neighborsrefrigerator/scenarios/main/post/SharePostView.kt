@@ -53,7 +53,7 @@ fun SharePostScreen(
 
 
 @Composable
-fun SharePostListByTime(posts: LazyPagingItems<PostData>?, route: NAV_ROUTE, navHostController: NavHostController) {
+fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController) {
 
     val scrollState = rememberLazyGridState()
 
@@ -66,13 +66,11 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>?, route: NAV_ROUTE, nav
             .padding(top = 10.dp, start = 30.dp, end = 30.dp),
         userScrollEnabled = true
     ) {
-        posts?.let {
-            items(posts.itemCount) { index ->
-                posts[index]?.let { item ->
-                    ItemCardByTime(item, route, navHostController)
-                }
-            }
+
+        items(posts.itemSnapshotList.items) { item ->
+            ItemCardByTime(item, route, navHostController)
         }
+
     }
 }
 
@@ -126,11 +124,9 @@ fun CategoryView(postViewModel: PostViewModel){
                 modifier = Modifier.size(40.dp),
                 onClick = {
                     if(it.value == "전체"){
-                        postViewModel.getPosts(null, null, "justTime", "share", 0, 12, 1)
+                        postViewModel.getPosts(null, null, "justTime", "share", 1)
                     }else {
                         postViewModel.getPosts(
-                            page = 0,
-                            pageSize = 12,
                             item = null,
                             category = it.key,
                             reqType = "category",

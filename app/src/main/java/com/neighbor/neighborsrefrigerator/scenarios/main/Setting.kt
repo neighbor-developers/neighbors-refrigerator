@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
-import android.content.Intent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,11 +29,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neighbor.neighborsrefrigerator.BuildConfig
-import com.neighbor.neighborsrefrigerator.scenarios.intro.LoginScreen
-import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 
 @Composable
@@ -47,8 +43,7 @@ private fun animateAlignmentAsState(
 
 @Preview
 @Composable
-fun Setting() {
-    val viewModel = LoginViewModel()
+fun Setting(loginViewModel: LoginViewModel = viewModel()) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -104,7 +99,7 @@ fun Setting() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                LogoutButton(viewModel)
+                LogoutButton(loginViewModel)
 
                 TextButton(onClick = { /*누르면 계정 삭제*/ }) {
                     Text(

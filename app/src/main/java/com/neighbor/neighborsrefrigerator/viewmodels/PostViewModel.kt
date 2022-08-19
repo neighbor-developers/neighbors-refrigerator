@@ -14,6 +14,7 @@ import com.neighbor.neighborsrefrigerator.network.MyPagingRepository
 import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,13 +48,12 @@ class PostViewModel : ViewModel() {
         ReqPostData(3, 2, null, null, timeStamp, userLat, userLng)
     ).cachedIn(viewModelScope)// 변경상태에도 페이징 상태를 유지하기 위해
 
-    var searchedPosts: Flow<PagingData<PostData>>? = null
-
+    var searchedPosts: Flow<PagingData<PostData>> = flow{}
 
     var sharePostsByDistance = MutableStateFlow<ArrayList<PostData>?>(null)
 
 
-    fun getPosts(item: String?, category:Int?, reqType: String, postType: String, page: Int, pageSize: Int, varType: Int) {
+    fun getPosts(item: String?, category:Int?, reqType: String, postType: String, varType: Int) {
         viewModelScope.launch {
             val result = myPagingRepository.getPostsByTime(
                 ReqPostData(

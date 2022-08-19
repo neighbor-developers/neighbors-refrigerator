@@ -13,18 +13,16 @@ interface DBAccessInterface {
     ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
 
     @GET("/post/getPostOrderByTime")
-    fun getPostOrderByTime(
+    suspend fun getPostOrderByTime(
         @Query("page") page: Int,
         @Query("reqType") reqType: Int,
         @Query("postType") postType: Int,
-//        @Query("currentIndex") currentIndex: Int,
-//        @Query("num") num: Int,
         @Query("categoryId") categoryId: Int?,
         @Query("title") title: String?,
         @Query("currentTime") currentTime: String,
         @Query("latitude") latitude: Double?,
         @Query("longitude") longitude: Double?
-    ): retrofit2.Call<ReturnObject<ArrayList<PostData>>>
+    ): ReturnObject<ArrayList<PostData>>
 
     @GET("/post/getInfoById")
     fun getPostById(

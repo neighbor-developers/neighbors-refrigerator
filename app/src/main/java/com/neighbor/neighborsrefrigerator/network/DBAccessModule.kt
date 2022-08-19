@@ -117,26 +117,11 @@ class DBAccessModule {
             }
         })
     }
-    fun getPostOrderByTime(page: Int, pageSize:Int, reqPostData: ReqPostData) : ArrayList<PostData>{
-        var resultPosts: ArrayList<PostData> = arrayListOf()
-        dbAccessApi.getPostOrderByTime(page, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude).enqueue(object :
-            Callback<ReturnObject<ArrayList<PostData>>> {
-            override fun onResponse(call: Call<ReturnObject<ArrayList<PostData>>>, response: Response<ReturnObject<ArrayList<PostData>>>) {
-                if(response.isSuccessful){
-                    response.body()?.let {
-                        resultPosts = it.result
-                    }
-                }
-                else{
-                    /*no-op*/
-                }
-            }
+    suspend fun getPostOrderByTime(page: Int, reqPostData: ReqPostData) : List<PostData>{
+        val resultPosts = kotlin.runCatching {
+            dbAccessApi.getPostOrderByTime(page, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude)
+        }.getOrNull()?.result ?: emptyList()
 
-            override fun onFailure(call: Call<ReturnObject<ArrayList<PostData>>>, t: Throwable) {
-                Log.d("test",t.localizedMessage)
-            }
-
-        })
         return resultPosts
     }
 

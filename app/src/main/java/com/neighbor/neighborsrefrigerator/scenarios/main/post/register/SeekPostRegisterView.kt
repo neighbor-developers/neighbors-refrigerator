@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.viewmodels.SeekPostRegisterViewModel
 
@@ -24,9 +25,9 @@ private var sampleList: List<Pair<String, String>> = listOf(Pair("100", "과일"
 
 @Composable
 fun SeekPostRegisterScreen(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    viewModel: SeekPostRegisterViewModel = viewModel()
 ) {
-    var viewModel = SeekPostRegisterViewModel()
 
     Scaffold(
         topBar = {

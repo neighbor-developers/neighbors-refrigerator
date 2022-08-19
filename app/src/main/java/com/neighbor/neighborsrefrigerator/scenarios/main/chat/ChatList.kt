@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
@@ -28,10 +30,7 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun ChatListScreen(navController: NavHostController){
-    val chatViewModel = ChatViewModel()
-    chatViewModel.initChatList()
-
+fun ChatListScreen(navController: NavHostController, chatViewModel: ChatViewModel = viewModel()){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -51,13 +50,16 @@ fun ChatListScreen(navController: NavHostController){
         Surface(modifier = Modifier.padding(padding)) {
             val chatList = chatViewModel.chatList.collectAsState()
             LazyColumn {
-                chatList.value?.let { chatList ->
+                chatList.value.let { chatList ->
                     items(chatList){ chat ->
                         ChatCard(chat = chat, navController, chatViewModel)
                     }
                 }
             }
         }
+    }
+    LaunchedEffect(Unit){
+        chatViewModel.initChatList()
     }
 }
 

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -41,6 +42,8 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDe
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
                         NAV_ROUTE.REGISTER_INFO.routeName
                     }
                     setContent {
-                        Screen(startRoute = route)
+                        Screen(mainViewModel = viewModel, startRoute = route)
                     }
                 }
             }
@@ -74,19 +77,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+
+
     }
 
     private fun sendEmail(content: String, userEmail: String){
-        val uId = auth.currentUser?.uid
+        val email = auth.currentUser?.email
 
-        val uri = Uri.parse("mailto:$userEmail")
         val managerEmail = "haejinjung1110@gmail.com"
+        val uri = Uri.parse("mailto:$managerEmail") // 받는 사람
 
         val intent = Intent(Intent.ACTION_SENDTO, uri)
 
         intent.putExtra(Intent.EXTRA_SUBJECT, "이웃집 냉장고 문의")
-        intent.putExtra(Intent.EXTRA_TEXT, "email : $userEmail \n uId: $uId \n 문의 내용 : $content")
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(managerEmail))
+        intent.putExtra(Intent.EXTRA_TEXT, "email : $userEmail \n 문의 내용 : $content")
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
 
         startActivity(intent)
     }
@@ -112,7 +118,7 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Screen(startRoute: String){
+fun Screen(mainViewModel: MainViewModel, startRoute: String){
 
     // 네비게이션 컨트롤러
     val navController = rememberNavController()
@@ -121,7 +127,7 @@ fun Screen(startRoute: String){
     NavHost(navController, startRoute){
 
         composable(NAV_ROUTE.MAIN.routeName){
-            MainScreen(navController)
+            MainScreen(viewModel = mainViewModel, navController)
         }
 
         composable(NAV_ROUTE.REGISTER_INFO.routeName){
@@ -132,13 +138,13 @@ fun Screen(startRoute: String){
             val post = remember {
                 navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
             }
-            SharePostDetailScreen(navController, post!!)
+            SharePostDetailScreen(navHostController = navController, post = post!!)
         }
         composable(NAV_ROUTE.SEEK_DETAIL.routeName){
             val post = remember {
                 navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
             }
-            SeekPostDetailScreen(navController, post!!)
+            SeekPostDetailScreen(navHostController = navController, post = post!!)
         }
         composable(NAV_ROUTE.SHARE_REGISTER.routeName){
             SharePostRegisterScreen(navController)
@@ -147,7 +153,7 @@ fun Screen(startRoute: String){
 
         }
         composable("${NAV_ROUTE.CHAT.routeName}/{chatID}", arguments = listOf(navArgument("chatId"){type = NavType.StringType})) {
-            ChatScreen(navController, it.arguments?.getString("chatId")?:"")
+            ChatScreen(navController = navController, chatId = it.arguments?.getString("chatId")?:"")
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
             ChatListScreen(navController)
@@ -171,7 +177,7 @@ fun Screen(startRoute: String){
 }
 
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
 
     val scaffoldState = rememberScaffoldState()
     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
@@ -224,11 +230,10 @@ fun MainScreen(navController: NavHostController) {
         },
         floatingActionButtonPosition = FabPosition.End,
         drawerContent = {
-            Drawer(navController)
+            Drawer(viewModel = viewModel, navController)
         },
         drawerGesturesEnabled = scaffoldState.drawerState.isOpen
     ) {
-
         Column(modifier = Modifier
             .padding(it)
             .fillMaxSize()) {
@@ -247,7 +252,8 @@ fun MainScreen(navController: NavHostController) {
                     Text(text = "나눔")
                 }
                 Button(
-                    onClick = { types.value = "seek" },
+                    onClick = {
+                        types.value = "seek" },
                     modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray, contentColor = Color.White, disabledBackgroundColor = Color.Yellow, disabledContentColor = Color.Black),
                     enabled = when(types.value){

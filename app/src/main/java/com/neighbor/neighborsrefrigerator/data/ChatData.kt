@@ -17,4 +17,5 @@ data class RdbChatData(
     val id: String?,
     val postId: Int,
     val contactUserId: Int,
+    val messages: ArrayList<RdbMessageData>
 )

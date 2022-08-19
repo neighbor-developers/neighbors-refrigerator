@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
@@ -21,7 +22,7 @@ import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun SeekPostDetailScreen(navHostController: NavHostController, post: PostData) {
+fun SeekPostDetailScreen(navHostController: NavHostController, chatViewModel: ChatViewModel = viewModel(), post: PostData) {
 
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -33,14 +34,13 @@ fun SeekPostDetailScreen(navHostController: NavHostController, post: PostData) {
         }
 
         Button(onClick = {
-            val viewModel = ChatViewModel()
 
             val contactUserId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
             // chatId는 포스트 아이디와 접근한 유저 아이디를 합쳐서 만듬
             val chatId = post.id.toString() + contactUserId.toString()
 
             // RDB, room에 채팅 저장
-            viewModel.newChatRoom(chatId, post.id!!, contactUserId)
+            chatViewModel.newChatRoom(chatId, post.id!!, contactUserId)
 
             navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
         }){

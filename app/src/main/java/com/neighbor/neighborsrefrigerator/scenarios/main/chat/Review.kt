@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -28,8 +29,7 @@ import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun ReviewScreen(postData: PostData, navController: NavHostController){
-    val chatViewModel = ChatViewModel()
+fun ReviewScreen(postData: PostData, navController: NavHostController, chatViewModel: ChatViewModel = viewModel()){
     var review by remember {
         mutableStateOf("")
     }
@@ -105,7 +105,9 @@ fun ReviewScreen(postData: PostData, navController: NavHostController){
 fun PostBox(postData: PostData){
     Card(elevation = 5.dp, modifier = Modifier
         .padding(top = 35.dp, bottom = 35.dp)) {
-        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth().padding(7.dp)
+        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier
+            .fillMaxWidth()
+            .padding(7.dp)
         ) {
             postData.productImg?.let { imgUrl ->
                 AsyncImage(
@@ -118,7 +120,9 @@ fun PostBox(postData: PostData){
                     placeholder = painterResource(R.drawable.icon_google),
                 )
             }
-            Column(horizontalAlignment = Alignment.Start, modifier = Modifier.height(50.dp).padding(start = 5.dp)) {
+            Column(horizontalAlignment = Alignment.Start, modifier = Modifier
+                .height(50.dp)
+                .padding(start = 5.dp)) {
                 Text(text = postData.title, fontSize = 17.sp)
                 Text(text = postData.content, fontSize = 13.sp)
             }

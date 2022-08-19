@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
@@ -21,10 +22,16 @@ import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 fun SearchPostView(
     item: String,
     type: String,
-    navController: NavHostController
+    navController: NavHostController,
+    postViewModel: PostViewModel = viewModel()
 ) {
-    val viewModel = PostViewModel()
-    Get(viewModel, item, type)
+    postViewModel.getPosts(
+        item = item,
+        category = null,
+        reqType = "search",
+        postType = type,
+        varType = 3
+    )
 
     Scaffold(
         topBar = {
@@ -43,28 +50,15 @@ fun SearchPostView(
         Surface(modifier = Modifier.padding(it)) {
             if (type == "share")
                 SharePostListByTime(
-                    posts = viewModel.searchedPosts?.collectAsLazyPagingItems(),
+                    posts = postViewModel.searchedPosts.collectAsLazyPagingItems(),
                     route = NAV_ROUTE.SHARE_DETAIL,
                     navHostController = navController)
             else{
                 SeekPostList(
-                    posts = viewModel.searchedPosts?.collectAsLazyPagingItems(),
+                    posts = postViewModel.searchedPosts.collectAsLazyPagingItems(),
                     route = NAV_ROUTE.SEEK_DETAIL,
                     navHostController = navController)
             }
         }
     }
-}
-
-@Composable
-fun Get(viewModel: PostViewModel, item: String, type: String){
-    viewModel.getPosts(
-        item = item,
-        category = null,
-        reqType = "search",
-        postType = type,
-        page = 0,
-        pageSize = 20,
-        varType = 3
-    )
 }

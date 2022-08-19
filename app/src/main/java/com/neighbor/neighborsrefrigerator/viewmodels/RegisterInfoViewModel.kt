@@ -100,7 +100,8 @@ class RegisterInfoViewModel(): ViewModel() {
                 reportPoint = 0,   //  모듈 만들기
                 latitude = coordinateData.latitude,
                 longitude = coordinateData.longitude,
-                createdAt = timeStamp
+                createdAt = timeStamp,
+                fcm = ""
             )
 
         val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()

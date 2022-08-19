@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.*
@@ -35,15 +36,10 @@ import java.util.*
 
 
 @Composable
-fun ChatScreen(navController : NavHostController, chatId:String){
-    val chatViewModel = ChatViewModel()
-
-    // 채팅창 들어가서 정보 가져오기- 채팅 데이터, 채팅 내용
-    chatViewModel.enterChatRoom(chatId)
-    // 채팅 생성한 post 정보 가져오기
-    chatViewModel.getPostData()
-
-    val userId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel = viewModel(), chatId:String){
+    val userId by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
+    }
 
     var declarationDialogState by remember {
         mutableStateOf(false)
@@ -88,6 +84,13 @@ fun ChatScreen(navController : NavHostController, chatId:String){
             }
         }
 
+    }
+
+    LaunchedEffect(Unit) {
+        // 채팅창 들어가서 정보 가져오기- 채팅 데이터, 채팅 내용
+        chatViewModel.enterChatRoom(chatId)
+        // 채팅 생성한 post 정보 가져오기
+        chatViewModel.getPostData()
     }
 }
 @OptIn(ExperimentalMaterialApi::class)
@@ -219,7 +222,7 @@ fun MessageItem(message: RdbMessageData, userId: Int) {
                             .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
                     }
                 ) {
-                    Text(text = message.content, color = Color.Black)
+                    Text(text = message.content!!, color = Color.Black)
                 }
             }
         }

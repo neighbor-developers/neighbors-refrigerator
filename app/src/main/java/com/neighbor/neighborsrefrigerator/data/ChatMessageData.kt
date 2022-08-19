@@ -3,6 +3,7 @@ package com.neighbor.neighborsrefrigerator.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Entity
 data class ChatMessageData(
     var content: String,
     var isRead: Boolean,

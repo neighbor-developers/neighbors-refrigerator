@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -34,9 +35,9 @@ private var sampleList: List<Pair<String, String>> = listOf(Pair("", "선택"), 
 
 @Composable
 fun SharePostRegisterScreen(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    viewModel: SharePostRegisterViewModel = viewModel()
 ) {
-    var viewModel = SharePostRegisterViewModel()
 
     val selectImageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         viewModel.imgUriState = uri

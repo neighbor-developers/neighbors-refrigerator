@@ -39,16 +39,14 @@ fun SeekPostScreen(
     }
 }
 @Composable
-fun SeekPostList(posts: LazyPagingItems<PostData>?,
+fun SeekPostList(posts: LazyPagingItems<PostData>,
                  route: NAV_ROUTE,
                  navHostController: NavHostController){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 30.dp, end = 30.dp)) {
-        posts?.let {
-//            it. {
-//                SeekItem(post = it, route = route, navHostController = navHostController)
-//            }
+        posts.itemSnapshotList.items.forEach {
+            SeekItem(post = it, route = route, navHostController = navHostController)
         }
     }
 }
