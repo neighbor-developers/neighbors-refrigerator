@@ -84,7 +84,7 @@ class SharePostRegisterViewModel: ViewModel() {
             validateType = validateType,
             validateDate = validateDate.value,
             validateImg = "https://newsimg-hams.hankookilbo.com/2022/04/28/a1844741-30af-475a-815e-226e2e319eae.jpg", // s3 개발 이후 추가
-            productImg = "https://newsimg-hams.hankookilbo.com/2022/04/28/a1844741-30af-475a-815e-226e2e319eae.jpg", // s3 개발 이후 추가
+            productimg1 = "https://newsimg-hams.hankookilbo.com/2022/04/28/a1844741-30af-475a-815e-226e2e319eae.jpg", // s3 개발 이후 추가
             latitude = location[0],
             longitude = location[1],
             distance = 0.0,

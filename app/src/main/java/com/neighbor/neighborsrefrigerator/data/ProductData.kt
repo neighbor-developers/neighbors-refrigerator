@@ -9,5 +9,5 @@ data class ProductData (
     val validateType: Int,
     val validateDate: Date,
     val validateImg: String?,
-    val productImg: String
+    val productimg1: String
 )

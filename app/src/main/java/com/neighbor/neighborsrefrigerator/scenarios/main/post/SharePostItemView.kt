@@ -47,8 +47,8 @@ fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, na
         Box(Modifier.fillMaxSize()) {
             Column() {
                 val modifier = Modifier.fillMaxHeight(0.6f)
-                post.productImg?.let {
-                    ItemImage(productImg = post.productImg, modifier = modifier)
+                post.productimg1?.let {
+                    ItemImage(productimg1 = post.productimg1, modifier = modifier)
                 }
 
                 ItemText(post = post)
@@ -82,8 +82,8 @@ fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavH
             Row(verticalAlignment = Alignment.Bottom) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                     val modifier = Modifier.size(100.dp)
-                    post.productImg?.let {
-                        ItemImage(productImg = post.productImg, modifier = modifier)
+                    post.productimg1?.let {
+                        ItemImage(productimg1 = post.productimg1, modifier = modifier)
                     }
 
                 }
@@ -121,11 +121,11 @@ fun ItemText(post: PostData){
     }
 }
 @Composable
-fun ItemImage(productImg:String, modifier: Modifier){
+fun ItemImage(productimg1:String, modifier: Modifier){
     Surface (shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp))){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(productImg)
+                .data(productimg1)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
@@ -157,7 +157,7 @@ fun IsTrustMark(isTrust: Boolean) {
 //            validateType = 1,
 //            validateDate = Date(2022, 3, 4),
 //            validateImg = null,
-//            productImg = "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7a2ccc0b-6765-4972-8221-8310ba6575a6%2FUntitled.png?table=block&id=9b25b556-a9a7-4637-a960-fd87f7b72cab&spaceId=cd12198d-d450-4deb-b809-0aa7cc554553&width=1730&userId=5c9e2a77-0418-4987-b276-3de00770167c&cache=v2"
+//            productimg1 = "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7a2ccc0b-6765-4972-8221-8310ba6575a6%2FUntitled.png?table=block&id=9b25b556-a9a7-4637-a960-fd87f7b72cab&spaceId=cd12198d-d450-4deb-b809-0aa7cc554553&width=1730&userId=5c9e2a77-0418-4987-b276-3de00770167c&cache=v2"
 //        ),
 //        distance = 3.4)
 //    )

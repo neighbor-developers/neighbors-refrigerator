@@ -76,8 +76,8 @@ fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: C
                 Row() {
                     Spacer(modifier = Modifier.width(30.dp))
                     val modifier = Modifier.size(150.dp)
-                    post.productImg?.let {
-                        ItemImage(productImg = post.productImg, modifier = modifier)
+                    post.productimg1?.let {
+                        ItemImage(productimg1 = post.productimg1, modifier = modifier)
                     }
                     Spacer(modifier = Modifier.width(30.dp))
                     Text(text = post.title, fontSize = 20.sp)

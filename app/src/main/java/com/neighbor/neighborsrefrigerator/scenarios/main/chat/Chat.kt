@@ -120,7 +120,7 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                 .padding(10.dp),
             onClick = {
                 navController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = postData)
-                if(postData.productImg != null){
+                if(postData.productimg1 != null){
                     navController.navigate(NAV_ROUTE.SHARE_DETAIL.routeName)
                 }else{
                     navController.navigate(NAV_ROUTE.SEEK_DETAIL.routeName)

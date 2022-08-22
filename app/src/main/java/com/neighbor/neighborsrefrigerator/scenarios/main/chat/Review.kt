@@ -109,7 +109,7 @@ fun PostBox(postData: PostData){
             .fillMaxWidth()
             .padding(7.dp)
         ) {
-            postData.productImg?.let { imgUrl ->
+            postData.productimg1?.let { imgUrl ->
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(imgUrl)
