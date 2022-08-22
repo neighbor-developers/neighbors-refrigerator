@@ -5,35 +5,29 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.firebase.database.FirebaseDatabase
-import com.neighbor.neighborsrefrigerator.data.ChatData
 import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.RdbChatData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.ItemImage
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 @Composable
 fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: ChatViewModel = viewModel(), post: PostData) {
 
     val postTime = post.validateDate
-    var token = postTime!!.split("T")[0].split("-")
+    val token = postTime!!.split("T")[0].split("-")
 
     val day = "${token[0]}년 ${token[1]}월 ${token[2]}일"
     val validateType = when (post.validateType) {
@@ -97,11 +91,13 @@ fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: C
                         Text(text = "$validateType : $day", fontSize = 20.sp, color = Color.White)
                     }
                 }
-                val contactUserId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+                val contactUserId by remember {
+                    mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
+                }
                 if(post.userId != contactUserId) {
                     Button(onClick = {
                         val chatId = post.id.toString() + contactUserId.toString()
-                        chatViewModel.newChatRoom(chatId, post.id!!, contactUserId)
+                        chatViewModel.newChatRoom(chatId, post.id!!, post.userId)
 
                         navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
                     }) {
@@ -109,43 +105,6 @@ fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: C
                     }
                 }
             }
-        }
-    }
-}
-
-
-
-@Composable
-fun Detail(){
-
-}
-
-
-
-@Preview
-@Composable
-fun Rreview111() {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Filled.Warning, contentDescription = "")
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "")
-                    }
-                },
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp
-            )
-        }
-    ) {
-        Surface(modifier = Modifier.padding(it)) {
-
         }
     }
 }

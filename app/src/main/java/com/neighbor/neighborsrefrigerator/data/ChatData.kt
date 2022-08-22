@@ -16,6 +16,7 @@ data class ChatData(
 data class RdbChatData(
     val id: String?,
     val postId: Int,
-    val contactUserId: Int,
+    val writer: Map<String, RdbUserData>,
+    val contact: Map<String, RdbUserData>,
     val messages: ArrayList<RdbMessageData>
 )

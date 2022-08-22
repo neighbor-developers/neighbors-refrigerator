@@ -30,6 +30,7 @@ import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
+import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
@@ -73,13 +74,11 @@ class MainActivity : ComponentActivity() {
                 viewModel.event.collect { event ->
                     when (event) {
                         MainViewModel.MainEvent.SendEmail -> sendEmail(viewModel.emailContent.value, viewModel.userEmail.value)
+                        MainViewModel.MainEvent.ToStartActivity -> toStartActivity()
                     }
                 }
             }
         }
-
-
-
     }
 
     private fun sendEmail(content: String, userEmail: String){
@@ -94,6 +93,11 @@ class MainActivity : ComponentActivity() {
         intent.putExtra(Intent.EXTRA_TEXT, "email : $userEmail \n 문의 내용 : $content")
         intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
 
+        startActivity(intent)
+    }
+
+    private fun toStartActivity(){
+        val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)
     }
 
@@ -159,7 +163,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             ChatListScreen(navController)
         }
         composable(NAV_ROUTE.SETTING.routeName){
-            Setting()
+            Setting(mainViewModel = mainViewModel)
         }
         composable(NAV_ROUTE.TRADE_HISTORY.routeName){
 

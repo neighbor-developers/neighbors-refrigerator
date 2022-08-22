@@ -117,6 +117,7 @@ class DBAccessModule {
             }
         })
     }
+
     suspend fun getPostOrderByTime(page: Int, reqPostData: ReqPostData) : List<PostData>{
         val resultPosts = kotlin.runCatching {
             dbAccessApi.getPostOrderByTime(page, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude)
@@ -146,23 +147,10 @@ class DBAccessModule {
     }
 
     //id로 UserData 불러오기
-    fun getUserInfoById(id: Int, applyUserDatas: (ArrayList<UserData> /* = java.util.ArrayList<com.neighbor.neighborsrefrigerator.data.PostData> */) -> Unit){
-        dbAccessApi.getUserInfoById(id).enqueue(object :
-            Callback<ReturnObject<ArrayList<UserData>>> {
-            override fun onResponse(call: Call<ReturnObject<ArrayList<UserData>>>, response: Response<ReturnObject<ArrayList<UserData>>>) {
-                if(response.isSuccessful){
-                    applyUserDatas(response.body()!!.result)
-                }
-                else{
-                    /*no-op*/
-                }
-            }
-
-            override fun onFailure(call: Call<ReturnObject<ArrayList<UserData>>>, t: Throwable) {
-                Log.d("test",t.localizedMessage)
-            }
-
-        })
+    suspend fun getUserInfoById(id: Int) : ArrayList<UserData>{
+        val result = kotlin.runCatching {
+            dbAccessApi.getUserInfoById(id)}.getOrNull()?.result?: arrayListOf()
+        return result
     }
 
     //fb아이디에 등록된 유저 아이디인지 확인

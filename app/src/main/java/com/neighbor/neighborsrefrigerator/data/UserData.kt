@@ -28,3 +28,9 @@ data class UserData(
     @SerializedName("fcm")
     var fcm: String?
 )
+
+data class RdbUserData(
+    val id: Int?,
+    val nickname: String,
+    val level: Int
+)

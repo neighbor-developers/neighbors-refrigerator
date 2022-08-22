@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neighbor.neighborsrefrigerator.BuildConfig
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 
 @Composable
 private fun animateAlignmentAsState(
@@ -41,9 +42,8 @@ private fun animateAlignmentAsState(
     return derivedStateOf { BiasAlignment(horizontalBias = bias, verticalBias = 0f) }
 }
 
-@Preview
 @Composable
-fun Setting(loginViewModel: LoginViewModel = viewModel()) {
+fun Setting(loginViewModel: LoginViewModel = viewModel(), mainViewModel: MainViewModel) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -99,7 +99,7 @@ fun Setting(loginViewModel: LoginViewModel = viewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                LogoutButton(loginViewModel)
+                LogoutButton(loginViewModel, mainViewModel)
 
                 TextButton(onClick = { /*누르면 계정 삭제*/ }) {
                     Text(
@@ -117,7 +117,7 @@ fun Setting(loginViewModel: LoginViewModel = viewModel()) {
 }
 
 @Composable
-fun LogoutButton(viewModel: LoginViewModel) {
+fun LogoutButton(viewModel: LoginViewModel, mainViewModel: MainViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,6 +128,7 @@ fun LogoutButton(viewModel: LoginViewModel) {
         Button(onClick = {
             // viewModel.signOut()
             // context.startActivity(Intent(context, StartActivity::class.java))
+            mainViewModel.toStartActivity()
         }) {
             Text(text = "로그아웃")
         }

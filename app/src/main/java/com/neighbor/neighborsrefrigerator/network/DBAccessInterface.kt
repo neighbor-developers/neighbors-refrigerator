@@ -45,9 +45,9 @@ interface DBAccessInterface {
     ): retrofit2.Call<ReturnObject<Int>>
 
     @GET("/user/getInfoById")
-    fun getUserInfoById(
+    suspend fun getUserInfoById(
         @Query("id") id : Int
-    ) : retrofit2.Call<ReturnObject<ArrayList<UserData>>>
+    ) : ReturnObject<ArrayList<UserData>>
 
     @POST("/user/join")
     fun userJoin(

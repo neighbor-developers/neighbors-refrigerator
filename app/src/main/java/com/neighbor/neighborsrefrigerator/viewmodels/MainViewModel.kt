@@ -31,8 +31,11 @@ class MainViewModel: ViewModel() {
         userEmail.value = email
         _event.emit(MainEvent.SendEmail) }
 
+    fun toStartActivity() = viewModelScope.launch {_event.emit(MainEvent.ToStartActivity)}
+
     sealed class MainEvent{
         object SendEmail : MainEvent()
+        object ToStartActivity : MainEvent()
     }
 
 }
