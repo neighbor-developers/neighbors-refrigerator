@@ -41,15 +41,14 @@ class PostViewModel : ViewModel() {
     var timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
 
     var sharePostsByTime: Flow<PagingData<PostData>> = myPagingRepository.getPostsByTime(
-        ReqPostData(3, 1, null, null, timeStamp, userLat, userLng)
+        ReqPostData(3, 1, null, null, timeStamp, 37.3402, 126.7335)
     ).cachedIn(viewModelScope)
 
     var seekPostsByTime: Flow<PagingData<PostData>> = myPagingRepository.getPostsByTime(
-        ReqPostData(3, 2, null, null, timeStamp, userLat, userLng)
+        ReqPostData(3, 2, null, null, timeStamp, 37.3402, 126.7335)
     ).cachedIn(viewModelScope)// 변경상태에도 페이징 상태를 유지하기 위해
 
     var searchedPosts: Flow<PagingData<PostData>> = flow{}
-
     var sharePostsByDistance = MutableStateFlow<ArrayList<PostData>?>(null)
 
 

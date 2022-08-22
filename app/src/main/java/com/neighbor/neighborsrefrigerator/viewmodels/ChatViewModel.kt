@@ -28,15 +28,15 @@ class ChatViewModel() : ViewModel() {
         firebaseDB.reference.child(chatId).get()
             .addOnSuccessListener {
                 Log.d("채팅방 정보", it.value.toString())
-                val _chatData = it.value as HashMap<String, Any>?
-                chatData.value =
-                    RdbChatData(
-                        _chatData?.get("id") as String,
-                        (_chatData["postId"] as Long).toInt(),
-                        _chatData["writer"] as Map<String, RdbUserData>,
-                        _chatData["contact"] as Map<String, RdbUserData>,
-                        _chatData["message"] as ArrayList<RdbMessageData>
+                val result = it.value as HashMap<String, Any>?
+                val _chatData = RdbChatData(
+                        result?.get("id") as String,
+                        (result["postId"] as Long).toInt(),
+                        result["writer"] as Map<String, RdbUserData>,
+                        result["contact"] as Map<String, RdbUserData>,
+                        result["message"] as ArrayList<RdbMessageData>
                     )
+                chatData.value = _chatData
             }
             .addOnFailureListener{
                 Log.d("채팅룸 정보 가져오기 실패", it.toString())

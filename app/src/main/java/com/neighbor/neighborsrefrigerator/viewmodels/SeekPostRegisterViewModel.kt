@@ -51,6 +51,8 @@ class SeekPostRegisterViewModel: ViewModel() {
             validateDate = "",
             validateImg = "", // s3 개발 이후 추가
             productimg1 = "", // s3 개발 이후 추가
+            productimg2 = "",
+            productimg3 = "",
             latitude = location[0],
             longitude = location[1],
             distance = 0.0,

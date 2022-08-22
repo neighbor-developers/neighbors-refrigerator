@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.utilities
 
-import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.util.Log
@@ -24,7 +23,7 @@ class UseGeocoder() {
             if(list.isEmpty()){
                 Log.d("실패", "")
             } else {
-                var address:Address = list[0]
+                val address:Address = list[0]
                 Log.d("좌표", address.toString())
                 coord  = LatLng(address.latitude, address.longitude)
             }

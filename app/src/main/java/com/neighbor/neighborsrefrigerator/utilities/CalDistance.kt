@@ -23,10 +23,6 @@ class CalDistance() {
 
         return dist; // 단위 m
     }
-    fun sendPostData(postArray : ArrayList<PostData>) :  ArrayList<PostData>{
-        return postArray
-    }
-
     // 주어진 도(degree) 값을 라디언으로 변환
     private fun deg2rad(deg: Double): Double {
         return deg * Math.PI / 180.0

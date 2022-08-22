@@ -79,7 +79,7 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Bottom
             ) {
-                ChatSection(chatViewModel.chatMessages.collectAsState(), userId, Modifier.weight(1f))
+                ChatSection(chatViewModel.chatMessages.collectAsState(),chatViewModel.chatData.collectAsState(), userId, Modifier.weight(1f))
                 SendSection(chatViewModel, userId, chatId)
             }
         }
@@ -160,7 +160,14 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
 }
 
 @Composable
-fun ChatSection(message: State<List<RdbMessageData>?>, userId: Int, modifier: Modifier = Modifier) {
+fun ChatSection(message: State<List<RdbMessageData>?>, chatData: State<RdbChatData?>, userId: Int, modifier: Modifier = Modifier) {
+    val writerId: Int = chatData.value?.writer?.getValue("writer")?.id!!
+    val nickname = if(writerId == userId){
+        chatData.value?.writer?.get("writer")!!.nickname
+    }else{
+        chatData.value?.contact?.get("contact")!!.nickname
+    }
+
 
     LazyColumn(
         modifier = Modifier
@@ -169,7 +176,7 @@ fun ChatSection(message: State<List<RdbMessageData>?>, userId: Int, modifier: Mo
     ) {
         message.value?.let {
             items(it) { message ->
-                MessageItem(message, userId)
+                MessageItem(message, userId, nickname)
                 Spacer(modifier = Modifier.height(13.dp))
             }
         }
@@ -177,9 +184,17 @@ fun ChatSection(message: State<List<RdbMessageData>?>, userId: Int, modifier: Mo
 }
 
 @Composable
-fun MessageItem(message: RdbMessageData, userId: Int) {
-    val formattedTime = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).parse(message.createdAt)
-    val time = SimpleDateFormat("hh:MM", Locale.KOREA).format(formattedTime!!)
+fun MessageItem(message: RdbMessageData, userId: Int, nickname: String) {
+    val current = System.currentTimeMillis()
+    val formattedTime = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).parse(message.createdAt)?.time
+
+    val time = if(604800000 > (current - formattedTime!!) && (current - formattedTime) >= 86400000){
+        "${(current - formattedTime)/86400000}일전"
+    }else if(current - formattedTime < 86400000){
+        SimpleDateFormat("hh:MM", Locale.KOREA).format(formattedTime)
+    } else {
+        SimpleDateFormat("mm.dd", Locale.KOREA).format(formattedTime)
+    }
 
     // 본인일때 true
     val isMe = message.from == userId
@@ -189,12 +204,12 @@ fun MessageItem(message: RdbMessageData, userId: Int) {
         verticalAlignment = Alignment.Bottom
     ) {
         if (isMe) {
-            Text(text = time, color = Color.Gray, modifier = Modifier.padding(start = 7.dp), fontSize = 13.sp)
+            Text(text = time, color = Color.Gray, modifier = Modifier.padding(start = 7.dp, end = 7.dp), fontSize = 13.sp)
         }
         Column {
             if (!isMe) {
                 Row{
-                    Text(text = "떼잉", color = Color.Black, fontSize = 13.sp, modifier = Modifier.padding(bottom = 5.dp, end = 5.dp))
+                    Text(text = nickname, color = Color.Black, fontSize = 13.sp, modifier = Modifier.padding(bottom = 5.dp, end = 5.dp))
                     Image(
                         painter = painterResource(R.drawable.sprout),
                         contentDescription = "App icon",
@@ -222,7 +237,7 @@ fun MessageItem(message: RdbMessageData, userId: Int) {
                             .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
                     }
                 ) {
-                    Text(text = message.content!!, color = Color.Black)
+                    Text(text = message.content, color = Color.Black)
                 }
             }
         }

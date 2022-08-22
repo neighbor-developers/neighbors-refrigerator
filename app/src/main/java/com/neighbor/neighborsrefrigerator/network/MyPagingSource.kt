@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.network
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.neighbor.neighborsrefrigerator.data.PostData
@@ -19,6 +20,7 @@ class MyPagingSource(
         return try {
             val position = params.key?: STARTING_PAGE_INDEX
             val result = dbAccessModule.getPostOrderByTime(page = position,reqPostData = reqPostData)
+            Log.d("결과과2", result.toString())
 
             // 로드에 성공한 경우
             LoadResult.Page(
