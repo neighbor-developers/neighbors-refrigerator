@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow

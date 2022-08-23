@@ -53,6 +53,7 @@ class PostViewModel : ViewModel() {
 
 
     fun getPosts(item: String?, category:Int?, reqType: String, postType: String, varType: Int) {
+        Log.d("func","getpost")
         viewModelScope.launch {
             val result = myPagingRepository.getPostsByTime(
                 ReqPostData(

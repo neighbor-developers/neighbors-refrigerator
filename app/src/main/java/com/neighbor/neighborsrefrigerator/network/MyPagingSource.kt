@@ -20,7 +20,7 @@ class MyPagingSource(
         return try {
             val position = params.key?: STARTING_PAGE_INDEX
             val result = dbAccessModule.getPostOrderByTime(page = position,reqPostData = reqPostData)
-            Log.d("결과과2", result.toString())
+            Log.d("결과2", result.toString())
 
             // 로드에 성공한 경우
             LoadResult.Page(
@@ -32,7 +32,7 @@ class MyPagingSource(
                 nextKey = position + 1
             )
             // PagingSource가 더 이상 결과의 무결성을 보장할 수 없으므로 무효화되어야 하는 경우
-            LoadResult.Invalid()
+//            LoadResult.Invalid()
         } catch (exception: IOException) {
             return LoadResult.Error(exception)
         }

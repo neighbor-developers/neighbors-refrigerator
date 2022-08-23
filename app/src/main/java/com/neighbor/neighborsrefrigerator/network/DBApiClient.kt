@@ -18,7 +18,7 @@ object DBApiClient {
                         .build()
                 }
                 return retrofit!!
-            }
-    }
+        }
+}
 
 

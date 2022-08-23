@@ -11,17 +11,17 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.DataTransferObject
 import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.utilities.App
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        /* 쉐어드 프리퍼런스로 유저데이터 초기화 후 fcm token 업데이트
-        val userData = UserData()
-        val dbAccess = DBAccessModule()
-        dbAccess.updateFcmToken(userData);
-         */
-
+        val userPrefs = UserSharedPreference(App.context())
+        val fcmTemp  = DataTransferObject<String>(userPrefs.getUserPrefs().id!!,token)
+        DBAccessModule().updateFcmToken(fcmTemp)
         Log.d("new Token", token)
     }
 

@@ -8,8 +8,10 @@ data class MessageData(
     val chatID: String,
     @SerializedName("created_at")
     val createdAt: String,
-    @SerializedName("message")
-    val message: String
+    @SerializedName("content")
+    val content: String,
+    @SerializedName("from")
+    val from: String
 )
 
 data class RdbMessageData(

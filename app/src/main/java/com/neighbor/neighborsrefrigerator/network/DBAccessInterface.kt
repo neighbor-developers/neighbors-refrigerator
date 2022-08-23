@@ -24,6 +24,11 @@ interface DBAccessInterface {
         @Query("longitude") longitude: Double?
     ): ReturnObject<ArrayList<PostData>>
 
+    @POST("/user/updateFcmToken")
+    fun updateFcmToken(
+        @Body dataTransferObject: DataTransferObject<String>
+    ): retrofit2.Call<ReturnObject<Int>>
+
     @GET("/post/getInfoById")
     fun getPostById(
         @Query("id") id : Int
@@ -74,5 +79,7 @@ interface DBAccessInterface {
         @Query("id") id: Int,
         @Query("nickname") nickname: String
     ) : retrofit2.Call<ReturnObject<Int>>
+
+
 
 }

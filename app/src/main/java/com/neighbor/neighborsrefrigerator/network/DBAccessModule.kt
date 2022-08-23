@@ -127,6 +127,23 @@ class DBAccessModule {
         return resultPosts
     }
 
+    fun updateFcmToken(dataTransferObject: DataTransferObject<String>){
+            dbAccessApi.updateFcmToken(dataTransferObject).enqueue(object : Callback<ReturnObject<Int>>{
+                override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                    Log.d("test",t.localizedMessage)
+                }
+
+                override fun onResponse(
+                    call: Call<ReturnObject<Int>>,
+                    response: Response<ReturnObject<Int>>
+                ) {
+                    if(response.isSuccessful){
+                        Log.d("test",response.body()!!.msg)
+                    }
+                }
+            })
+    }
+
     //review 등록하기
     fun reviewPost(id : Int, review: String, rate:Int){
         val reviewData = ReviewData(id,review,rate)
@@ -194,23 +211,6 @@ class DBAccessModule {
         })
     }
 
-    fun updateFcmToken(userData: UserData){
-        dbAccessApi.updateFcmToken(userData).enqueue(object : Callback<ReturnObject<Int>>{
-            override fun onResponse(
-                call: Call<ReturnObject<Int>>,
-                response: Response<ReturnObject<Int>>
-            ) {
-                if(response.isSuccessful){
-                    Log.d("test",response.body()!!.msg)
-                }
-
-            }
-
-            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
-                Log.d("test",t.localizedMessage)
-            }
-        })
-    }
 
 
 }
