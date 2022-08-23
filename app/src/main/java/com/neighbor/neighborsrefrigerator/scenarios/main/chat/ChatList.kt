@@ -23,76 +23,100 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.data.ChatData
-import com.neighbor.neighborsrefrigerator.data.RdbChatData
+import com.neighbor.neighborsrefrigerator.data.Chat
+import com.neighbor.neighborsrefrigerator.data.ChatListData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
-fun ChatListScreen(navController: NavHostController, chatViewModel: ChatViewModel = viewModel()){
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text(text = "채팅목록", textAlign = TextAlign.Center, modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(end = 50.dp), fontSize = 17.sp) },
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.navigateUp() }, modifier = Modifier.size(50.dp) ) {
-//                    Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")}
-//                },
-//
-//                backgroundColor = Color.Transparent,
-//                elevation = 0.dp
-//            )
-//        }
-//    ) { padding ->
-//        Surface(modifier = Modifier.padding(padding)) {
-//            val chatList = chatViewModel.chatList.collectAsState()
-//            LazyColumn {
-//                chatList.value.let { chatList ->
-//                    items(chatList){ chat ->
-//                        ChatCard(chat = chat, navController, chatViewModel)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    LaunchedEffect(Unit){
-//        chatViewModel.initChatList()
-//    }
-//}
-//
-//
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun ChatCard(chat: RdbChatData, navController: NavController, viewModel: ChatViewModel){
-//    navController.currentBackStackEntry?.savedStateHandle?.set(key = "chatViewModel", value = viewModel)
-//    Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {
-//        Row() {
-//            Image(
-//                painter = painterResource(id = R.drawable.sprout2),
-//                contentDescription = "이미지",
-//                modifier = Modifier
-//                    .size(40.dp)
-//                    .clip(CircleShape))
-//            Spacer(modifier = Modifier.width(8.dp))
-//            Column() {
-//                Text(
-//                    text = "상대방 닉네임",
-//                    color = MaterialTheme.colors.secondaryVariant,
-//                    style = MaterialTheme.typography.subtitle2)
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Text(
-//                    text = "마지막 채팅 메세지",
-//                    style = MaterialTheme.typography.body2)
-//            }
-//        }
-//    }
+fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = viewModel()){
+    val chatListViewModel = chatListViewModel
+    chatListViewModel.initChatList()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "채팅목록", textAlign = TextAlign.Center, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 50.dp), fontSize = 17.sp) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }, modifier = Modifier.size(50.dp) ) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")}
+                },
+
+                backgroundColor = Color.Transparent,
+                elevation = 0.dp
+            )
+        }
+    ) { padding ->
+        Surface(modifier = Modifier.padding(padding)) {
+            // composable에서 컴포지션이 일어날 때 suspend fun을 실행해주는 composable
+            LaunchedEffect(Unit){
+                chatListViewModel.initChatList()
+            }
+            val chatList = chatListViewModel.chatList.collectAsState()
+            LazyColumn {
+                chatList.value.let { chatList ->
+                    items(chatList!!){ chat ->
+                        ChatCard(chat = chat, navController, chatListViewModel)
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ChatCard(chat: Chat, navController: NavController, viewModel: ChatListViewModel){
+    viewModel.refreshChatList(chat)
+
+    var nickname = viewModel.nickname.collectAsState()
+    var lastMessage = viewModel.lastMessage.collectAsState()
+    var createAt = viewModel.createAt.collectAsState()
+    var newMessage = viewModel.newMessage.collectAsState()
+
+    navController.currentBackStackEntry?.savedStateHandle?.set(key = "chatViewModel", value = viewModel)
+    Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {
+        Column() {
+            Row() {
+                Column() {
+                    Image(
+                        painter = painterResource(id = R.drawable.sprout2),
+                        contentDescription = "async 이미지",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = nickname.value,
+                        color = MaterialTheme.colors.secondaryVariant,
+                        style = MaterialTheme.typography.subtitle2)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = lastMessage.value,
+                        style = MaterialTheme.typography.body2)
+                }
+                Text(
+                    text= createAt.value.toString(),
+                    style = MaterialTheme.typography.body2
+                )
+            }
+            Text(
+                text = newMessage.value.toString(),
+                style = MaterialTheme.typography.body2
+            )
+        }
+    }
 }
 
 @Composable
 @Preview
 fun ChatPreview(){
-
+    ChatListScreen(rememberNavController())
 }

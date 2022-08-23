@@ -1,30 +1,32 @@
 package com.neighbor.neighborsrefrigerator.data
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 
-@Database(entities = [ChatList::class], version = 1)
-abstract class ChatListDatabase: RoomDatabase() {
-    abstract fun chatListDao(): ChatListDao
+// https://youngest-programming.tistory.com/456
+// https://developer.android.com/training/data-storage/room/relationships?hl=ko
+
+
+@Database(entities = [ChatData::class], version = 1)
+@TypeConverters(MyTypeConverters::class)
+abstract class ChatListDB : RoomDatabase() {
+    abstract fun chatListDao(): ChatListDao?
 
     companion object {
-        private var instance: ChatListDatabase? = null
-
-        @Synchronized
-        fun getInstance(context: Context): ChatListDatabase?
-        {
-            if(instance == null){
-                synchronized(ChatListDatabase::class){
-                    instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        ChatListDatabase::class.java,
-                        "chatList-database"
-                    ).build()
-                }
+        private var INSTANCE: ChatListDB? = null
+        fun getInstance(context: Context): ChatListDB? {
+            if (INSTANCE == null) {
+                INSTANCE = Room.databaseBuilder(
+                    context.applicationContext,
+                    ChatListDB::class.java,
+                    "chatList-database"
+                ).build()
             }
-            return instance
+            return INSTANCE
+        }
+
+        fun destroyInstance() {
+            INSTANCE = null
         }
     }
 }
