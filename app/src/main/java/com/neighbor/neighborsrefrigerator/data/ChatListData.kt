@@ -4,12 +4,13 @@ import android.graphics.Bitmap
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.sql.Date
 
 
 @Entity
 data class ChatListData(
     @Embedded(prefix = "chatlistdata_") var chatData: Chat?,
-    @PrimaryKey(autoGenerate = true) var chatId: String
+    @PrimaryKey(autoGenerate = true) var chatId: Int
 )
 
 @Entity
@@ -23,16 +24,15 @@ data class Chat(
 
 @Entity
 data class Inform(
-    var image: Bitmap?,
-    var id: String,
-    var nickname: String,
+    var id: String?,
+    var nickname: String?,
     var level: Int
 )
 
 @Entity
 data class ChatMessage(
-    var content: String,
+    var content: String?,
     var isRead: Boolean,
-    var created_at: String,
+    var created_at: String?,
     var from: Int
 )

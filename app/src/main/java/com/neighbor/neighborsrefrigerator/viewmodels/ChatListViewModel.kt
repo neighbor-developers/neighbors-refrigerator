@@ -3,10 +3,12 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 import android.R
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
@@ -20,27 +22,46 @@ import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class ChatListViewModel: ViewModel() {
-    var chatData = MutableStateFlow<List<Chat>?>(null) // 임시로 String으로 설정
-    var chatList = MutableStateFlow<ArrayList<Chat>?>(null)
+    var example: ChatListData = ChatListData(
+        Chat(
+        postId = "1234",
+        writer = Inform(id = "1", nickname = "seoyeon", 1),
+        contact = Inform(id = "2", nickname = "zinkiki", 2),
+        message = listOf(ChatMessage(content = "안녕하세요", false, "2022-08-26 17:47:01", 2))
+        ),
+        12345678
+    )
+    var chatData = MutableStateFlow<List<ChatListData>?>(listOf(example))
     var nickname = MutableStateFlow<String>("")
     var lastMessage = MutableStateFlow<String>("")
     var newMessage = MutableStateFlow<Int>(0)
-    var createAt = MutableStateFlow<Timestamp>(Timestamp(2022,8,23,16,19,20,10))
+    var createAt = MutableStateFlow<Long>(0)
 
 
-    private lateinit var db: ChatListDB
+    // 싱글톤 패턴을 사용하지 않을 경우
+/*    private val db = Room.databaseBuilder(
+        App.context(),
+        ChatListDB::class.java,
+        "chatList-database"
+    ).build()*/
+
+    // 싱글톤 패턴을 사용할 경우
+    private var db = ChatListDB.getInstance(App.context())
 
 
     fun initChatList(){
-        CoroutineScope(Dispatchers.Main).launch {
+        viewModelScope.launch {
+
             val chats = CoroutineScope(Dispatchers.IO).async{
-                db.chatListDao()!!.getChatMessage(UserSharedPreference(App.context()).getUserPrefs("id")!!)
+                db?.chatListDao()!!.getChatMessage()
             }.await()
             chatData.value = chats
         }
+        // chatData timestamp 순으로 배치
 /*        chatData.value?.forEach {
 
             refreshChatList(it)

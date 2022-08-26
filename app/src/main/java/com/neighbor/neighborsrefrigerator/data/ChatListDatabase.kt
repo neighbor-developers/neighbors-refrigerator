@@ -2,12 +2,13 @@ package com.neighbor.neighborsrefrigerator.data
 
 import android.content.Context
 import androidx.room.*
+import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 
 // https://youngest-programming.tistory.com/456
 // https://developer.android.com/training/data-storage/room/relationships?hl=ko
 
 
-@Database(entities = [ChatData::class], version = 1)
+@Database(entities = [ChatListData::class], version = 4)
 @TypeConverters(MyTypeConverters::class)
 abstract class ChatListDB : RoomDatabase() {
     abstract fun chatListDao(): ChatListDao?
