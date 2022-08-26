@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -43,8 +42,6 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDe
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -133,11 +130,9 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
         composable(NAV_ROUTE.MAIN.routeName){
             MainScreen(viewModel = mainViewModel, navController)
         }
-
         composable(NAV_ROUTE.REGISTER_INFO.routeName){
             RegisterInfo(navController)
         }
-
         composable(NAV_ROUTE.SHARE_DETAIL.routeName){
             val post = remember {
                 navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
@@ -156,7 +151,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
         composable(NAV_ROUTE.SEEK_REGISTER.routeName){
 
         }
-        composable("${NAV_ROUTE.CHAT.routeName}/{chatID}", arguments = listOf(navArgument("chatId"){type = NavType.StringType})) {
+        composable("${NAV_ROUTE.CHAT.routeName}/{chatId}", arguments = listOf(navArgument("chatId"){type = NavType.StringType})) {
             ChatScreen(navController = navController, chatId = it.arguments?.getString("chatId")?:"")
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
@@ -269,14 +264,17 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
                     Text(text = "구함")
                 }
             }
+            val postViewModel by remember {
+                mutableStateOf(PostViewModel())
+            }
             when(types.value){
                 "share" -> SharePostScreen(
-                    postViewModel = PostViewModel(),
+                    postViewModel,
                     route = NAV_ROUTE.SHARE_DETAIL,
                     navController = navController
                 )
                 "seek" -> SeekPostScreen(
-                    postViewModel = PostViewModel(),
+                    postViewModel,
                     route = NAV_ROUTE.SEEK_DETAIL,
                     navHostController = navController
                 )

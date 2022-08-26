@@ -17,17 +17,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import java.util.*
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.data.ProductData
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
-import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ISO_DATE_TIME
+import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -100,11 +93,13 @@ fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavH
 }
 @Composable
 fun ItemText(post: PostData){
+    val current = System.currentTimeMillis()
+    val calTime = CalculateTime()
+    val time = calTime.calTimeToPost(current, post.createdAt)
 
-    val postTime = post.validateDate
-    var token = postTime!!.split("T")[0].split("-")
+    val token = post.validateDate!!.split("T")[0].split("-")
 
-    val day = "${token[0]}년 ${token[1]}월 ${token[2]}일"
+    val validateDate = "${token[0]}년 ${token[1]}월 ${token[2]}일"
     val validateType = when (post.validateType) {
         1 -> "유통기한"
         2 -> "제조일자"
@@ -113,11 +108,11 @@ fun ItemText(post: PostData){
     }
     Column(Modifier.padding(10.dp)) {
         Text(text = post.title, fontSize = 15.sp, color = Color.Black, modifier = Modifier.padding(bottom = 10.dp))
-        Text(text = "$validateType : $day", fontSize = 10.sp, color = Color.Black)
+        Text(text = "$validateType : $validateDate", fontSize = 10.sp, color = Color.Black)
         post.distance?.let {
             Text(text = "내 위치에서 ${post.distance}km", fontSize = 10.sp, color = Color.Black)
         }
-        Text(text = "업로드 : 3분전", fontSize = 10.sp, color = Color.Black)
+        Text(text = "업로드 : $time", fontSize = 10.sp, color = Color.Black)
     }
 }
 @Composable
@@ -144,21 +139,3 @@ fun IsTrustMark(isTrust: Boolean) {
             .padding(end = 10.dp, top = 10.dp))
     }
 }
-//
-//@Preview
-//@Composable
-//fun ItemViewPreview() {
-//    ItemCardByTime(
-//        ProductIncludeDistanceData(
-//        ProductData(
-//            productID = ",",
-//            postID = 1,
-//            productName = "a",
-//            validateType = 1,
-//            validateDate = Date(2022, 3, 4),
-//            validateImg = null,
-//            productimg1 = "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7a2ccc0b-6765-4972-8221-8310ba6575a6%2FUntitled.png?table=block&id=9b25b556-a9a7-4637-a960-fd87f7b72cab&spaceId=cd12198d-d450-4deb-b809-0aa7cc554553&width=1730&userId=5c9e2a77-0418-4987-b276-3de00770167c&cache=v2"
-//        ),
-//        distance = 3.4)
-//    )
-//}

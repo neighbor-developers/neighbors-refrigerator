@@ -97,7 +97,6 @@ class ChatViewModel() : ViewModel() {
     }
 
     fun newMessage(chatId: String, messageData: RdbMessageData){
-        // 아직 RDB 사용법을 제대로 파악 못해서 어떤 형식으로 저장할지 미정, 배열로 할지
         if(chatMessages.value.isEmpty()) {
             chatMessages.value = arrayListOf(messageData)
             Log.d("빈 리스트에 추가됨", chatMessages.value.toString())

@@ -50,9 +50,9 @@ fun SharePostRegisterScreen(
 
     val mCalendar = Calendar.getInstance()
 
-    var mYear = mCalendar.get(Calendar.YEAR)
-    var mMonth = mCalendar.get(Calendar.MONTH)
-    var mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+    val mYear = mCalendar.get(Calendar.YEAR)
+    val mMonth = mCalendar.get(Calendar.MONTH)
+    val mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
 
     var completeShareDialog by remember {
         mutableStateOf(false)
@@ -223,7 +223,8 @@ fun LocationButton(name: String, locationType: MutableState<String>) {
             Text(text = name, fontSize = 12.sp)
         },
         onClick = { locationType.value = name },
-        colors = ChangeButtonColor(locationType.value == name),
+        colors = if( locationType.value == name ) ButtonDefaults.buttonColors(backgroundColor = Color.Blue, contentColor = Color.White)
+        else ButtonDefaults.buttonColors(backgroundColor = Color.White, contentColor = Color.Blue),
         modifier = Modifier
             .height(30.dp)
             .width(90.dp)
@@ -233,26 +234,19 @@ fun LocationButton(name: String, locationType: MutableState<String>) {
 
 @Composable
 fun PeriodButton(name: String, periodType: MutableState<String>) {
+
     OutlinedButton(
         content = {
             Text(text = name, fontSize = 10.sp)
         },
         onClick = { periodType.value = name },
-        colors = ChangeButtonColor(periodType.value == name),
+        colors = if(periodType.value == name) ButtonDefaults.buttonColors(backgroundColor = Color.Blue, contentColor = Color.White)
+                else ButtonDefaults.buttonColors(backgroundColor = Color.White, contentColor = Color.Blue),
         modifier = Modifier
             .height(30.dp)
             .width(60.dp)
             .padding(end = 5.dp)
     )
-}
-
-@Composable
-fun ChangeButtonColor(isSelect: Boolean): ButtonColors {
-    return if (isSelect) {
-        ButtonDefaults.buttonColors(backgroundColor = Color.Blue, contentColor = Color.White)
-    } else {
-        ButtonDefaults.buttonColors(backgroundColor = Color.White, contentColor = Color.Blue)
-    }
 }
 
 @Composable

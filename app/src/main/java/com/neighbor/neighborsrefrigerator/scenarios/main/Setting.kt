@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.neighbor.neighborsrefrigerator.BuildConfig
+import com.google.android.datatransport.BuildConfig
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 

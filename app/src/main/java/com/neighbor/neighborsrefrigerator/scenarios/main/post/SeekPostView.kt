@@ -14,17 +14,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun SeekPostScreen(
-    postViewModel: PostViewModel,
+    postViewModel: PostViewModel ,
     route: NAV_ROUTE,
     navHostController: NavHostController
 ) {

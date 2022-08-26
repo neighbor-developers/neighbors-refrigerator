@@ -54,7 +54,7 @@ class SearchAddressDialogViewModel:ViewModel() {
 
     fun sendAddress(addressDetail: List<AddressDetail.HtReturnValue.Result.Zipcode>): List<String>{
 
-        var generalAddressList: ArrayList<String> = arrayListOf()
+        val generalAddressList: ArrayList<String> = arrayListOf()
         var roadNameAddressList: ArrayList<String> = arrayListOf()
         // 도로명 주소가 추후에 필요하면 추가
         for (m in addressDetail) {

@@ -1,13 +1,10 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.google.firebase.database.FirebaseDatabase
 import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.RdbChatData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.network.MyPagingRepository
@@ -18,7 +15,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class ReqPostData(
     val reqType: Int,
@@ -53,7 +49,6 @@ class PostViewModel : ViewModel() {
 
 
     fun getPosts(item: String?, category:Int?, reqType: String, postType: String, varType: Int) {
-        Log.d("func","getpost")
         viewModelScope.launch {
             val result = myPagingRepository.getPostsByTime(
                 ReqPostData(

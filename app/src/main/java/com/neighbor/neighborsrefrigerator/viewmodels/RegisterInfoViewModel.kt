@@ -1,30 +1,15 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.app.Application
-import android.content.Context
-import android.content.Intent
-import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.neighbor.neighborsrefrigerator.data.*
-import com.neighbor.neighborsrefrigerator.network.DBAccessInterface
-import com.neighbor.neighborsrefrigerator.network.DBApiClient
-import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
-import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.create
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,61 +18,54 @@ import java.util.*
 // address의 경우 dialog에서 선택한 address를 클릭 시 textfield의 address에 자동으로 넣기
 // dialog에서 address 검색 구성하기
 
-class RegisterInfoViewModel(): ViewModel() {
+class RegisterInfoViewModel: ViewModel() {
+    val dbAccessModule = DBAccessModule()
+
     var userNicknameInput by mutableStateOf("")
     var addressMain by mutableStateOf("")
     var addressDetail by mutableStateOf("")
-    val availableNickname = MutableStateFlow<Boolean?>(false)
-    val fillAddressMain = MutableStateFlow<Boolean?>(false)
+    val availableNickname = MutableStateFlow(false)
+    val fillAddressMain = MutableStateFlow(false)
 
-    var buttonEnabled = MutableStateFlow<Boolean?>(false)
+    var buttonEnabled = MutableStateFlow(false)
 
     fun check(){
-        buttonEnabled.value = availableNickname.value!!
+        buttonEnabled.value = availableNickname.value
     }
 
-
     val time = System.currentTimeMillis()
-    private val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(time))
+    private val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(time))
 
-    fun checkNickname(){
-        // 0일때만 등록 ->
-        // 1일때는 거부 ->
-        if (userNicknameInput.isEmpty()){
+    fun checkNickname() {
+        if (userNicknameInput.isEmpty()) {
             availableNickname.value = false
             return
         }
-        val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
+        dbAccessModule.checkNickname(userNicknameInput) {completeCheck()}
 
-        dbAccessApi.checkNickname(userNicknameInput).enqueue(object :
-            Callback<ReturnObject<Boolean>> {
-            override fun onResponse(
-                call: Call<ReturnObject<Boolean>>,
-                response: Response<ReturnObject<Boolean>>
-            ) {
-                availableNickname.value = !response.body()!!.result
-                fillAddressMain.value = addressMain.isNotEmpty()
-                buttonEnabled.value = availableNickname.value!! && fillAddressMain.value!!
-            }
-            override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
-                Log.d("실패", t.localizedMessage)
-            }
-        })
+
     }
 
+    private fun completeCheck() {
+        availableNickname.value = true
+        fillAddressMain.value = addressMain.isNotEmpty()
+        buttonEnabled.value = availableNickname.value && fillAddressMain.value
+    }
 
-    // db 모듈 만들기
-    fun registerPersonDB(){
+    fun registerPersonDB() {
 
         val coordinateData: LatLng = UseGeocoder().addressToLatLng(addressMain + addressDetail)
         val auth: FirebaseAuth = FirebaseAuth.getInstance()
-        val uID:String = if(auth.uid!=null){
+        val uID: String = if (auth.uid != null) {
             auth.uid!!
-        } else{ "" }
-        val email: String? = if(auth.currentUser?.email !=null){
+        } else {
+            ""
+        }
+        val email: String? = if (auth.currentUser?.email != null) {
             auth.currentUser!!.email
-        } else{ "" }
-
+        } else {
+            ""
+        }
 
         val userdata =
             UserData(
@@ -104,27 +82,6 @@ class RegisterInfoViewModel(): ViewModel() {
                 fcm = ""
             )
 
-        val dbAccessApi: DBAccessInterface = DBApiClient.getApiClient().create()
-
-        dbAccessApi.userJoin(
-            userdata!!
-        ).enqueue(object : Callback<ReturnObject<Int>> {
-
-            override fun onResponse(
-                call: Call<ReturnObject<Int>>,
-                response: Response<ReturnObject<Int>>
-            ) {
-                userdata.id = response.body()?.result!!.toInt()
-                // sharedPreference에 저장하기
-                UserSharedPreference(App.context()).setUserPrefs(userdata)
-
-
-                UserSharedPreference(App.context()).getUserPrefs("id")?.let { Log.d("성공", it) }
-                Log.d("DB 값", userdata.toString())
-            }
-            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
-                Log.d("실패", t.localizedMessage)
-            }
-        })
+        dbAccessModule.joinUser(userdata)
     }
 }

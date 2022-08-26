@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.maps.model.LatLng
 import com.neighbor.neighborsrefrigerator.data.*
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import com.neighbor.neighborsrefrigerator.viewmodels.ReqPostData
 import retrofit2.Call
@@ -13,6 +14,22 @@ import retrofit2.create
 
 class DBAccessModule {
     private val dbAccessApi:  DBAccessInterface = DBApiClient.getApiClient().create()
+
+    fun checkNickname(nickname: String, ok: ()-> Unit){
+        dbAccessApi.checkNickname(nickname).enqueue(object :
+            Callback<ReturnObject<Boolean>> {
+            override fun onResponse(
+                call: Call<ReturnObject<Boolean>>,
+                response: Response<ReturnObject<Boolean>>
+            ) {
+                ok()
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
+                Log.d("실패", t.localizedMessage)
+            }
+        })
+    }
 
     fun completeTrade(postData: PostData){
         dbAccessApi.completeTrade(postData).enqueue(object : Callback<ReturnObject<Int>>{
@@ -81,7 +98,12 @@ class DBAccessModule {
                 response: Response<ReturnObject<Int>>
             ) {
                 if(response.isSuccessful){
-                    Log.d("test","joined successfully")
+                    userData.id = response.body()?.result!!.toInt()
+                    // sharedPreference에 저장하기
+                    UserSharedPreference(App.context()).setUserPrefs(userData)
+
+                    UserSharedPreference(App.context()).getUserPrefs("id")?.let { Log.d("성공", it) }
+                    Log.d("DB 값", userData.toString())
                 }
                 else{
                     Log.d("test","join user response failed")
@@ -119,6 +141,7 @@ class DBAccessModule {
     }
 
     suspend fun getPostOrderByTime(page: Int, reqPostData: ReqPostData) : List<PostData>{
+        Log.d("실헹", "실행")
         val resultPosts = kotlin.runCatching {
             dbAccessApi.getPostOrderByTime(page, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude)
         }.getOrNull()?.result ?: emptyList()
@@ -210,7 +233,4 @@ class DBAccessModule {
             }
         })
     }
-
-
-
 }

@@ -1,4 +1,4 @@
-package com.neighbor.neighborsrefrigerator.data
+package com.neighbor.neighborsrefrigerator.utilities
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

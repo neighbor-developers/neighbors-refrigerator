@@ -28,6 +28,7 @@ import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
 import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
@@ -186,15 +187,9 @@ fun ChatSection(message: State<List<RdbMessageData>?>, chatData: State<RdbChatDa
 @Composable
 fun MessageItem(message: RdbMessageData, userId: Int, nickname: String) {
     val current = System.currentTimeMillis()
-    val formattedTime = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).parse(message.createdAt)?.time
 
-    val time = if(604800000 > (current - formattedTime!!) && (current - formattedTime) >= 86400000){
-        "${(current - formattedTime)/86400000}일전"
-    }else if(current - formattedTime < 86400000){
-        SimpleDateFormat("hh:MM", Locale.KOREA).format(formattedTime)
-    } else {
-        SimpleDateFormat("mm.dd", Locale.KOREA).format(formattedTime)
-    }
+    val calculateTime = CalculateTime()
+    val time = calculateTime.calTimeToChat(current, message.createdAt)
 
     // 본인일때 true
     val isMe = message.from == userId

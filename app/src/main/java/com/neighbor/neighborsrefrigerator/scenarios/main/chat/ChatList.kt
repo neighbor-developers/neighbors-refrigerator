@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,14 +25,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.Chat
-import com.neighbor.neighborsrefrigerator.data.ChatListData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
-import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
 @Composable
 fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = viewModel()){
-    val chatListViewModel = chatListViewModel
     chatListViewModel.initChatList()
 
     Scaffold(
@@ -59,8 +55,8 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
             }
             val chatList = chatListViewModel.chatList.collectAsState()
             LazyColumn {
-                chatList.value.let { chatList ->
-                    items(chatList!!){ chat ->
+                chatList.value?.let { chatList ->
+                    items(chatList){ chat ->
                         ChatCard(chat = chat, navController, chatListViewModel)
                     }
                 }
@@ -76,10 +72,10 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
 fun ChatCard(chat: Chat, navController: NavController, viewModel: ChatListViewModel){
     viewModel.refreshChatList(chat)
 
-    var nickname = viewModel.nickname.collectAsState()
-    var lastMessage = viewModel.lastMessage.collectAsState()
-    var createAt = viewModel.createAt.collectAsState()
-    var newMessage = viewModel.newMessage.collectAsState()
+    val nickname = viewModel.nickname.collectAsState()
+    val lastMessage = viewModel.lastMessage.collectAsState()
+    val createAt = viewModel.createAt.collectAsState()
+    val newMessage = viewModel.newMessage.collectAsState()
 
     navController.currentBackStackEntry?.savedStateHandle?.set(key = "chatViewModel", value = viewModel)
     Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {

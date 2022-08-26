@@ -1,8 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,30 +8,20 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
-import com.neighbor.neighborsrefrigerator.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.maps.model.LatLng
+import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
-import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
-import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
-import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.observeOn
 
 
 @SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
@@ -48,7 +36,7 @@ fun RegisterInfo(navController: NavHostController){
             verticalArrangement = Arrangement.Center
         ) {
             val registerInfoViewModel = remember{RegisterInfoViewModel()}
-            var enabled = registerInfoViewModel.buttonEnabled.collectAsState()
+            val enabled = registerInfoViewModel.buttonEnabled.collectAsState()
             var available = registerInfoViewModel.availableNickname.collectAsState()
             //var enabled by remember { mutableStateOf(false) }
             //var enabled = registerInfoViewModel.buttonEnabled
@@ -64,7 +52,7 @@ fun RegisterInfo(navController: NavHostController){
             TextButton( onClick = {
                 registerInfoViewModel.registerPersonDB()
                 navController.navigate(NAV_ROUTE.MAIN.routeName)},
-                enabled = enabled.value!!
+                enabled = enabled.value
             )
             {
                 Text(text = "확인")
@@ -94,7 +82,7 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
                 leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
                 trailingIcon = {
                     // 아이콘 두 개 만들지 말고 하나로 색 변경하게 수정하기
-                    if (availableNickname.value!!) { // DB에서 Nickname 확인 후 존재한다면
+                    if (availableNickname.value) { // DB에서 Nickname 확인 후 존재한다면
                         Icon(painter = painterResource(id = R.drawable.ic_check_green), tint = Color.Green, contentDescription = null)
                     }else { //  DB에서 Nickname 확인 후 존재하지 않는다면
                         Icon(painter = painterResource(id = R.drawable.ic_check_red), tint = Color.Red, contentDescription = null)
@@ -122,7 +110,7 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
 @Composable
 fun GetMainAddress(viewModel: RegisterInfoViewModel) {
     var dialogState by remember { mutableStateOf(false) }
-    var searchAddressDialogViewModel = SearchAddressDialogViewModel()
+    val searchAddressDialogViewModel = SearchAddressDialogViewModel()
 
     Column(
         modifier = Modifier
@@ -146,7 +134,7 @@ fun GetMainAddress(viewModel: RegisterInfoViewModel) {
                         onConfirm = {
                             viewModel.addressMain = searchAddressDialogViewModel.userAddressInput
                             viewModel.fillAddressMain.value = viewModel.addressMain.isNotEmpty()
-                            viewModel.buttonEnabled.value = viewModel.availableNickname.value!! && viewModel.fillAddressMain.value!!
+                            viewModel.buttonEnabled.value = viewModel.availableNickname.value && viewModel.fillAddressMain.value
                             dialogState = false
                         },
                         onDismiss = { dialogState = false },

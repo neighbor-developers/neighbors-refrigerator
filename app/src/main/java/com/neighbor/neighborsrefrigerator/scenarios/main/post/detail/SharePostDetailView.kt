@@ -10,10 +10,12 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
@@ -107,4 +109,35 @@ fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: C
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun ShareDetailPreview(){
+    SharePostDetailScreen(navHostController = rememberNavController(), post = PostData(
+        id = 3,
+        title = "고구마 나눠요",
+        categoryId = "100",
+        userId = 3,
+        content = "생각보다 많이 남을 것 같아서 나눠요",
+        type = 1,
+        mainAddr = "산기대학로 233",
+        addrDetail = "E동",
+        validateType = 1,
+        validateDate = "2022/3/24",
+        createdAt = "2022-07-29 13:23:22",
+        latitude = 33.4,
+        longitude = 127.4,
+        state = "판매",
+        rate = null,
+        review = null,
+        validateImg = null,
+        productimg1 = null,
+        productimg2 = null,
+        productimg3 = null,
+        updatedAt = null,
+        completedAt = null,
+        distance = null
+    )
+    )
 }
