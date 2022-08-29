@@ -23,10 +23,11 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.ItemImage
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 
 
 @Composable
-fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: ChatViewModel = viewModel(), post: PostData) {
+fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: PostViewModel = viewModel(), post: PostData) {
 
     val postTime = post.validateDate
     val token = postTime!!.split("T")[0].split("-")
@@ -99,9 +100,8 @@ fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: C
                 if(post.userId != contactUserId) {
                     Button(onClick = {
                         val chatId = post.id.toString() + contactUserId.toString()
-                        chatViewModel.newChatRoom(chatId, post.id!!, post.userId)
-
-                        navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
+                        //postViewModel.newChatRoom(chatId, post.id!!, post.userId)
+                        navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
                     }) {
                         Text(text = "채팅하기")
                     }
@@ -110,34 +110,34 @@ fun SharePostDetailScreen(navHostController: NavHostController, chatViewModel: C
         }
     }
 }
-
-@Preview
-@Composable
-fun ShareDetailPreview(){
-    SharePostDetailScreen(navHostController = rememberNavController(), post = PostData(
-        id = 3,
-        title = "고구마 나눠요",
-        categoryId = "100",
-        userId = 3,
-        content = "생각보다 많이 남을 것 같아서 나눠요",
-        type = 1,
-        mainAddr = "산기대학로 233",
-        addrDetail = "E동",
-        validateType = 1,
-        validateDate = "2022/3/24",
-        createdAt = "2022-07-29 13:23:22",
-        latitude = 33.4,
-        longitude = 127.4,
-        state = "판매",
-        rate = null,
-        review = null,
-        validateImg = null,
-        productimg1 = null,
-        productimg2 = null,
-        productimg3 = null,
-        updatedAt = null,
-        completedAt = null,
-        distance = null
-    )
-    )
-}
+//
+//@Preview
+//@Composable
+//fun ShareDetailPreview(){
+//    SharePostDetailScreen(navHostController = rememberNavController(), post = PostData(
+//        id = 3,
+//        title = "고구마 나눠요",
+//        categoryId = "100",
+//        userId = 3,
+//        content = "생각보다 많이 남을 것 같아서 나눠요",
+//        type = 1,
+//        mainAddr = "산기대학로 233",
+//        addrDetail = "E동",
+//        validateType = 1,
+//        validateDate = "2022/3/24",
+//        createdAt = "2022-07-29 13:23:22",
+//        latitude = 33.4,
+//        longitude = 127.4,
+//        state = "판매",
+//        rate = null,
+//        review = null,
+//        validateImg = null,
+//        productimg1 = null,
+//        productimg2 = null,
+//        productimg3 = null,
+//        updatedAt = null,
+//        completedAt = null,
+//        distance = null
+//    )
+//    )
+//}

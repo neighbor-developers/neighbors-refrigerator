@@ -20,9 +20,10 @@ import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 
 @Composable
-fun SeekPostDetailScreen(navHostController: NavHostController, chatViewModel: ChatViewModel = viewModel(), post: PostData) {
+fun SeekPostDetailScreen(navHostController: NavHostController, postViewModel: PostViewModel = viewModel(), post: PostData) {
 
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -39,10 +40,7 @@ fun SeekPostDetailScreen(navHostController: NavHostController, chatViewModel: Ch
             // chatId는 포스트 아이디와 접근한 유저 아이디를 합쳐서 만듬
             val chatId = post.id.toString() + contactUserId.toString()
 
-            // RDB, room에 채팅 저장
-            chatViewModel.newChatRoom(chatId, post.id!!, contactUserId)
-
-            navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}")
+            navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
         }){
             Text(text = "채팅하기")
         }

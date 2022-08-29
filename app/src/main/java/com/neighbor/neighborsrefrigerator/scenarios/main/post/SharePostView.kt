@@ -144,15 +144,14 @@ fun CategoryView(postViewModel: PostViewModel){
 
                     }
                 },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                colors = ButtonDefaults.buttonColors(backgroundColor = if(selectedCategory == category.value) colorResource(id = R.color.green) else Color.White),
                 contentPadding = PaddingValues(0.dp),
                 elevation = ButtonDefaults.elevation(0.dp)
             ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-                    Icon(painterResource(id = categoryIconList[category.key]!!), contentDescription = category.value, modifier = Modifier.size(if (category.key == 200) 31.dp else if (category.key == null) 30.dp else 35.dp), tint = colorResource(
-                        id = R.color.green
-                    ))
-                    Text(text = category.value, fontSize = 10.sp, color = Color.DarkGray, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                    Icon(painterResource(id = categoryIconList[category.key]!!), contentDescription = category.value, modifier = Modifier.size(if (category.key == 200) 31.dp else if (category.key == null) 30.dp else 35.dp),
+                        tint = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green))
+                    Text(text = category.value, fontSize = 10.sp, color = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                 }
             }
         }

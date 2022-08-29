@@ -1,14 +1,17 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.neighbor.neighborsrefrigerator.data.PostData
-import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.network.MyPagingRepository
 import com.neighbor.neighborsrefrigerator.utilities.App
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
@@ -77,6 +80,7 @@ class PostViewModel : ViewModel() {
             }
         }
     }
+
     fun changeTime(){
         timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(System.currentTimeMillis()))
     }

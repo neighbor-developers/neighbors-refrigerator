@@ -152,11 +152,3 @@ private fun CategorySpinner(
         )
     }
 }
-
-@Preview
-@Composable
-fun SeekPreview() {
-    SeekPostRegisterScreen(
-        navHostController = NavHostController(context = LocalContext.current)
-    )
-}

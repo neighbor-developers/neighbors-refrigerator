@@ -17,6 +17,6 @@ data class MessageData(
 data class RdbMessageData(
     val content: String,
     val is_read: Boolean,
-    val createdAt: String,
+    val createdAt: Long,
     val from: Int
 )

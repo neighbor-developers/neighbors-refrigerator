@@ -69,34 +69,3 @@ fun SeekItem(post: PostData,
         }
     }
 }
-
-@Preview
-@Composable
-fun Preview22() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)) {
-        var content by remember { mutableStateOf("") }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp, end = 30.dp, start = 30.dp),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            val cornerSize = CornerSize(20.dp)
-            OutlinedTextField(value = content, onValueChange = { content = it }, modifier = Modifier
-                .fillMaxWidth()
-                .size(45.dp), shape = MaterialTheme.shapes.large.copy(cornerSize))
-
-            IconButton(onClick = {  }) {
-                Icon(Icons.Filled.Search, contentDescription = null)
-            }
-        }
-        Text(
-            text = "# 이웃 주민과 함께 어쩌구 ~",
-            modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 25.dp, bottom = 10.dp),
-            fontSize = 15.sp
-        )
-
-    }
-}

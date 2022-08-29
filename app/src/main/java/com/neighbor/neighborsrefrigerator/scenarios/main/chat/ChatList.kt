@@ -158,9 +158,3 @@ fun ChatCard(chat: Chat, navController: NavController, viewModel: ChatListViewMo
         }
     }
 }
-
-@Composable
-@Preview
-fun ChatPreview(){
-    ChatListScreen(rememberNavController())
-}

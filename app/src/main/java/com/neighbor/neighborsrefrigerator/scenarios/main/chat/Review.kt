@@ -149,9 +149,3 @@ fun RatingBar(ratingState: MutableState<Int>){
         }
     }
 }
-
-@Composable
-@Preview
-fun ReviewPreview(){
-    //ReviewScreen(navController = rememberNavController())
-}

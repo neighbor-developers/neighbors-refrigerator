@@ -37,7 +37,7 @@ import java.util.*
 
 
 @Composable
-fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel = viewModel(), chatId:String){
+fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel = viewModel(), chatId:String, postId: Int){
     val userId by remember {
         mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
     }
@@ -81,7 +81,7 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
                 verticalArrangement = Arrangement.Bottom
             ) {
                 ChatSection(chatViewModel.chatMessages.collectAsState(),chatViewModel.chatData.collectAsState(), userId, Modifier.weight(1f))
-                SendSection(chatViewModel, userId, chatId)
+                SendSection(chatViewModel, chatId, userId)
             }
         }
 
@@ -91,7 +91,7 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
         // 채팅창 들어가서 정보 가져오기- 채팅 데이터, 채팅 내용
         chatViewModel.enterChatRoom(chatId)
         // 채팅 생성한 post 정보 가져오기
-        chatViewModel.getPostData()
+        chatViewModel.getPostData(postId)
     }
 }
 @OptIn(ExperimentalMaterialApi::class)
@@ -162,11 +162,14 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
 
 @Composable
 fun ChatSection(message: State<List<RdbMessageData>?>, chatData: State<RdbChatData?>, userId: Int, modifier: Modifier = Modifier) {
-    val writerId: Int = chatData.value?.writer?.getValue("writer")?.id!!
+    //userId = 내 아이디
+    val writerId: Int? = chatData.value?.writer?.id
+
+    // 상대방 닉네임
     val nickname = if(writerId == userId){
-        chatData.value?.writer?.get("writer")!!.nickname
+        chatData.value?.contact?.nickname
     }else{
-        chatData.value?.contact?.get("contact")!!.nickname
+        chatData.value?.writer?.nickname
     }
 
 
@@ -177,8 +180,10 @@ fun ChatSection(message: State<List<RdbMessageData>?>, chatData: State<RdbChatDa
     ) {
         message.value?.let {
             items(it) { message ->
-                MessageItem(message, userId, nickname)
-                Spacer(modifier = Modifier.height(13.dp))
+                nickname?.let { nickname ->
+                    MessageItem(message, userId, nickname)
+                    Spacer(modifier = Modifier.height(13.dp))
+                }
             }
         }
     }
@@ -190,6 +195,7 @@ fun MessageItem(message: RdbMessageData, userId: Int, nickname: String) {
 
     val calculateTime = CalculateTime()
     val time = calculateTime.calTimeToChat(current, message.createdAt)
+
 
     // 본인일때 true
     val isMe = message.from == userId
@@ -243,12 +249,12 @@ fun MessageItem(message: RdbMessageData, userId: Int, nickname: String) {
 }
 
 @Composable
-fun SendSection(viewModel: ChatViewModel, userId: Int, chatId: String) {
+fun SendSection(viewModel: ChatViewModel, chatId: String, userId: Int) {
     val sendMessage = remember {
         mutableStateOf("")
     }
     val timestamp = remember {
-        mutableStateOf("")
+        mutableStateOf<Long>(0)
     }
     Card(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -261,7 +267,7 @@ fun SendSection(viewModel: ChatViewModel, userId: Int, chatId: String) {
                         // 메세지 보내기
                         if (sendMessage.value.isNotEmpty()) {
                             Log.d("새로운 메세지", sendMessage.value)
-                            timestamp.value = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
+                            timestamp.value = System.currentTimeMillis()
                             val message = RdbMessageData(sendMessage.value, false, timestamp.value, userId)
                             viewModel.newMessage(chatId, message)
                             sendMessage.value = ""

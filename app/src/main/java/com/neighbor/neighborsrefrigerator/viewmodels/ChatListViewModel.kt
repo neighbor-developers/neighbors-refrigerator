@@ -1,17 +1,13 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neighbor.neighborsrefrigerator.data.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 
 
 class ChatListViewModel: ViewModel() {
@@ -45,22 +41,22 @@ class ChatListViewModel: ViewModel() {
 
 
     fun initChatList(){
-        viewModelScope.launch {
-
-            val chats = CoroutineScope(Dispatchers.IO).async{
-                db?.chatListDao()!!.getChatMessage()
-            }.await()
-
-            chatData.value = chats
-
-            chatData.value!!.forEach{ chatListData ->
-                //chatListHashMap.value?.set(chatListData, getLastChatTimestamp())
-                chatListData.chatData?.message?.forEach {
-                    it.created_at = MyTypeConverters().convertDateToTimeStamp(it.created_at!!).toString()
-                }
-            }
-
-        }
+//        viewModelScope.launch {
+//
+//            val chats = viewModelScope.async{
+//                db?.chatListDao()!!.getChatMessage()
+//            }.await()
+//
+//            chatData.value = chats
+//
+//            chatData.value!!.forEach{ chatListData ->
+//                //chatListHashMap.value?.set(chatListData, getLastChatTimestamp())
+//                chatListData.chatData?.message?.forEach {
+//                    it.created_at = MyTypeConverters().convertDateToTimeStamp(it.created_at!!).toString()
+//                }
+//            }
+//
+//        }
         // chatList 정렬 - 각 chat들의 가장 최근 메시지 중 더 큰 값 순으로 정렬
 
 

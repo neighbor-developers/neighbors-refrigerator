@@ -11,6 +11,7 @@ import com.google.firebase.database.ValueEventListener
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -23,20 +24,26 @@ class ChatViewModel() : ViewModel() {
     var chatData = MutableStateFlow<RdbChatData?>(null)
     var postData = MutableStateFlow<PostData?>(null)
 
+    // 채팅방 들어감
     fun enterChatRoom(chatId: String){
-        // 기본적으로 룸디비, 와이파이 될때 rdb와 비교??
-        firebaseDB.reference.child(chatId).get()
+        // 한번도 채팅하지 않은경우는 조회 불가
+        Log.d("채팅방 id", chatId)
+        firebaseDB.reference.child("chat").child(chatId).get()
             .addOnSuccessListener {
                 Log.d("채팅방 정보", it.value.toString())
-                val result = it.value as HashMap<String, Any>?
-                val _chatData = RdbChatData(
+                it.value?.let { value ->
+                    val result = value as HashMap<String, Any>?
+                    val writer = result?.get("writer") as HashMap<String, Any>?
+                    val contact = result?.get("contact") as HashMap<String, Any>?
+                    val _chatData = RdbChatData(
                         result?.get("id") as String,
                         (result["postId"] as Long).toInt(),
-                        result["writer"] as Map<String, RdbUserData>,
-                        result["contact"] as Map<String, RdbUserData>,
-                        result["message"] as ArrayList<RdbMessageData>
+                        RdbUserData((writer?.get("id") as Long).toInt(), writer["nickname"] as String, (writer["level"] as Long).toInt()),
+                        RdbUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
+                        result["messages"] as List<RdbMessageData>
                     )
-                chatData.value = _chatData
+                    chatData.value = _chatData
+                }
             }
             .addOnFailureListener{
                 Log.d("채팅룸 정보 가져오기 실패", it.toString())
@@ -47,71 +54,105 @@ class ChatViewModel() : ViewModel() {
                 val _chatMessage = arrayListOf<RdbMessageData>()
                 val messageData = snapshot.value as ArrayList<HashMap<String, Any>>?
 
+                Log.d("변화 리스너", snapshot.value.toString())
                 messageData?.forEach {
                     _chatMessage.add(
                         RdbMessageData(
                             it["content"] as String,
                             it["_read"] as Boolean,
-                            it["createdAt"] as String,
+                            it["createdAt"] as Long,
                             (it["from"] as Long).toInt()
                         )
                     )
                 }
                 chatMessages.value = arrayListOf()
                 chatMessages.value = _chatMessage.toList()
+                Log.d("변화 리스너2", chatMessages.value.toString())
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.d(TAG, "loadMessage:onCancelled", error.toException())
             }
         }
-        firebaseDB.reference.child(chatId).child("message").addValueEventListener(chatListener)
-    }
-
-     fun newChatRoom(chatId: String, postId: Int, writerId: Int){
-        // roomDb에 저장된 채팅이 있는지 확인->진행되고 있는 채팅이 있음에도 채팅하기 버튼 누를 가능성 있음
-        // RDB ChatId 찾아보고 없으면 RDB 저장
-        if (true) { // 없을때
-            viewModelScope.launch {
-                val writerData : ArrayList<UserData> = dbAccessModule.getUserInfoById(writerId)
-                val writerRdbData = RdbUserData(writerData[0].id, writerData[0].nickname, writerData[0].reportPoint)
-                val writer = mapOf("writer" to writerRdbData)
-
-                val contactData =UserSharedPreference(App.context()).getUserPrefs()
-                val contactRdbData = RdbUserData(contactData.id, contactData.nickname, contactData.reportPoint)
-                val contact = mapOf("contact" to contactRdbData)
-
-                val rdbChatData = RdbChatData(chatId, postId, writer, contact, arrayListOf())
-
-                firebaseDB.reference.child(chatId).setValue(rdbChatData)
-                    .addOnSuccessListener {
-                        Log.d("newChatRoomSuccess", "채팅룸 생성 완료")
-                    }
-                    .addOnFailureListener{
-                        Log.d("채팅룸 생성 실패", it.toString())
-                    }
-            }
-        } else {
-            /*no-op*/
-        }
+        firebaseDB.reference.child("chat").child(chatId).child("messages").addValueEventListener(chatListener)
     }
 
     fun newMessage(chatId: String, messageData: RdbMessageData){
         if(chatMessages.value.isEmpty()) {
-            chatMessages.value = arrayListOf(messageData)
+            // 첫 메세지일때 채팅방 생성
+            chatMessages.value = listOf(messageData)
+            newChatRoom(chatId, postId = postData.value!!.id!!, postData.value!!.userId, chatMessages.value)
             Log.d("빈 리스트에 추가됨", chatMessages.value.toString())
         }else{
             chatMessages.value += messageData
             Log.d("추가됨", chatMessages.value.toString())
+            firebaseDB.reference.child("chat").child(chatId).child("messages").setValue(chatMessages.value)
+                .addOnSuccessListener {
+                    Log.d("newChatRoomSuccess", "메세지 보내기 성공")
+                }
+                .addOnFailureListener{
+                    Log.d("메세지 보내기 실패", it.toString())
+                }
         }
+    }
 
-        firebaseDB.reference.child(chatId).child("messages").setValue(chatMessages.value)
-            .addOnSuccessListener {
-                Log.d("newChatRoomSuccess", "메세지 보내기 성공")
+    private fun newChatRoom(chatId: String, postId: Int, writerId: Int, message :List<RdbMessageData>){
+        val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
+        var isHave = false
+        var usersChatList: List<String> = emptyList()
+
+        viewModelScope.launch {
+            viewModelScope.async {
+                firebaseDB.reference.child("user").child(userId).get()
+                    .addOnSuccessListener {
+                        it.value?.let { it ->
+                            usersChatList = it as List<String>
+                            isHave = chatId in usersChatList
+                        }
+                        Log.d("유저 채팅 정보 가져옴", usersChatList.toString())
+
+                    }
+                    .addOnFailureListener {
+                        isHave = false
+                    }
+            }.await()
+
+            if (!isHave) {
+                val writerData: java.util.ArrayList<UserData> = dbAccessModule.getUserInfoById(writerId)
+                val writer = RdbUserData(writerData[0].id, writerData[0].nickname, writerData[0].reportPoint)
+
+                val contactData = UserSharedPreference(App.context()).getUserPrefs()
+                val contact = RdbUserData(contactData.id, contactData.nickname, contactData.reportPoint)
+
+                val rdbChatData = RdbChatData(chatId, postId, writer, contact, message)
+
+                firebaseDB.reference.child("chat").child(chatId).setValue(rdbChatData)
+                    .addOnSuccessListener {
+                        Log.d("newChatRoomSuccess", "채팅룸 생성 완료")
+                        enterChatRoom(chatId)
+                    }
+                    .addOnFailureListener {
+                        Log.d("채팅룸 생성 실패", it.toString())
+                    }
+
+                if (usersChatList.isEmpty()){
+                    usersChatList = listOf(chatId)
+                }else {
+                    usersChatList.plus(chatId)
+                }
+                Log.d("유저 채팅 리스트", usersChatList.toString())
+
+                firebaseDB.reference.child("user").child(userId).setValue(usersChatList)
+                    .addOnSuccessListener {
+                    Log.d("newChatRoomSuccess", "유저 정보에 추가 완료")
+                    enterChatRoom(chatId)
+                }
+                    .addOnFailureListener {
+                        Log.d("유저 정보 추가 실패", it.toString())
+                    }
+
             }
-            .addOnFailureListener{
-                Log.d("메세지 보내기 실패", it.toString())
-            }
+        }
     }
 
     // 리뷰 작성
@@ -120,10 +161,8 @@ class ChatViewModel() : ViewModel() {
     }
 
     // 포스트 데이타 가져오기
-    fun getPostData(){
-        chatData.value?.let { data ->
-            dbAccessModule.getPostByPostId(data.postId){postData.value = it[0] }
-        }
+    fun getPostData(postId: Int){
+        dbAccessModule.getPostByPostId(postId){postData.value = it[0] }
     }
 
     // 판매완료 요청

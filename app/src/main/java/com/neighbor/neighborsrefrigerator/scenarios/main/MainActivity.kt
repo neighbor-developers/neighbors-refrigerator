@@ -161,8 +161,8 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
         composable(NAV_ROUTE.SEEK_REGISTER.routeName){
 
         }
-        composable("${NAV_ROUTE.CHAT.routeName}/{chatId}", arguments = listOf(navArgument("chatId"){type = NavType.StringType})) {
-            ChatScreen(navController = navController, chatId = it.arguments?.getString("chatId")?:"")
+        composable("${NAV_ROUTE.CHAT.routeName}/{chatId}/{postId}", arguments = listOf(navArgument("chatId"){type = NavType.StringType},navArgument("postId"){type = NavType.IntType})) {
+            ChatScreen(navController = navController, chatId = it.arguments?.getString("chatId")?:"", postId = it.arguments?.getInt("postId") ?:0)
         }
         composable(NAV_ROUTE.CHAT_LIST.routeName){
             ChatListScreen(navController)

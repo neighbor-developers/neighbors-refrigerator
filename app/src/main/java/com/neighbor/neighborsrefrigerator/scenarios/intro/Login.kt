@@ -66,19 +66,3 @@ fun SignInGoogleButton(onClick: () -> Unit) {
     }
 }
 
-@Preview
-@Composable
-fun Preview() {
-    Surface(color = Color.White) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 13.dp, end = 13.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Greeting(text = "시작하시겠습니까?")
-            SignInGoogleButton(onClick = { })
-        }
-    }
-}
-
