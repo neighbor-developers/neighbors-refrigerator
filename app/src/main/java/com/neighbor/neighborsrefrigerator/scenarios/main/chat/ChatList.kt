@@ -34,10 +34,7 @@ import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = viewModel()){
-    val chatListViewModel = chatListViewModel
-    chatListViewModel.initChatList()
-
+fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel =ChatListViewModel()){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,10 +52,7 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
         }
     ) { padding ->
         Surface(modifier = Modifier.padding(padding)) {
-            // composable에서 컴포지션이 일어날 때 suspend fun을 실행해주는 composable
-            LaunchedEffect(Unit){
-                chatListViewModel.initChatList()
-            }
+
             val chatList = chatListViewModel.chatData.collectAsState()
             val chatRemove = chatListViewModel.chatData
             LazyColumn {
@@ -125,7 +119,6 @@ fun ChatCard(chat: Chat, navController: NavController, viewModel: ChatListViewMo
     var createAt = viewModel.createAt.collectAsState()
     var newMessage = viewModel.newMessage.collectAsState()
 
-    navController.currentBackStackEntry?.savedStateHandle?.set(key = "chatViewModel", value = viewModel)
     Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {
         Column() {
             Row() {
