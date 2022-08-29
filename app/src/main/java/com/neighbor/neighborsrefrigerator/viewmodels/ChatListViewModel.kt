@@ -1,36 +1,35 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
 import android.content.ContentValues
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.neighbor.neighborsrefrigerator.data.*
-import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
+import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 
 
 class ChatListViewModel: ViewModel() {
-
-    private val firebaseDB = FirebaseDatabase.getInstance()
-
-    var example: ChatListData = ChatListData(
-        Chat(
-        postId = "1234",
-        writer = Inform(id = "1", nickname = "seoyeon", 1),
-        contact = Inform(id = "2", nickname = "zinkiki", 2),
-        message = listOf(ChatMessage(content = "안녕하세요", false, "2022-08-26 17:47:01", 2))
-        ),
-        12345678
+    var example: RdbChatData = RdbChatData(
+        id = "a",
+        postId = 1,
+        writer = RdbUserData(id = 1, nickname = "seoyeon", 1),
+        contact = RdbUserData(id = 2, nickname = "zinkiki", 2),
+        messages = listOf(RdbMessageData(content = "안녕하세요", false, 1661518435, 2))
     )
-    var chatData = MutableStateFlow<List<ChatListData>?>(listOf(example))
+    var chatData = MutableStateFlow<List<RdbChatData>?>(listOf(example))
     var nickname = MutableStateFlow<String>("")
     var lastMessage = MutableStateFlow<String>("")
     var newMessage = MutableStateFlow<Int>(0)
@@ -39,6 +38,8 @@ class ChatListViewModel: ViewModel() {
 
     private val usersChatList = MutableStateFlow<List<String>>(emptyList())
     val chatListData = MutableStateFlow<List<RdbChatData>>(emptyList())
+    private val firebaseDB = FirebaseDatabase.getInstance()
+
 
     // 실시간으로 유저의 채팅 리스트 변화 감지 -> 추가되면 추가된 상태로 정렬 다시
     init {
@@ -97,19 +98,10 @@ class ChatListViewModel: ViewModel() {
 
 
 
-
-    // 싱글톤 패턴을 사용하지 않을 경우
-/*    private val db = Room.databaseBuilder(
-        App.context(),
-        ChatListDB::class.java,
-        "chatList-database"
-    ).build()*/
-
-    // 싱글톤 패턴을 사용할 경우
-    private var db = ChatListDB.getInstance(App.context())
+    private val db = FirebaseDatabase.getInstance()
 
 
-    //fun initChatList(){
+    fun initChatList(){
 //        viewModelScope.launch {
 //
 //            val chats = viewModelScope.async{
@@ -135,7 +127,7 @@ class ChatListViewModel: ViewModel() {
             refreshChatList(it)
 
         }*/
-   // }
+    }
 
     private fun getLastChatTimestamp(chat: Chat): Long?{
 
@@ -146,7 +138,8 @@ class ChatListViewModel: ViewModel() {
 
         return MyTypeConverters().convertDateToTimeStamp(lastChat?.created_at.toString())
     }
-    fun refreshChatList(chat: Chat){
+
+    fun refreshChatList(chat: RdbChatData){
         // 채팅 하나마다 안읽은 메세지 수, 마지막 채팅, 상대방 닉네임 및 정보 가져와야함
 
         // 최근 채팅 순으로 정렬
@@ -163,23 +156,21 @@ class ChatListViewModel: ViewModel() {
 
     }
 
-    private fun checkNewMessage(chat: Chat){
+    private fun checkNewMessage(chatData: RdbChatData){
         newMessage.value = 0
-        chat.message.forEach {
-            if(!it.isRead){
+        chatData.messages.forEach {
+            if(!it.is_read){
                 newMessage.value++
             }
         }
     }
 
-    private fun checkLastChat(chat: Chat) {
+    private fun checkLastChat(chatData: RdbChatData) {
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
 
-        val lastChat = chat.message.maxWithOrNull(compareBy { it.created_at?.let { date ->
-            MyTypeConverters().convertDateToTimeStamp(date)
-        } })
+        val lastChat = chatData.messages.maxWithOrNull(compareBy { it.createdAt })
         val current = System.currentTimeMillis()
-        val lastChatTime = MyTypeConverters().convertDateToTimeStamp(lastChat?.created_at.toString())!!
+        val lastChatTimeStamp = lastChat?.createdAt
 
 /*        compareBy<ChatMessage>{ it.created_at?.let { it ->
             MyTypeConverters().convertDateToTimeStamp(
@@ -187,16 +178,23 @@ class ChatListViewModel: ViewModel() {
             )
         } }*/
 
-        lastMessage.value = MyTypeConverters().convertTimestampToStringDate(current, lastChatTime).toString()
+        if (lastChatTimeStamp == null){
+            Log.d("타임스탬프 에러", "타임스탬프 null")
+        }
+        else{
+            lastMessage.value =
+                MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp).toString()
+        }
     }
 
-    private fun getUserData(chat: Chat){
+    private fun getUserData(chatData: RdbChatData){
         // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
-        if(chat.writer.id == UserSharedPreference(App.context()).getUserPrefs("id")){
-            nickname.value = chat.contact.id.toString()
+        // int? String? 에러날 수 있음
+        if(chatData.writer.id == UserSharedPreference(App.context()).getUserPrefs("id")?.toInt()){
+            nickname.value = chatData.contact.nickname
         }
-        else if(chat.contact.id == UserSharedPreference(App.context()).getUserPrefs("id")){
-            nickname.value = chat.writer.id.toString()
+        else if(chatData.contact.id == UserSharedPreference(App.context()).getUserPrefs("id")?.toInt()){
+            nickname.value = chatData.writer.nickname
         }
         // 아닐 경우 writerId 체크해서 상대방 정보 가져오기
     }

@@ -45,16 +45,17 @@ class MyTypeConverters {
     // 일단 써보고 맞게 바꾸기
     fun convertTimestampToStringDate(current: Long, timestamp: Long): String? {
 
-        return if (604800000 > (current - timestamp!!) && (current - timestamp) >= 86400000)
-            "${(current - timestamp) / 86400000}일전"
-        // 1일 미만
-        else if (current - timestamp < 86400000)
-            SimpleDateFormat("hh:MM", Locale.KOREA).format(timestamp)
         // 1분 미만
-        else if (current - timestamp <= 60000)
+        return if (current - timestamp < 60000)
             "방금"
-        // 일주일 이상
+        // 1시간 미만
+        else if (current - timestamp in 60000..3599999)
+            "${(current - timestamp) / 60000}분 전"
+        // 1시간 초과 24시간 미만
+        else if (current - timestamp in 3600000..86399999)
+            "${(current - timestamp) / 86400000}시간 전"
+        // 24시간 이상
         else
-            SimpleDateFormat("mm.dd", Locale.KOREA).format(timestamp)
+            "${(current - timestamp) / 108000000}일 전"
     }
 }
