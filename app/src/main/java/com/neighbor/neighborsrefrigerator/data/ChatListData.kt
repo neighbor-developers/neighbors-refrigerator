@@ -9,7 +9,7 @@ import java.sql.Date
 
 @Entity
 data class ChatListData(
-    @Embedded(prefix = "chatlistdata_") var chatData: Chat?,
+    @Embedded(prefix = "chatlistdb_") var chatData: Chat?,
     @PrimaryKey(autoGenerate = true) var chatId: Int
 )
 

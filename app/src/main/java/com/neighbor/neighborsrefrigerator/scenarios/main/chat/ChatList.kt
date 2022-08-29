@@ -1,17 +1,18 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,11 +27,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.Chat
-import com.neighbor.neighborsrefrigerator.data.ChatListData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
-import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
+
+@SuppressLint("UnrememberedMutableState")
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = viewModel()){
     val chatListViewModel = chatListViewModel
@@ -58,12 +60,54 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
                 chatListViewModel.initChatList()
             }
             val chatList = chatListViewModel.chatData.collectAsState()
+            val chatRemove = chatListViewModel.chatData
             LazyColumn {
-                chatList.value.let { it ->
+                chatList.value.let{ chatlist ->
+                    itemsIndexed(items = chatlist!!, key={_, listItem ->
+                        listItem.hashCode()
+                    }){ index, chat ->
+                        // https://www.youtube.com/watch?v=Q89i4iZK8ko
+                        val state = rememberDismissState(
+                            confirmStateChange = {
+                                if(it == DismissValue.DismissedToStart){
+                                    // https://stackoverflow.com/questions/73201881/modifying-a-mutablestateflow-list-in-kotlin
+                                    chatRemove.value?.toMutableList()?.remove(chat)
+                                }
+                                true
+                            }
+                        )
+                        SwipeToDismiss(state = state, background = {
+                            val color = when(state.dismissDirection){
+                                DismissDirection.StartToEnd -> Color.Transparent
+                                    DismissDirection.EndToStart -> Color.Black
+                                    null -> Color.Magenta
+                            }
+                            Box(modifier = Modifier
+                                .fillMaxSize()
+                                .background(color = color)
+                                .padding(10.dp)){
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "delete",
+                                    modifier = Modifier.align(Alignment.CenterEnd),
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        dismissContent = {
+                            ChatCard(chat = chat.chatData!!, navController, chatListViewModel)
+                        },
+                        directions = setOf(DismissDirection.EndToStart))
+                        Divider()
+                    }
+
+                }
+
+                /*chatList.value.let { it ->
                     items(it!!){ chat ->
                         ChatCard(chat = chat.chatData!!, navController, chatListViewModel)
                     }
-                }
+                }*/
             }
         }
     }

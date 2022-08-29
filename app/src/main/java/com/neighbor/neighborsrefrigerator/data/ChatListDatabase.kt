@@ -6,6 +6,7 @@ import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 
 // https://youngest-programming.tistory.com/456
 // https://developer.android.com/training/data-storage/room/relationships?hl=ko
+// https://todaycode.tistory.com/39 room + singleton + coroutine
 
 
 @Database(entities = [ChatListData::class], version = 4)
