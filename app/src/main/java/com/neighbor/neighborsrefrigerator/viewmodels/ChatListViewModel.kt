@@ -1,28 +1,14 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.R
-import android.os.Bundle
-import android.util.Log
-import androidx.annotation.RequiresPermission
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import com.neighbor.neighborsrefrigerator.data.*
+import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import com.neighbor.neighborsrefrigerator.network.DBAccessModule
-import com.neighbor.neighborsrefrigerator.utilities.App
-import java.sql.Timestamp
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 
 class ChatListViewModel: ViewModel() {

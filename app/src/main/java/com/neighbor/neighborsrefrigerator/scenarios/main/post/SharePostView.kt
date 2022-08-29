@@ -17,14 +17,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 
 @Composable
@@ -41,7 +47,6 @@ fun SharePostScreen(
             .verticalScroll(state)
             .height(1000.dp)
     ) {
-        SearchBox("share", navController)
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
         CategoryView(postViewModel)
         SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsLazyPagingItems(),  route, navController)
@@ -57,11 +62,10 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navH
     LazyVerticalGrid(
         state = scrollState,
         columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(40.dp),
-        horizontalArrangement = Arrangement.spacedBy(40.dp),
-        modifier = Modifier
-            .padding(top = 10.dp, start = 30.dp, end = 30.dp),
-        userScrollEnabled = true
+        verticalArrangement = Arrangement.spacedBy(30.dp),
+        horizontalArrangement = Arrangement.spacedBy(30.dp),
+        modifier = Modifier.padding(top = 20.dp, start = 20.dp, end = 20.dp),
+        userScrollEnabled = true,
     ) {
 
         items(posts.itemSnapshotList.items) { item ->
@@ -73,13 +77,15 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navH
 
 @Composable
 fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController){
+    val userNickname by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("nickname")!!)
+    }
     if (!posts.value.isNullOrEmpty()){
         Text(
-            text = "# 어쩌고님 위치에서 가까운 나눔",
+            text = "# ${userNickname}님 위치에서 가까운 나눔",
             modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
             fontSize = 15.sp
         )
-
         LazyRow (modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
@@ -110,64 +116,50 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
 @Composable
 fun CategoryView(postViewModel: PostViewModel){
     val categoryList = mapOf(null to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
+    val categoryIconList = mapOf(null to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
 
+    var selectedCategory by remember {
+        mutableStateOf("전체")
+    }
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     ) {
-        categoryList.forEach { it ->
-            TextButton(
-                border = BorderStroke(1.dp, Color.Black),
-                modifier = Modifier.size(40.dp),
+        categoryList.forEach { category ->
+            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(60.dp),
                 onClick = {
-                    if(it.value == "전체"){
+                    selectedCategory = category.value
+                    if(category.value == "전체"){
                         postViewModel.getPosts(null, null, "justTime", "share", 1)
                     }else {
                         postViewModel.getPosts(
                             item = null,
-                            category = it.key,
+                            category = category.key,
                             reqType = "category",
                             postType = "share",
                             varType = 1
                         )
 
-
                     }
-                }
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                contentPadding = PaddingValues(0.dp),
+                elevation = ButtonDefaults.elevation(0.dp)
             ){
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    //Icon(Icons.Filled.Favorite, contentDescription = it.value, modifier = Modifier.size(20.dp), tint =Color.Black)
-                    Text(text = it.value, fontSize = 10.sp, color = Color.Black)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+                    Icon(painterResource(id = categoryIconList[category.key]!!), contentDescription = category.value, modifier = Modifier.size(if (category.key == 200) 31.dp else if (category.key == null) 30.dp else 35.dp), tint = colorResource(
+                        id = R.color.green
+                    ))
+                    Text(text = category.value, fontSize = 10.sp, color = Color.DarkGray, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                 }
             }
         }
     }
 }
 
-@Composable
-fun SearchBox(type: String, navController: NavHostController) {
-    var item by remember { mutableStateOf("") }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 5.dp, end = 30.dp, start = 30.dp),
-        contentAlignment = Alignment.CenterEnd
-    ) {
-        val cornerSize = CornerSize(20.dp)
-        OutlinedTextField(value = item, onValueChange = { item = it }, modifier = Modifier
-            .fillMaxWidth()
-            .size(45.dp), shape = MaterialTheme.shapes.large.copy(cornerSize))
 
-        IconButton(
-            onClick = {
-                if(item.isNotEmpty() && item != " ") {
-                    navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/$item/$type")
-                }
-        }) {
-            Icon(Icons.Filled.Search, contentDescription = null)
-        }
-    }
-}
 
 
 @Preview

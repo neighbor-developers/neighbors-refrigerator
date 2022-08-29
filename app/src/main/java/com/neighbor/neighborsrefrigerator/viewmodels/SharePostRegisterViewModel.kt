@@ -17,8 +17,8 @@ class SharePostRegisterViewModel: ViewModel() {
     private val dbAccessModule = DBAccessModule()
     private val userPrefs = UserSharedPreference(App.context())
 
-    var locationType = mutableStateOf("")
-    var validateTypeName = mutableStateOf("")
+    var locationType = mutableStateOf("홈")
+    var validateTypeName = mutableStateOf("유통")
     var title = mutableStateOf(TextFieldValue())
     var content = mutableStateOf(TextFieldValue())
     var imgUriState by mutableStateOf<Uri?>(null)

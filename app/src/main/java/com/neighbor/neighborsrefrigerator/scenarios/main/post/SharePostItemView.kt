@@ -31,15 +31,12 @@ fun ItemCardByTime(post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, na
             navHostController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = post)
             navHostController.navigate(route = route.routeName)
          },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(230.dp),
         shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)),
-        elevation = 10.dp
+        elevation = 0.dp
     ) {
         Box(Modifier.fillMaxSize()) {
             Column() {
-                val modifier = Modifier.fillMaxHeight(0.6f)
+                val modifier = Modifier.aspectRatio(1f)
                 post.productimg1?.let {
                     ItemImage(productimg1 = post.productimg1, modifier = modifier)
                 }
@@ -69,12 +66,12 @@ fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavH
             .padding(end = 20.dp)
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)),
-        elevation = 10.dp
+        elevation = 0.dp
     ) {
         Surface(shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp))) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-                    val modifier = Modifier.size(100.dp)
+                    val modifier = Modifier.aspectRatio(1f)
                     post.productimg1?.let {
                         ItemImage(productimg1 = post.productimg1, modifier = modifier)
                     }
@@ -97,21 +94,23 @@ fun ItemText(post: PostData){
     val calTime = CalculateTime()
     val time = calTime.calTimeToPost(current, post.createdAt)
 
-    val token = post.validateDate!!.split("T")[0].split("-")
-
-    val validateDate = "${token[0]}년 ${token[1]}월 ${token[2]}일"
-    val validateType = when (post.validateType) {
-        1 -> "유통기한"
-        2 -> "제조일자"
-        3 -> "구매일자"
-        else -> { "" }
-    }
+//    val token = post.validateDate!!.split("T")[0].split("-")
+//
+//    val validateDate = "${token[0]}년 ${token[1]}월 ${token[2]}일"
+//    val validateType = when (post.validateType) {
+//        1 -> "유통기한"
+//        2 -> "제조일자"
+//        3 -> "구매일자"
+//        else -> { "" }
+//    }
     Column(Modifier.padding(10.dp)) {
-        Text(text = post.title, fontSize = 15.sp, color = Color.Black, modifier = Modifier.padding(bottom = 10.dp))
-        Text(text = "$validateType : $validateDate", fontSize = 10.sp, color = Color.Black)
+        Text(text = post.title, fontSize = 18.sp, color = Color.Black, modifier = Modifier.padding(bottom = 7.dp))
+        //Text(text = "$validateType : $validateDate", fontSize = 10.sp, color = Color.Black)
         post.distance?.let {
             Text(text = "내 위치에서 ${post.distance}km", fontSize = 10.sp, color = Color.Black)
         }
+
+        Text(text = "내 위치에서 7km", fontSize = 10.sp, color = Color.Black)
         Text(text = "업로드 : $time", fontSize = 10.sp, color = Color.Black)
     }
 }

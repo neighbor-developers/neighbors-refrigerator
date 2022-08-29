@@ -8,17 +8,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,6 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
+import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
@@ -43,6 +52,7 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePost
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
+import java.security.DomainLoadStoreParameter
 
 class MainActivity : ComponentActivity() {
 
@@ -170,7 +180,11 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             ReviewScreen(post!!, navController)
         }
         composable("${NAV_ROUTE.SEARCH_POST.routeName}/{item}/{type}", arguments = listOf(navArgument("item"){type = NavType.StringType}, navArgument("type"){type = NavType.StringType})){
-            SearchPostView(item = it.arguments?.getString("item")?:"", type = it.arguments?.getString("type")?:"share", navController = navController,)
+            SearchPostView(
+                item = it.arguments?.getString("item") ?: "",
+                type = it.arguments?.getString("type") ?: "share",
+                navController = navController
+            )
         }
     }
 }
@@ -192,7 +206,9 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
                 },
                 actions = {
                     IconButton(onClick = { navController.navigate(NAV_ROUTE.CHAT_LIST.routeName) }) {
-                        Icon(Icons.Filled.Send, contentDescription = "")
+                        Icon(painter = painterResource(id = R.drawable.icon_chat2), contentDescription = "", modifier = Modifier.size(28.dp), tint = colorResource(
+                            id = R.color.green
+                        ))
                     }
 
                 },
@@ -201,7 +217,8 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
                         scope.launch {
                             scaffoldState.drawerState.open()
                         }}) {
-                        Icon(Icons.Filled.Menu, contentDescription = "")
+                        Icon(painterResource(id = R.drawable.icon_menu), contentDescription = "", modifier = Modifier.size(35.dp), tint = colorResource(
+                            id = R.color.green))
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -210,19 +227,20 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { isDropDownMenuExpanded = true }, contentColor = Color.Black, backgroundColor = Color.Yellow) {
-                Icon(Icons.Filled.Edit, contentDescription = "a")
+            FloatingActionButton(onClick = { isDropDownMenuExpanded = true }, contentColor = Color.Black, backgroundColor = Color.White) {
+                Icon(painter = painterResource(id = R.drawable.icon_add), contentDescription = "add", modifier = Modifier.size(35.dp), tint = colorResource(
+                    id = R.color.green
+                ))
                 DropdownMenu(
                     modifier = Modifier.wrapContentSize(),
                     expanded = isDropDownMenuExpanded,
-                    onDismissRequest = { isDropDownMenuExpanded = false },
-                    offset = DpOffset((10).dp, 0.dp)
+                    onDismissRequest = { isDropDownMenuExpanded = false }
                 ) {
                     DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.SHARE_REGISTER.routeName) }) {
-                        Text("나눔")
+                        Text("나눔 글쓰기")
                     }
                     DropdownMenuItem(onClick = { navController.navigate(NAV_ROUTE.SEEK_REGISTER.routeName) }) {
-                        Text("구함")
+                        Text("구함 글쓰기")
                     }
                 }
             }
@@ -236,32 +254,82 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
         Column(modifier = Modifier
             .padding(it)
             .fillMaxSize()) {
-            Row(){
+
+            Row(modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 8.dp, bottom = 8.dp)){
                 Button(
-                    onClick = {
-                        types.value = "share" },
-                    modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray, contentColor = Color.White, disabledBackgroundColor = Color.Yellow, disabledContentColor = Color.Black),
+                    onClick = { types.value = "share" },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White, contentColor = colorResource(id = R.color.green), disabledBackgroundColor = colorResource(id = R.color.green), disabledContentColor = Color.White),
                     enabled = when(types.value){
                         "share" -> false
                         "seek" -> true
                         else -> true
-                    }
+                    },
+                    elevation = ButtonDefaults.elevation(0.dp),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text(text = "나눔")
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "나눔",
+                            color = if(types.value == "share") Color.White else Color.Black,
+                            fontWeight = if (types.value == "share") FontWeight.Bold else FontWeight.Normal
+                        )
+//                        if(types.value == "share"){
+//                            Canvas(modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(3.dp)
+//                                .padding(start = 6.dp, end = 6.dp, top = 7.dp)){
+//                                val canvasWidth = size.width
+//
+//                                drawLine(
+//                                    start = Offset(x = canvasWidth, y = 0f),
+//                                    end = Offset(x = 0f, y = 0f),
+//                                    color = Color.Gray,
+//                                    strokeWidth = 13F
+//                                )
+//                            }
+//                        }
+                    }
+
                 }
                 Button(
-                    onClick = {
-                        types.value = "seek" },
-                    modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray, contentColor = Color.White, disabledBackgroundColor = Color.Yellow, disabledContentColor = Color.Black),
+                    onClick = { types.value = "seek" },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White, contentColor = colorResource(id = R.color.green), disabledBackgroundColor = colorResource(id = R.color.green), disabledContentColor = Color.White),
                     enabled = when(types.value){
                         "share" -> true
                         "seek" -> false
                         else -> true
-                    }
+                    },
+                    elevation = ButtonDefaults.elevation(0.dp),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text(text = "구함")
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "구함",
+                            color = if(types.value == "seek") Color.White else Color.Black,
+                            fontWeight = if (types.value == "seek") FontWeight.Bold else FontWeight.Normal
+                        )
+//                        if(types.value == "seek") {
+//                            Canvas(modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(3.dp)
+//                                .padding(start = 6.dp, end = 6.dp, top = 7.dp)) {
+//                                val canvasWidth = size.width
+//                                drawLine(
+//                                    start = Offset(x = canvasWidth, y = 0f),
+//                                    end = Offset(x = 0f, y = 0f),
+//                                    strokeWidth = 13F,
+//                                    color = Color.Gray
+//                                )
+//                            }
+//                        }
+                    }
+                }
+                Surface(modifier = Modifier
+                    .weight(4f)
+                    .padding(start = 6.dp)) {
+                    SearchBox(type = types.value, navController = navController)
                 }
             }
             val postViewModel by remember {
@@ -281,5 +349,52 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
             }
 
         }
+    }
+}
+
+@Composable
+fun SearchBox(type: String, navController: NavHostController) {
+    var item by remember { mutableStateOf("") }
+    Box(
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        val cornerSize = CornerSize(20.dp)
+        TextField(
+            value = item,
+            onValueChange = { item = it },
+            modifier = Modifier
+                .height(45.dp),
+            shape = MaterialTheme.shapes.large.copy(cornerSize),
+            placeholder = { Text(text = "검색하기", style = TextStyle(fontSize = 11.5.sp, textDecoration = TextDecoration.None), modifier = Modifier.padding(bottom = 0.dp)) },
+            maxLines = 1,
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        if(item.isNotEmpty() && item != " ") {
+                            navController.navigate("${NAV_ROUTE.SEARCH_POST.routeName}/$item/$type")
+                        }
+                    }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_search),
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp),
+                        tint = colorResource(id = R.color.green)
+                    )
+                }
+            },
+            visualTransformation = VisualTransformation.None
+            ,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.DarkGray,
+                disabledTextColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                cursorColor = Color.DarkGray,
+                backgroundColor = colorResource(id = R.color.backgroundGray),
+            ),
+            textStyle = TextStyle(fontSize = 13.sp, textDecoration = TextDecoration.None),
+
+        )
     }
 }

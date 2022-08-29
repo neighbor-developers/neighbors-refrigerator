@@ -27,7 +27,6 @@ fun SeekPostScreen(
     navHostController: NavHostController
 ) {
     Column() {
-        SearchBox( "seek", navHostController)
         Text(
             text = "# 이웃 주민과 함께 어쩌구 ~",
             modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),

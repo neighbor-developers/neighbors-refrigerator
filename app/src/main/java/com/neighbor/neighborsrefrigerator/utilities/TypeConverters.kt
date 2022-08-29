@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.room.TypeConverter
 import com.google.gson.Gson
+import com.neighbor.neighborsrefrigerator.data.ChatMessage
 import java.io.ByteArrayOutputStream
 import java.sql.Timestamp
 import java.text.SimpleDateFormat

@@ -11,9 +11,10 @@ import kotlinx.coroutines.flow.Flow
 class MyPagingRepository {
 
     fun getPostsByTime(reqPostData: ReqPostData): Flow<PagingData<PostData>> {
+        Log.d("실헹1", "실행1")
         return Pager(config = PagingConfig(
             pageSize = 5,
-            maxSize = 20,
+            maxSize = 15,
             enablePlaceholders = false
         ),
             pagingSourceFactory = { MyPagingSource(reqPostData) }
