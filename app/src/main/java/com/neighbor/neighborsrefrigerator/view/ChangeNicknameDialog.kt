@@ -1,6 +1,5 @@
 package com.neighbor.neighborsrefrigerator.view
 
-import android.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,17 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.constraintlayout.compose.ConstraintLayout
+import com.neighbor.neighborsrefrigerator.R
 
 @Composable
-fun CustomDialog(value: String, changeDialogState:(Boolean) -> Unit, setValue: (String) -> Unit) {
+fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, changeNickname: (String) -> Unit) {
     val txtFieldError = remember { mutableStateOf("") }
-    val txtField = remember { mutableStateOf(value) }
+    val nickname = remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { changeDialogState(false) }) {
         Surface(
@@ -38,27 +37,30 @@ fun CustomDialog(value: String, changeDialogState:(Boolean) -> Unit, setValue: (
                 contentAlignment = Alignment.Center
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                        val (text, button) = createRefs()
                         Text(
-                            text = "원하는 닉네임을 작성해주십시오.",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                fontFamily = FontFamily.Default,
-                                fontWeight = FontWeight.Bold
-                            )
+                            text = "닉네임 변경",
+                            fontSize = 18.sp,
+                            modifier = Modifier.constrainAs(text) {
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                                top.linkTo(parent.top)
+                                bottom.linkTo(parent.bottom)
+                            }
                         )
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "",
-                            tint = colorResource(R.color.darker_gray),
+                            tint = Color.DarkGray,
                             modifier = Modifier
-                                .width(30.dp)
-                                .height(30.dp)
+                                .width(25.dp)
+                                .height(25.dp)
+                                .constrainAs(button) {
+                                    end.linkTo(parent.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                }
                                 .clickable { changeDialogState(false) }
                         )
                     }
@@ -70,8 +72,8 @@ fun CustomDialog(value: String, changeDialogState:(Boolean) -> Unit, setValue: (
                             .fillMaxWidth()
                             .border(
                                 BorderStroke(
-                                    width = 2.dp,
-                                    color = colorResource(id = if (txtFieldError.value.isEmpty()) R.color.holo_green_light else R.color.holo_red_dark)
+                                    width = 1.dp,
+                                    color = colorResource(id = if (txtFieldError.value.isEmpty()) R.color.green else R.color.green)
                                 ),
                                 shape = RoundedCornerShape(50)
                             ),
@@ -84,45 +86,40 @@ fun CustomDialog(value: String, changeDialogState:(Boolean) -> Unit, setValue: (
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = "",
-                                tint = colorResource(R.color.holo_green_light),
+                                tint = colorResource(R.color.green),
                                 modifier = Modifier
                                     .width(20.dp)
                                     .height(20.dp)
                             )
                         },
-                        placeholder = { Text(text = "ex. 정왕동땅부자") },
-                        value = txtField.value,
+                        placeholder = { Text(text = "변경할 닉네임을 입력해주세요") },
+                        value = nickname.value,
                         onValueChange = {
-                            txtField.value = it.take(10)
+                            nickname.value = it.take(10)
                         })
 
                     Spacer(modifier = Modifier.height(25.dp))
 
-                    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                        Button(
-                            onClick = {
-                                if (txtField.value.isEmpty()) {
-                                    txtFieldError.value = "빈칸은 입력하실 수 없습니다."
-                                    return@Button
-                                }else {
-                                    setValue(txtField.value)
-                                    changeDialogState(false)
-                                }
-                            },
-                            shape = RoundedCornerShape(50.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                                .border(
-                                    width = 3.dp,
-                                    color = Color.LightGray,
-                                    shape = RoundedCornerShape(50.dp)
-                                ),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
-                        ) {
-                            Text(text = "입력")
-                        }
+                    Button(
+                        onClick = {
+                            if (nickname.value.isEmpty()) {
+                                txtFieldError.value = "빈칸은 입력하실 수 없습니다."
+                                return@Button
+                            } else {
+                                changeNickname(nickname.value)
+                                changeDialogState(false)
+                            }
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                        elevation = ButtonDefaults.elevation(0.dp)
+                    ) {
+                        Text(text = "변경", color = colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                     }
+
                 }
             }
         }

@@ -3,7 +3,9 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
+import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,7 +26,12 @@ class MainViewModel: ViewModel() {
     init {
         dbAccessModule.hasFbId(auth.currentUser.toString()) { hasId.value = it }
     }
+    fun changeNickname(nickname : String){
+        val id = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
 
+        UserSharedPreference(App.context()).setUserPrefs("nickname", nickname)
+        dbAccessModule.updateNickname(id, nickname)
+    }
 
     fun sendEmail(content: String, email: String) = viewModelScope.launch {
         emailContent.value = content

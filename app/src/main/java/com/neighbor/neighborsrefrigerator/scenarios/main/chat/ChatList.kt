@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +45,9 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
                     .padding(end = 50.dp), fontSize = 17.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }, modifier = Modifier.size(50.dp) ) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")}
+                        Icon(painterResource(id = R.drawable.icon_back), contentDescription = "뒤로가기", modifier = Modifier.size(35.dp), tint = colorResource(
+                            id = R.color.green)
+                        )}
                 },
 
                 backgroundColor = Color.Transparent,
@@ -120,7 +123,7 @@ fun ChatCard(chat: RdbChatData, navController: NavController, viewModel: ChatLis
     var createAt = viewModel.createAt.collectAsState()
     var newMessage = viewModel.newMessage.collectAsState()
 
-    Card(onClick = {navController.navigate(route = NAV_ROUTE.CHAT.routeName)}) {
+    Card(onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.id}/${chat.postId}")}) {
         Column() {
             Row() {
                 Column() {

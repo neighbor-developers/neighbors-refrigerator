@@ -31,41 +31,37 @@ fun SearchAddressDialog(
     if (dialogState) {
         AlertDialog(
             backgroundColor = Color.White,
-            onDismissRequest = onDismiss,
-            title = null,
+            onDismissRequest = { onDismiss() },
+            title = {Text(text = "위치 설정", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontSize = 16.sp)},
             text = {
                 Column(){
                     Text(
                         "동(읍/면/리)과 번지수 또는 건물명을 정확하게 입력해 주세요.",
-                        textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(70.dp),
-                        fontSize = 16.sp,
+                            .fillMaxWidth().padding(10.dp),
+                        fontSize = 13.sp,
                         lineHeight = 17.sp
                     )
                     DialogUI(viewModel)
                 }
             },
-            buttons = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement =  Arrangement.Center
+            dismissButton = {
+                TextButton(
+                    onClick = { onDismiss() }
                 ) {
-                    TextButton( onClick = onConfirm )
-                    {
-                        Text(text = "확인")
-                    }
-                    TextButton(onClick = onDismiss)
-                    {
-                        Text(text = "Calcel")
-                    }
+                    Text(text = "취소", color = Color.DarkGray)
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { onConfirm() }
+                ) {
+                    Text(text = "확인", color = Color.DarkGray)
                 }
             },
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-            shape = RoundedCornerShape(9.dp),
-            modifier = Modifier.height(400.dp)
+            modifier = Modifier
+                .padding(10.dp)
         )
     }
 }
@@ -73,10 +69,6 @@ fun SearchAddressDialog(
 @Composable
 fun DialogUI(viewModel: SearchAddressDialogViewModel) {
     Column {
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-        )
         /*Divider(
             color = Color.DarkGray,
             thickness = 0.8.dp,
@@ -84,7 +76,7 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
         )*/
         OutlinedTextField(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().padding(10.dp),
             value = viewModel.userAddressInput,
             onValueChange = { viewModel.userAddressInput = it },
             singleLine = true,
@@ -102,7 +94,7 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
             )
         )
         Box(
-            modifier = Modifier.height(150.dp)
+            modifier = Modifier.height(100.dp)
         ) {
             AddressList(viewModel)
         }
@@ -142,7 +134,7 @@ fun DefaultPreview() {
                 .padding(it)
         ) {
             var dialogState by remember { mutableStateOf(true) }
-            var searchAddressDialogViewModel = SearchAddressDialogViewModel()
+            val searchAddressDialogViewModel = SearchAddressDialogViewModel()
 
             SearchAddressDialog(
                 dialogState = dialogState,

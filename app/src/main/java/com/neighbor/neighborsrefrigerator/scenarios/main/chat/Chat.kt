@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,12 +56,14 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
                 title = { Text(text = "", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 17.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")
+                        Icon(painterResource(id = R.drawable.icon_back), contentDescription = "뒤로가기", modifier = Modifier.size(35.dp), tint = colorResource(
+                            id = R.color.green)
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { declarationDialogState = true }) {
-                        Icon(Icons.Filled.Warning, contentDescription = "신고하기", tint = Color.Red)
+                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(45.dp), tint = Color.Red)
                     }
                 },
                 backgroundColor = Color.Transparent,
@@ -275,12 +278,13 @@ fun SendSection(viewModel: ChatViewModel, chatId: String, userId: Int) {
                     }
                 ){
                     Icon(imageVector = Icons.Filled.Send,
-                        contentDescription = "보내기",)
+                        contentDescription = "보내기", tint = colorResource(id = R.color.green))
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(10.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorResource(id = R.color.green))
         )
     }
 }

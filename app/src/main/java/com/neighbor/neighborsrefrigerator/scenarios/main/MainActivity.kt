@@ -168,7 +168,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             ChatListScreen(navController)
         }
         composable(NAV_ROUTE.SETTING.routeName){
-            Setting(mainViewModel = mainViewModel)
+            Setting(navController = navController,mainViewModel = mainViewModel)
         }
         composable(NAV_ROUTE.TRADE_HISTORY.routeName){
 

@@ -47,4 +47,11 @@ class UserSharedPreference(context: Context) {
         prefs.edit().putString("longitude", person.longitude.toString()).apply()
         prefs.edit().putString("createdAt", person.createdAt).apply()
     }
+
+    fun setNoticePref(item: String, data: Boolean){
+        prefs.edit().putBoolean(item, data).apply()
+    }
+    fun getNoticePref(item: String): Boolean{
+        return prefs.getBoolean(item, true)
+    }
 }
