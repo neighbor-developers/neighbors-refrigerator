@@ -23,7 +23,9 @@ import com.neighbor.neighborsrefrigerator.view.CustomDialog
 import com.neighbor.neighborsrefrigerator.view.FlowerDialog
 import com.neighbor.neighborsrefrigerator.view.InquiryDialog
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
+import com.neighbor.neighborsrefrigerator.viewmodels.DrawerProfileViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 
 data class DrawerItem(
@@ -103,7 +105,9 @@ fun Drawer(
                 if (showNicknameDialog.value){
                     CustomDialog(value = "",
                         changeDialogState = { showNicknameDialog.value = it },
-                        setValue = {})
+                        setValue = {}, DrawerProfileViewModel(),
+                        RegisterInfoViewModel()
+                    )
                 }
                 Text("Nickname", fontSize = 25.sp)
                 IconButton(

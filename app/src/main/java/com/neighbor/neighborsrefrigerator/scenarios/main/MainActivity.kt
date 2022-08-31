@@ -40,6 +40,7 @@ import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
+/*import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen*/
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer

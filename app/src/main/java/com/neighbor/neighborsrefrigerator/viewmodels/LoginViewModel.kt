@@ -1,6 +1,7 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
 import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
-
+    private lateinit var googleSignInClient : GoogleSignInClient
 
     // 로그인 결과 반환 변수
     private val _loginResult = MutableSharedFlow<Boolean>()
@@ -35,7 +36,8 @@ class LoginViewModel : ViewModel() {
     }
 
     // 이전에 로그인 한 계정이 있는지 확인
-    private fun getLastSignedInAccount(context: Context) = GoogleSignIn.getLastSignedInAccount(context)
+    private fun getLastSignedInAccount(context: Context) =
+        GoogleSignIn.getLastSignedInAccount(context)
 
     private fun setLoginResult(isLogin: Boolean) {
         viewModelScope.launch {
@@ -43,7 +45,10 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    /*fun signOut() = viewModelScope.launch {
+    fun signOut(context: Context) = viewModelScope.launch {
         Firebase.auth.signOut()
-    }*/
+        googleSignInClient.signOut().addOnCompleteListener {
+            tryLogin(context)
+        }
+    }
 }
