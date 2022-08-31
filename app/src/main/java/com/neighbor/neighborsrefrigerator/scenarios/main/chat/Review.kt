@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,18 +40,23 @@ fun ReviewScreen(postData: PostData, navController: NavHostController, chatViewM
     var dialogState by remember {
         mutableStateOf(false)
     }
+    val nickname by remember {
+        mutableStateOf(chatViewModel.chatData.value?.writer?.nickname)
+    }
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = "후기 작성", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")
+                        Icon(painterResource(id = R.drawable.icon_back), contentDescription = "뒤로가기", modifier = Modifier.size(35.dp), tint = colorResource(
+                            id = R.color.green)
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { dialogState = true }) {
-                        Icon(Icons.Filled.Warning, contentDescription = "신고하기", tint = Color.Red)
+                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(45.dp), tint = Color.Red)
                     }
                 },
                 backgroundColor = Color.Transparent,
@@ -70,7 +76,7 @@ fun ReviewScreen(postData: PostData, navController: NavHostController, chatViewM
                 PostBox(postData)
 
                 Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(bottom = 20.dp)) {
-                    Text(text = "진키키", fontSize = 18.sp, color = Color.Blue)
+                    Text(text = nickname?:"작성자", fontSize = 18.sp, color = Color.Blue)
                     Text(text = "님과의 거래가 만족스러우셨나요?", fontSize = 15.sp)
                 }
 
@@ -149,3 +155,4 @@ fun RatingBar(ratingState: MutableState<Int>){
         }
     }
 }
+

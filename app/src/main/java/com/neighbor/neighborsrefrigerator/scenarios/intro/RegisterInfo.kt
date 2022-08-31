@@ -13,10 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
@@ -35,7 +33,9 @@ fun RegisterInfo(navController: NavHostController){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val registerInfoViewModel = remember{RegisterInfoViewModel()}
+            val registerInfoViewModel by remember {
+                mutableStateOf(RegisterInfoViewModel())
+            }
             val enabled = registerInfoViewModel.buttonEnabled.collectAsState()
             var available = registerInfoViewModel.availableNickname.collectAsState()
             //var enabled by remember { mutableStateOf(false) }
@@ -110,7 +110,9 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
 @Composable
 fun GetMainAddress(viewModel: RegisterInfoViewModel) {
     var dialogState by remember { mutableStateOf(false) }
-    val searchAddressDialogViewModel = SearchAddressDialogViewModel()
+    val searchAddressDialogViewModel by remember{
+        mutableStateOf(SearchAddressDialogViewModel())
+    }
 
     Column(
         modifier = Modifier
