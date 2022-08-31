@@ -60,9 +60,9 @@ interface DBAccessInterface {
     ): retrofit2.Call<ReturnObject<Int>>
 
     @GET("/user/checkNickname")
-    fun checkNickname(
+    suspend fun checkNickname(
         @Query("nickname") nickname: String
-    ): retrofit2.Call<ReturnObject<Boolean>>
+    ): ReturnObject<Boolean>
 
     @GET("/user/hasFbId")
     fun hasFbId(

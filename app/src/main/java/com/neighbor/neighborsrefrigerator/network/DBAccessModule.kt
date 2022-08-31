@@ -15,20 +15,11 @@ import retrofit2.create
 class DBAccessModule {
     private val dbAccessApi:  DBAccessInterface = DBApiClient.getApiClient().create()
 
-    fun checkNickname(nickname: String, ok: ()-> Unit){
-        dbAccessApi.checkNickname(nickname).enqueue(object :
-            Callback<ReturnObject<Boolean>> {
-            override fun onResponse(
-                call: Call<ReturnObject<Boolean>>,
-                response: Response<ReturnObject<Boolean>>
-            ) {
-                ok()
-            }
-
-            override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
-                Log.d("실패", t.localizedMessage)
-            }
-        })
+    suspend fun checkNickname(nickname: String): Boolean{
+        val result = kotlin.runCatching {
+            dbAccessApi.checkNickname(nickname)}.getOrNull()?.result?: false
+        //false 가 중복 ㄴㄴ
+        return result
     }
 
     fun completeTrade(postData: PostData){

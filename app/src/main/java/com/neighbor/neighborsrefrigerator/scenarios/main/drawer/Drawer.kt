@@ -41,9 +41,8 @@ fun Drawer(
     val email by remember {
         mutableStateOf(auth.value.currentUser?.email)
     }
-    val nickname by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("nickname"))
-    }
+    val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
+
     var flowerDialogState by remember { mutableStateOf(false) }
     var locationDialogState by remember { mutableStateOf(false) }
     var inquiryDialogState by remember { mutableStateOf(false) }
@@ -69,8 +68,8 @@ fun Drawer(
         if (showNicknameDialog){
             ChangeNicknameDialog(
                 changeDialogState = { showNicknameDialog = it },
-                changeNickname = {
-                    viewModel.changeNickname(it) })
+                viewModel
+            )
         }
         Row(
             Modifier

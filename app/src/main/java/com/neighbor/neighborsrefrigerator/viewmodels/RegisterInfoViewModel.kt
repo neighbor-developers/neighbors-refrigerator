@@ -4,12 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.UserData
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,9 +43,12 @@ class RegisterInfoViewModel: ViewModel() {
             availableNickname.value = false
             return
         }
-        dbAccessModule.checkNickname(userNicknameInput) {completeCheck()}
-
-
+        viewModelScope.launch {
+            val result = dbAccessModule.checkNickname(userNicknameInput)
+            if(result){
+                completeCheck()
+            }
+        }
     }
 
     private fun completeCheck() {

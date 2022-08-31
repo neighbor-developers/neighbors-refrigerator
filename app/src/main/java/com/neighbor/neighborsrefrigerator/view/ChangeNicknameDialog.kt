@@ -9,9 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +20,20 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 @Composable
-fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, changeNickname: (String) -> Unit) {
+fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, viewModel: MainViewModel) {
     val txtFieldError = remember { mutableStateOf("") }
     val nickname = remember { mutableStateOf("") }
+    var hasNickname by remember {
+        mutableStateOf(false)
+    }
 
     Dialog(onDismissRequest = { changeDialogState(false) }) {
         Surface(
@@ -98,7 +105,10 @@ fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, changeNickname: (S
                             nickname.value = it.take(10)
                         })
 
-                    Spacer(modifier = Modifier.height(25.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+                    if (hasNickname){
+                        Text(text = "중복된 닉네임이 있습니다.", color = Color.DarkGray, fontSize = 12.sp)
+                    }
 
                     Button(
                         onClick = {
@@ -106,8 +116,14 @@ fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, changeNickname: (S
                                 txtFieldError.value = "빈칸은 입력하실 수 없습니다."
                                 return@Button
                             } else {
-                                changeNickname(nickname.value)
-                                changeDialogState(false)
+                                CoroutineScope(Dispatchers.Main).launch() {
+                                    val result = viewModel.changeNickname(nickname.value)
+                                    if (result){
+                                        changeDialogState(false)
+                                    }else{
+                                        hasNickname = true
+                                    }
+                                }
                             }
                         },
                         shape = RoundedCornerShape(10.dp),

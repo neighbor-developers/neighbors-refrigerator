@@ -76,7 +76,7 @@ fun Setting(navController: NavHostController, loginViewModel: LoginViewModel = v
                 .fillMaxWidth()) {
                 val (button, switch) = createRefs()
                 Text(
-                    text = "게시글 알림",
+                    text = "채팅 알림",
                     style = TextStyle(fontSize = 16.sp),
                     modifier = Modifier.constrainAs(button){
                         start.linkTo(parent.start)
@@ -102,7 +102,7 @@ fun Setting(navController: NavHostController, loginViewModel: LoginViewModel = v
                 .fillMaxWidth()) {
                 val (button, switch) = createRefs()
                 Text(
-                    text = "채팅 알림",
+                    text = "후기 알림",
                     style = TextStyle(fontSize = 16.sp),
                     modifier = Modifier.constrainAs(button){
                         start.linkTo(parent.start)
