@@ -1,6 +1,8 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -15,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -57,41 +61,74 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
     ) { padding ->
         Surface(modifier = Modifier.padding(padding)) {
 
-            val chatList = chatListViewModel.chatData.collectAsState()
-            val chatRemove = chatListViewModel.chatData
+            val chatList = chatListViewModel.chatListData.collectAsState()
+            val chatRemove = chatListViewModel.chatListData
+
+
             LazyColumn {
                 chatList.value.let{ chatlist ->
                     itemsIndexed(items = chatlist!!, key={_, listItem ->
                         listItem.hashCode()
                     }){ index, chat ->
                         // https://www.youtube.com/watch?v=Q89i4iZK8ko
-                        val state = rememberDismissState(
-                            confirmStateChange = {
-                                if(it == DismissValue.DismissedToStart){
-                                    // https://stackoverflow.com/questions/73201881/modifying-a-mutablestateflow-list-in-kotlin
-                                    chatRemove.value?.toMutableList()?.remove(chat)
+                        val dismissState = rememberDismissState(
+                            confirmStateChange = { dismissValue ->
+                                when (dismissValue) {
+                                    DismissValue.Default -> { // dismissThresholds 만족 안한 상태
+                                        false
+                                    }
+                                    DismissValue.DismissedToEnd ->{
+                                        false
+                                    }
+                                    DismissValue.DismissedToStart -> { // <- 방향 스와이프 (삭제)
+                                        chatRemove.value?.toMutableList()?.remove(chat)
+                                        true
+                                    }
                                 }
-                                true
-                            }
-                        )
-                        SwipeToDismiss(state = state, background = {
-                            val color = when(state.dismissDirection){
-                                DismissDirection.StartToEnd -> Color.Transparent
-                                    DismissDirection.EndToStart -> Color.Black
-                                    null -> Color.Magenta
-                            }
-                            Box(modifier = Modifier
-                                .fillMaxSize()
-                                .background(color = color)
-                                .padding(10.dp)){
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "delete",
-                                    modifier = Modifier.align(Alignment.CenterEnd),
-                                    tint = Color.Gray
+                            })
+                        SwipeToDismiss(
+                            state = dismissState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(100.dp),
+                            background = { // dismiss content
+                                val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+                                val color by animateColorAsState(
+                                    when (dismissState.targetValue) {
+                                        DismissValue.Default -> backgroundColor.copy(alpha = 0.5f) // dismissThresholds 만족 안한 상태
+                                        DismissValue.DismissedToEnd -> Color.Green.copy(alpha = 0.4f) // -> 방향 스와이프 (수정)
+                                        DismissValue.DismissedToStart -> Color.Red.copy(alpha = 0.5f) // <- 방향 스와이프 (삭제)
+                                    }
                                 )
-                            }
-                        },
+                                val icon = when (dismissState.targetValue) {
+                                    DismissValue.Default -> painterResource(R.drawable.ic_check_green)
+                                    DismissValue.DismissedToEnd -> painterResource(R.drawable.ic_check_green)
+                                    DismissValue.DismissedToStart -> painterResource(R.drawable.ic_check_red)
+                                }
+                                val scale by animateFloatAsState(
+                                    when (dismissState.targetValue == DismissValue.Default) {
+                                        true -> 0.8f
+                                        else -> 1.5f
+                                    }
+                                )
+                                val alignment = when (direction) {
+                                    DismissDirection.EndToStart -> Alignment.CenterEnd
+                                    DismissDirection.StartToEnd -> Alignment.CenterStart
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color(240,240,240))
+                                        .padding(horizontal = 30.dp),
+                                    contentAlignment = alignment
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.scale(scale),
+                                        imageVector = Icons.Filled.Delete,
+                                        contentDescription = null
+                                    )
+                                }
+                            },
                         dismissContent = {
                             ChatCard(chat = chat, navController, chatListViewModel)
                         },

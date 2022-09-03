@@ -29,15 +29,15 @@ class ChatListViewModel: ViewModel() {
         contact = RdbUserData(id = 2, nickname = "zinkiki", 2),
         messages = listOf(RdbMessageData(content = "안녕하세요", false, 1661518435, 2))
     )
-    var chatData = MutableStateFlow<List<RdbChatData>?>(listOf(example))
+
     var nickname = MutableStateFlow<String>("")
     var lastMessage = MutableStateFlow<String>("")
     var newMessage = MutableStateFlow<Int>(0)
     var createAt = MutableStateFlow<Long>(0)
-    private val chatListHashMap = MutableStateFlow<HashMap<ChatListData, Long>?>(null)
 
     private val usersChatList = MutableStateFlow<List<String>>(emptyList())
-    val chatListData = MutableStateFlow<List<RdbChatData>>(emptyList())
+    val chatListData = MutableStateFlow<List<RdbChatData>>(listOf(example))
+    val sortChatList = mutableMapOf<RdbChatData, Long>()
     private val firebaseDB = FirebaseDatabase.getInstance()
 
 
@@ -47,11 +47,13 @@ class ChatListViewModel: ViewModel() {
 
         val chatListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val _usersChatList = snapshot.value as List<String>
-                usersChatList.value = _usersChatList
+                snapshot.value?.let{
+                    val _usersChatList = it as List<String>
+                    usersChatList.value = _usersChatList
 
-                usersChatList.value.forEach { chatId ->
-                    initChatList(chatId)
+                    usersChatList.value.forEach { chatId ->
+                        initChatList(chatId)
+                    }
                 }
             }
 
@@ -79,9 +81,15 @@ class ChatListViewModel: ViewModel() {
                         RdbUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
                         result["messages"] as List<RdbMessageData>
                     )
+
                     if(usersChatList.value.isNotEmpty()){
                         // 있는 데이터인지 찾아보고 있으면 삭제 후 맨앞, 없으면 그냥 맨앞에 추가
-                        chatListData.value.plus(_chatData)
+                        chatListData.value?.let {
+                            chatListData.value.plus(_chatData)
+                            chatListData.value.sortedWith(
+                                compareBy { getLastChatTimestamp(it) }
+                            )
+                        }
                     }else{
                         chatListData.value = listOf(_chatData)
                     }
@@ -96,47 +104,14 @@ class ChatListViewModel: ViewModel() {
     }
 
 
-
-
-    private val db = FirebaseDatabase.getInstance()
-
-
-    fun initChatList(){
-//        viewModelScope.launch {
-//
-//            val chats = viewModelScope.async{
-//                db?.chatListDao()!!.getChatMessage()
-//            }.await()
-//
-//            chatData.value = chats
-//
-//            chatData.value!!.forEach{ chatListData ->
-//                //chatListHashMap.value?.set(chatListData, getLastChatTimestamp())
-//                chatListData.chatData?.message?.forEach {
-//                    it.created_at = MyTypeConverters().convertDateToTimeStamp(it.created_at!!).toString()
-//                }
-//            }
-//
-//        }
-        // chatList 정렬 - 각 chat들의 가장 최근 메시지 중 더 큰 값 순으로 정렬
-
-
-        // chatData timestamp 순으로 배치
-/*        chatData.value?.forEach {
-
-            refreshChatList(it)
-
-        }*/
-    }
-
-    private fun getLastChatTimestamp(chat: Chat): Long?{
+    private fun getLastChatTimestamp(chatData: RdbChatData): Long?{
 
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
-        val lastChat = chat.message.maxWithOrNull(compareBy { it.created_at?.let { date ->
-            MyTypeConverters().convertDateToTimeStamp(date)
-        } })
+        val lastChat = chatData.messages.maxWithOrNull(compareBy { it.createdAt})
 
-        return MyTypeConverters().convertDateToTimeStamp(lastChat?.created_at.toString())
+        // 임시로 널 값을 현재값으로 설정, 후에 바꾸기
+        // 아무런 메세지가 없을 때 어떻게 할지 정하기
+        return lastChat?.createdAt ?: System.currentTimeMillis()
     }
 
     fun refreshChatList(chat: RdbChatData){
@@ -151,10 +126,6 @@ class ChatListViewModel: ViewModel() {
         getUserData(chat)   //  상대 닉네임 가져오기
     }
 
-    private fun sortChatList(){
-
-
-    }
 
     private fun checkNewMessage(chatData: RdbChatData){
         newMessage.value = 0

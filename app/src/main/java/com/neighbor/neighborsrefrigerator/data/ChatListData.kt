@@ -7,13 +7,13 @@ import androidx.room.PrimaryKey
 import java.sql.Date
 
 
-@Entity
+
 data class ChatListData(
     @Embedded(prefix = "chatlistdb_") var chatData: Chat?,
     @PrimaryKey(autoGenerate = true) var chatId: Int
 )
 
-@Entity
+
 data class Chat(
     var postId: String,
     @Embedded(prefix = "writer_") var writer: Inform,
@@ -22,14 +22,14 @@ data class Chat(
     var message: List<ChatMessage>
 )
 
-@Entity
+
 data class Inform(
     var id: String?,
     var nickname: String?,
     var level: Int
 )
 
-@Entity
+
 data class ChatMessage(
     var content: String?,
     var isRead: Boolean,
