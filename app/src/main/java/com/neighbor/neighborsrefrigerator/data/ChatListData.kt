@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import java.sql.Date
 
 
-
+@Entity
 data class ChatListData(
     @Embedded(prefix = "chatlistdb_") var chatData: Chat?,
     @PrimaryKey(autoGenerate = true) var chatId: Int

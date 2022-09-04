@@ -1,6 +1,7 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -61,15 +62,16 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
     ) { padding ->
         Surface(modifier = Modifier.padding(padding)) {
 
+
             val chatList = chatListViewModel.chatListData.collectAsState()
             val chatRemove = chatListViewModel.chatListData
 
+            LaunchedEffect(chatList) {
 
+            }
             LazyColumn {
                 chatList.value.let{ chatlist ->
-                    itemsIndexed(items = chatlist!!, key={_, listItem ->
-                        listItem.hashCode()
-                    }){ index, chat ->
+                    itemsIndexed(items = chatlist!!){ index, chat ->
                         // https://www.youtube.com/watch?v=Q89i4iZK8ko
                         val dismissState = rememberDismissState(
                             confirmStateChange = { dismissValue ->
@@ -86,6 +88,7 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
                                     }
                                 }
                             })
+
                         SwipeToDismiss(
                             state = dismissState,
                             modifier = Modifier
@@ -118,13 +121,13 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(Color(240,240,240))
+                                        .background(color)
                                         .padding(horizontal = 30.dp),
                                     contentAlignment = alignment
                                 ) {
                                     Icon(
                                         modifier = Modifier.scale(scale),
-                                        imageVector = Icons.Filled.Delete,
+                                        painter = icon,
                                         contentDescription = null
                                     )
                                 }
@@ -138,15 +141,9 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
 
                 }
 
-                /*chatList.value.let { it ->
-                    items(it!!){ chat ->
-                        ChatCard(chat = chat.chatData!!, navController, chatListViewModel)
-                    }
-                }*/
             }
         }
     }
-
 }
 
 
@@ -159,34 +156,42 @@ fun ChatCard(chat: RdbChatData, navController: NavController, viewModel: ChatLis
     var lastMessage = viewModel.lastMessage.collectAsState()
     var createAt = viewModel.createAt.collectAsState()
     var newMessage = viewModel.newMessage.collectAsState()
+    Log.d("새로운 메세지2", newMessage.value.toString())
 
-    Card(onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.id}/${chat.postId}")}) {
-        Column() {
-            Row() {
-                Column() {
+    Card(
+        onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.id}/${chat.postId}")},
+        modifier = Modifier.fillMaxWidth().fillMaxHeight()
+    ) {
+        Row() {
+            Column() {
+                Row() {
                     Image(
                         painter = painterResource(id = R.drawable.sprout2),
                         contentDescription = "async 이미지",
                         modifier = Modifier
                             .size(40.dp)
-                            .clip(CircleShape))
+                            .clip(CircleShape)
+                            .fillMaxWidth(fraction = 0.3f))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
+                        modifier = Modifier.fillMaxWidth(fraction = 0.2f),
                         text = nickname.value,
                         color = MaterialTheme.colors.secondaryVariant,
                         style = MaterialTheme.typography.subtitle2)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
+                        modifier = Modifier.fillMaxWidth(fraction = 0.4f),
                         text = lastMessage.value,
                         style = MaterialTheme.typography.body2)
                 }
                 Text(
-                    text= createAt.value.toString(),
+                    text= createAt.value.toString(),    //   아래
                     style = MaterialTheme.typography.body2
                 )
             }
             Text(
-                text = newMessage.value.toString(),
+                modifier = Modifier.fillMaxWidth(fraction = 1f),
+                text = newMessage.value.toString(), //  옆
                 style = MaterialTheme.typography.body2
             )
         }

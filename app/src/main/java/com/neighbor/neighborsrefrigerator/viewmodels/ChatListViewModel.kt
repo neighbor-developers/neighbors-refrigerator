@@ -19,24 +19,35 @@ import kotlinx.coroutines.launch
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
 import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
+import kotlin.io.path.createTempDirectory
 
 
 class ChatListViewModel: ViewModel() {
-    var example: RdbChatData = RdbChatData(
+    var example: List<RdbChatData> = listOf(
+        RdbChatData(
         id = "a",
         postId = 1,
-        writer = RdbUserData(id = 1, nickname = "seoyeon", 1),
+        writer = RdbUserData(id = 1, nickname = "ㅂㅎㅇ", 1),
         contact = RdbUserData(id = 2, nickname = "zinkiki", 2),
-        messages = listOf(RdbMessageData(content = "안녕하세요", false, 1661518435, 2))
+        messages = listOf(RdbMessageData(content = "안녕하세요", false, 1662288446, 2),
+            RdbMessageData(content = "안녕하세요", false, 1662288446, 2),
+            RdbMessageData(content = "안녕하세요", true, 1662288446, 2),
+            RdbMessageData(content = "안녕하세요", false, 1662288446, 2))),
+        RdbChatData(
+            id = "a",
+            postId = 1,
+            writer = RdbUserData(id = 1, nickname = "seoyeon", 1),
+            contact = RdbUserData(id = 2, nickname = "zinkiki", 2),
+            messages = listOf(RdbMessageData(content = "안녕하세요", false, 1661518435, 2)))
     )
 
     var nickname = MutableStateFlow<String>("")
     var lastMessage = MutableStateFlow<String>("")
     var newMessage = MutableStateFlow<Int>(0)
-    var createAt = MutableStateFlow<Long>(0)
+    var createAt = MutableStateFlow<String>("")
 
     private val usersChatList = MutableStateFlow<List<String>>(emptyList())
-    val chatListData = MutableStateFlow<List<RdbChatData>>(listOf(example))
+    val chatListData = MutableStateFlow<List<RdbChatData>>(example)
     val sortChatList = mutableMapOf<RdbChatData, Long>()
     private val firebaseDB = FirebaseDatabase.getInstance()
 
@@ -62,7 +73,6 @@ class ChatListViewModel: ViewModel() {
             }
         }
         firebaseDB.reference.child("user").child(userId).addValueEventListener(chatListener)
-
     }
 
     // 데이터 정렬
@@ -93,6 +103,7 @@ class ChatListViewModel: ViewModel() {
                     }else{
                         chatListData.value = listOf(_chatData)
                     }
+                    Log.d("리스트", chatListData.value.toString())
                 }
             }
             override fun onCancelled(error: DatabaseError) {
@@ -100,7 +111,6 @@ class ChatListViewModel: ViewModel() {
             }
         }
         firebaseDB.reference.child("chat").child(chatId).addValueEventListener(chatListener)
-
     }
 
 
@@ -122,6 +132,7 @@ class ChatListViewModel: ViewModel() {
         // 가장 최근 채팅 먼저 올리기
         checkNewMessage(chat)   //  새 메세지 개수 가져오기
         checkLastChat(chat)
+
         // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
         getUserData(chat)   //  상대 닉네임 가져오기
     }
@@ -134,6 +145,7 @@ class ChatListViewModel: ViewModel() {
                 newMessage.value++
             }
         }
+        Log.d("새로운 메세지",newMessage.value.toString())
     }
 
     private fun checkLastChat(chatData: RdbChatData) {
@@ -153,18 +165,19 @@ class ChatListViewModel: ViewModel() {
             Log.d("타임스탬프 에러", "타임스탬프 null")
         }
         else{
-            lastMessage.value =
+            createAt.value =
                 MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp).toString()
+            lastMessage.value = lastChat.content
         }
     }
 
     private fun getUserData(chatData: RdbChatData){
         // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
         // int? String? 에러날 수 있음
-        if(chatData.writer.id == UserSharedPreference(App.context()).getUserPrefs("id")?.toInt()){
+        if(chatData.writer.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){
             nickname.value = chatData.contact.nickname
         }
-        else if(chatData.contact.id == UserSharedPreference(App.context()).getUserPrefs("id")?.toInt()){
+        else if(chatData.contact.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){
             nickname.value = chatData.writer.nickname
         }
         // 아닐 경우 writerId 체크해서 상대방 정보 가져오기
