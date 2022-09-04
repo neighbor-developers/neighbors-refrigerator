@@ -28,15 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 import java.util.*
@@ -200,6 +197,11 @@ fun SharePostRegisterScreen(
                             colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
                         )
 
+                        if (viewModel.imgUriState != null) {
+                            viewModel.imgInputStream = LocalContext.current.contentResolver.openInputStream(
+                                viewModel.imgUriState!!
+                            )
+                        }
                     }
                 }
                 Column(
@@ -294,6 +296,12 @@ fun SharePostRegisterScreen(
                                     }, mYear, mMonth, mDay
                                 ).show()
                                 periodButtonState = false
+                            }
+
+                            if (viewModel.validateImgUriState != null) {
+                                viewModel.validateImgInputStream = LocalContext.current.contentResolver.openInputStream(
+                                    viewModel.validateImgUriState!!
+                                )
                             }
                         }
                         IconButton(
@@ -418,3 +426,5 @@ private fun CategorySpinner(
         )
     }
 }
+
+

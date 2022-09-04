@@ -1,6 +1,10 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64.NO_WRAP
+import android.util.Base64.encodeToString
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +14,8 @@ import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,12 +28,25 @@ class SharePostRegisterViewModel: ViewModel() {
     var title = mutableStateOf(TextFieldValue())
     var content = mutableStateOf(TextFieldValue())
     var imgUriState by mutableStateOf<Uri?>(null)
+    var imgInputStream by mutableStateOf<InputStream?>(null)
     var validateDate = mutableStateOf("0000/00/00")
     var validateImgUriState by mutableStateOf<Uri?>(null)
+    var validateImgInputStream by mutableStateOf<InputStream?>(null)
     var category = mutableStateOf("")
     var isSuccessRegist = mutableStateOf(false)
     var myLatitude = mutableStateOf(0.0)
     var myLongitude = mutableStateOf(0.0)
+
+    private fun encodeImgToBase64(ins: InputStream): String {
+        // Base64 인코딩부분
+        val img: Bitmap = BitmapFactory.decodeStream(ins)
+        val resized = Bitmap.createScaledBitmap(img, 256, 256, true)
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        resized.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream)
+        val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+
+        return encodeToString(byteArray, NO_WRAP)
+    }
 
     var errorMessage = mutableStateOf("")
 
@@ -83,8 +102,8 @@ class SharePostRegisterViewModel: ViewModel() {
             state = "1",
             validateType = validateType,
             validateDate = validateDate.value,
-            validateImg = "https://newsimg-hams.hankookilbo.com/2022/04/28/a1844741-30af-475a-815e-226e2e319eae.jpg", // s3 개발 이후 추가
-            productimg1 = "https://newsimg-hams.hankookilbo.com/2022/04/28/a1844741-30af-475a-815e-226e2e319eae.jpg", // s3 개발 이후 추가
+            validateImg = validateImgInputStream?.let { encodeImgToBase64(it) },
+            productimg1 = imgInputStream?.let { encodeImgToBase64(it) },
             productimg2 = "",
             productimg3 = "",
             latitude = location[0],
