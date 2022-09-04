@@ -9,8 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.utilities.App
 
 data class Flower(
     val id: Int,
@@ -37,6 +38,8 @@ private val flowerList = listOf(
 
 @Composable
 fun FlowerDialog(changeDialogState : () -> Unit, flowerNum : MutableState<Int>) {
+
+    val nickname =UserSharedPreference(App.context()).getUserPrefs("nickname")
 
     Dialog(onDismissRequest = { changeDialogState() }) {
         Surface(
@@ -54,11 +57,9 @@ fun FlowerDialog(changeDialogState : () -> Unit, flowerNum : MutableState<Int>) 
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "(닉네임)님이 피우실 꽃을 선택해주세요.",
+                            text = "${nickname}님이 피우실 꽃을 선택해주세요.",
                             style = TextStyle(
-                                fontSize = 20.sp,
-                                fontFamily = FontFamily.Default,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 15.sp
                             )
                         )
                         Icon(

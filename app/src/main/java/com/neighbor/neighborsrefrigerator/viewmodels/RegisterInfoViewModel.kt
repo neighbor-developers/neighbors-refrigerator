@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.UserData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -38,17 +40,18 @@ class RegisterInfoViewModel: ViewModel() {
     val time = System.currentTimeMillis()
     private val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(time))
 
-    fun checkNickname() {
+    suspend fun checkNickname(): Boolean {
         if (userNicknameInput.isEmpty()) {
             availableNickname.value = false
-            return
-        }
-        viewModelScope.launch {
+            return false
+        }else{
             val result = dbAccessModule.checkNickname(userNicknameInput)
-            if(result){
+            return if (!result) {
                 completeCheck()
-            }
-        }
+                true
+            }else{
+                false
+            }}
     }
 
     private fun completeCheck() {
@@ -86,6 +89,7 @@ class RegisterInfoViewModel: ViewModel() {
                 createdAt = timeStamp,
                 fcm = ""
             )
+        UserSharedPreference(App.context()).setUserPrefs(userdata)
 
         dbAccessModule.joinUser(userdata)
     }

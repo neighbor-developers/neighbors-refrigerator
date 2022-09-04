@@ -20,6 +20,9 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
@@ -98,8 +101,11 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
                     .padding(5.dp)
                     .wrapContentWidth(),
                 onClick = {
-                    viewModel.checkNickname()
-                    viewModel.check()}) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        viewModel.checkNickname()
+                        viewModel.check()
+                    }
+                }){
                 Text(text = "Check")
             }
         }

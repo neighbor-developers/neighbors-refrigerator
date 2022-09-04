@@ -1,20 +1,14 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import androidx.paging.*
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
-import com.neighbor.neighborsrefrigerator.network.MyPagingRepository
+import com.neighbor.neighborsrefrigerator.network.MyPagingSource
 import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,54 +26,52 @@ data class ReqPostData(
 class PostViewModel : ViewModel() {
 
     private val dbAccessModule = DBAccessModule()
-    private val myPagingRepository = MyPagingRepository()
-    private val userLat = 37.34
-    private val userLng = 126.74
-//    private val userLat = UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble()
-//    private val userLng = UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble()
+
+    private val userLat = UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble()
+    private val userLng = UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble()
 
     var timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
 
-    var sharePostsByTime: Flow<PagingData<PostData>> = myPagingRepository.getPostsByTime(
-        ReqPostData(3, 1, null, null, timeStamp, 37.3402, 126.7335)
-    ).cachedIn(viewModelScope)
+    private var initData = MutableStateFlow(ReqPostData(3, 1, null, null, timeStamp, 37.3402, 126.7335))
+    private val initDataSeek = MutableStateFlow(ReqPostData(3, 2, null, null, timeStamp, 37.3402, 126.7335))
 
-    var seekPostsByTime: Flow<PagingData<PostData>> = myPagingRepository.getPostsByTime(
-        ReqPostData(3, 2, null, null, timeStamp, 37.3402, 126.7335)
-    ).cachedIn(viewModelScope)// 변경상태에도 페이징 상태를 유지하기 위해
+    var sharePostsByTime = Pager(
+                PagingConfig(pageSize = 15))
+            { MyPagingSource(initData.value)
+                }.flow.cachedIn(viewModelScope)
 
-    var searchedPosts: Flow<PagingData<PostData>> = flow{}
+    var seekPostsByTime = Pager(
+        PagingConfig(pageSize = 20))
+    { MyPagingSource(initDataSeek.value)
+    }.flow.cachedIn(viewModelScope)
+
     var sharePostsByDistance = MutableStateFlow<ArrayList<PostData>?>(null)
 
+    fun initPostData(){
+        sharePostsByTime = Pager(
+            PagingConfig(pageSize = 15))
+        { MyPagingSource(initData.value)
+        }.flow.cachedIn(viewModelScope)
+    }
 
-    fun getPosts(item: String?, category:Int?, reqType: String, postType: String, varType: Int) {
-        viewModelScope.launch {
-            val result = myPagingRepository.getPostsByTime(
-                ReqPostData(
-                    reqType = when (reqType) {
-                        "category" -> 1
-                        "search" -> 2
-                        "justTime" -> 3
-                        else -> 1
-                    },
+    fun getPostForCategory(categoryId: Int){
+        sharePostsByTime = Pager(
+            PagingConfig(pageSize = 20)
+        )
+        { MyPagingSource(
+            ReqPostData(1, postType =1, categoryId, null, currentTime = timeStamp, 37.3402, 126.7335)
+        )
+        }.flow.cachedIn(viewModelScope)
+    }
 
-                    postType = when (postType) {
-                        "share" -> 1
-                        "seek" -> 2
-                        else -> 1
-                    },
-                    categoryId = category, // null일수 있음
-                    title = item,
-                    currentTime = timeStamp,
-                    133.4, 80.6
-                )
-            )
-            when(varType){
-                1 -> {sharePostsByTime = result}
-                2 -> {seekPostsByTime = result}
-                3 -> {searchedPosts = result}
-            }
-        }
+    suspend fun getUserNickname(userId: Int): UserData? {
+        var userData : UserData? = null
+
+        viewModelScope.async {
+            userData = dbAccessModule.getUserInfoById(userId)[0]
+        }.await()
+
+        return userData
     }
 
     fun changeTime(){

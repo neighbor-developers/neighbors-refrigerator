@@ -32,6 +32,9 @@ import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 @Composable
 fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: PostViewModel = viewModel(), post: PostData) {
 
+    val contactUserId by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
+    }
     val postTime = post.validateDate
     val token = postTime!!.split("T")[0].split("-")
 
@@ -98,18 +101,15 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
                         .background(color = Color(0xff00ac77))) {
                         Text(text = "내 위치에서 ${post.distance}km", fontSize = 20.sp, color = Color.White)
                         Text(text = "$validateType : $day", fontSize = 20.sp, color = Color.White)
-                    }
-                }
-                val contactUserId by remember {
-                    mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
-                }
-                if(post.userId != contactUserId) {
-                    Button(onClick = {
-                        val chatId = post.id.toString() + contactUserId.toString()
-                        //postViewModel.newChatRoom(chatId, post.id!!, post.userId)
-                        navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
-                    }) {
-                        Text(text = "채팅하기")
+                        if(post.userId != contactUserId) {
+                            Button(onClick = {
+                                val chatId = post.id.toString() + contactUserId.toString()
+                                //postViewModel.newChatRoom(chatId, post.id!!, post.userId)
+                                navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
+                            }) {
+                                Text(text = "채팅하기")
+                            }
+                        }
                     }
                 }
             }

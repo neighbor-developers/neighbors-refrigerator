@@ -6,6 +6,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,8 +22,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -94,6 +101,21 @@ fun ItemText(post: PostData){
     val calTime = CalculateTime()
     val time = calTime.calTimeToPost(current, post.createdAt)
 
+    val calDistance = CalDistance()
+    val lat  by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
+    }
+    val lng  by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
+    }
+
+    val distancePost  by remember{
+        mutableStateOf(
+            if(lat != null && lng !=null){
+                calDistance.getDistance(lat!!, lng!!, post.latitude,post.longitude)
+            }else null)
+    }
+
 //    val token = post.validateDate!!.split("T")[0].split("-")
 //
 //    val validateDate = "${token[0]}년 ${token[1]}월 ${token[2]}일"
@@ -104,13 +126,16 @@ fun ItemText(post: PostData){
 //        else -> { "" }
 //    }
     Column(Modifier.padding(10.dp)) {
+        Text(text = post.categoryId)
         Text(text = post.title, fontSize = 18.sp, color = Color.Black, modifier = Modifier.padding(bottom = 7.dp))
         //Text(text = "$validateType : $validateDate", fontSize = 10.sp, color = Color.Black)
-        post.distance?.let {
-            Text(text = "내 위치에서 ${post.distance}km", fontSize = 10.sp, color = Color.Black)
-        }
+//        distancePost?.let {
+//            distancePost?.let {
+//                val distanceText = "${(it / 10).roundToInt() / 100} km"
+//                Text(text = "내 위치에서 $distanceText", fontSize = 10.sp, color = Color.DarkGray)
+//            }
+//        }
 
-        Text(text = "내 위치에서 7km", fontSize = 10.sp, color = Color.Black)
         Text(text = "업로드 : $time", fontSize = 10.sp, color = Color.Black)
     }
 }

@@ -1,17 +1,19 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -40,7 +41,7 @@ fun SharePostScreen(
     navController: NavHostController
 ) {
     val state = rememberScrollState()
-    
+
     LaunchedEffect(Unit) { state.animateScrollTo(0) }
     Column(
         modifier = Modifier
@@ -49,14 +50,14 @@ fun SharePostScreen(
     ) {
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
         CategoryView(postViewModel)
-        SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsLazyPagingItems(),  route, navController)
+        SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsLazyPagingItems(),  route, navController, postViewModel)
     }
 }
 
 
 @Composable
-fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController) {
-
+fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController, postViewModel: PostViewModel)
+{
     val scrollState = rememberLazyGridState()
 
     LazyVerticalGrid(
@@ -67,11 +68,52 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navH
         modifier = Modifier.padding(top = 20.dp, start = 20.dp, end = 20.dp),
         userScrollEnabled = true,
     ) {
-
-        items(posts.itemSnapshotList.items) { item ->
-            ItemCardByTime(item, route, navHostController)
+        items(posts.itemCount) { count ->
+            //if(posts[count]?.categoryId == category.value.toString()){
+                ItemCardByTime(posts[count]!!, route, navHostController)
+            //}
         }
 
+    }
+}
+
+
+@Composable
+fun CategoryView(postViewModel: PostViewModel){
+    val categoryList = mapOf(null to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
+    val categoryIconList = mapOf(null to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
+
+    var selectedCategory by remember {
+        mutableStateOf("전체")
+    }
+    Row(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
+        categoryList.forEach { category ->
+            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(60.dp),
+                onClick = {
+                    selectedCategory = category.value
+                    if(category.key == null){
+                        postViewModel.initPostData()
+                    }else {
+                        postViewModel.getPostForCategory(category.key!!)
+                    }
+
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = if(selectedCategory == category.value) colorResource(id = R.color.green) else Color.White),
+                contentPadding = PaddingValues(0.dp),
+                elevation = ButtonDefaults.elevation(0.dp)
+            ){
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+                    Icon(painterResource(id = categoryIconList[category.key]!!), contentDescription = category.value, modifier = Modifier.size(if (category.key == 200) 31.dp else if (category.key == null) 30.dp else 35.dp),
+                        tint = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green))
+                    Text(text = category.value, fontSize = 10.sp, color = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                }
+            }
+        }
     }
 }
 
@@ -109,89 +151,6 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
                 color = Color.DarkGray,
                 strokeWidth = 1F
             )
-        }
-    }
-}
-
-@Composable
-fun CategoryView(postViewModel: PostViewModel){
-    val categoryList = mapOf(null to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
-    val categoryIconList = mapOf(null to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
-
-    var selectedCategory by remember {
-        mutableStateOf("전체")
-    }
-    Row(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-    ) {
-        categoryList.forEach { category ->
-            Button(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(60.dp),
-                onClick = {
-                    selectedCategory = category.value
-                    if(category.value == "전체"){
-                        postViewModel.getPosts(null, null, "justTime", "share", 1)
-                    }else {
-                        postViewModel.getPosts(
-                            item = null,
-                            category = category.key,
-                            reqType = "category",
-                            postType = "share",
-                            varType = 1
-                        )
-
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(backgroundColor = if(selectedCategory == category.value) colorResource(id = R.color.green) else Color.White),
-                contentPadding = PaddingValues(0.dp),
-                elevation = ButtonDefaults.elevation(0.dp)
-            ){
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-                    Icon(painterResource(id = categoryIconList[category.key]!!), contentDescription = category.value, modifier = Modifier.size(if (category.key == 200) 31.dp else if (category.key == null) 30.dp else 35.dp),
-                        tint = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green))
-                    Text(text = category.value, fontSize = 10.sp, color = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-                }
-            }
-        }
-    }
-}
-
-
-
-
-@Preview
-@Composable
-fun Preview() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)) {
-        Text(text = "# 내 위치에서 가까운 나눔", modifier = Modifier.padding(start = 20.dp, end = 15.dp, top = 30.dp, bottom = 30.dp), fontSize = 18.sp)
-        Canvas(modifier = Modifier
-            .fillMaxWidth()
-            .padding(30.dp)) {
-            val canvasHeight = size.height
-            drawLine(
-                start = Offset(x = 0f, y = canvasHeight),
-                end = Offset(x = this.size.width, y = canvasHeight),
-                color = Color.DarkGray,
-                strokeWidth = 1F
-            )
-        }
-    }
-    var content by remember { mutableStateOf("") }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp, end = 30.dp, start = 30.dp),
-        contentAlignment = Alignment.CenterEnd
-    ) {
-        OutlinedTextField(value = content, onValueChange = { content = it }, modifier = Modifier
-            .fillMaxWidth()
-            .size(45.dp), shape = MaterialTheme.shapes.small)
-        IconButton(onClick = { /*onSearch(content)*/ }) {
-            Icon(Icons.Filled.Search, contentDescription = null)
         }
     }
 }

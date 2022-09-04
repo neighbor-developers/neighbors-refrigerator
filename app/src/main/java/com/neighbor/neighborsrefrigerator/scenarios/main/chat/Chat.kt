@@ -104,6 +104,8 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
     var completeShareDialog by remember {
         mutableStateOf(false)
     }
+    val chatData = chatViewModel.chatData.collectAsState()
+
     /*
      postData 가져와서 보여주고, 거래 완료 null에, 작성자면 판매완료 버튼 생성하고, 실시간으로 변경도 가능하게끔 해야함
     */
@@ -124,7 +126,7 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                 .padding(10.dp),
             onClick = {
                 navController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = postData)
-                if(postData.productimg1 != null){
+                if(postData.type == 1){
                     navController.navigate(NAV_ROUTE.SHARE_DETAIL.routeName)
                 }else{
                     navController.navigate(NAV_ROUTE.SEEK_DETAIL.routeName)
@@ -150,7 +152,9 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Text(text = postData.title, color = Color.Black, fontSize = 17.sp)
-                    Text(text = "${postData.userId}", color = Color.DarkGray, fontSize = 12.sp)
+                    chatData.value?.writer?.nickname?.let {
+                        Text(text = it, color = Color.DarkGray, fontSize = 12.sp)
+                    }
                 }
                 if (postData.userId == userId) {
                     // 포스트 작성자일때 완료 버튼
