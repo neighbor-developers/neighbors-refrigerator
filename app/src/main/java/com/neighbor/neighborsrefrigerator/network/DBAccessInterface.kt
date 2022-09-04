@@ -76,8 +76,7 @@ interface DBAccessInterface {
 
     @POST("/user/updateNickname")
     fun updateNickname(
-        @Query("id") id: Int,
-        @Query("nickname") nickname: String
+        @Body dataTransferObject: DataTransferObject<String>
     ) : retrofit2.Call<ReturnObject<Int>>
 
 

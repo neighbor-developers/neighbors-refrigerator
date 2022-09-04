@@ -33,9 +33,10 @@ class PostViewModel : ViewModel() {
 
     private val dbAccessModule = DBAccessModule()
     private val myPagingRepository = MyPagingRepository()
-
-    private val userLat = UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble()
-    private val userLng = UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble()
+    private val userLat = 37.34
+    private val userLng = 126.74
+//    private val userLat = UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble()
+//    private val userLng = UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble()
 
     var timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
 

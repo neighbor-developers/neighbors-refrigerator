@@ -206,7 +206,8 @@ class DBAccessModule {
     }
 
     fun updateNickname(id : Int, nickname: String){
-        dbAccessApi.updateNickname(id, nickname).enqueue(object : Callback<ReturnObject<Int>>{
+        val nicknameData = DataTransferObject<String>(id,nickname)
+        dbAccessApi.updateNickname(nicknameData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
                 call: Call<ReturnObject<Int>>,
                 response: Response<ReturnObject<Int>>
