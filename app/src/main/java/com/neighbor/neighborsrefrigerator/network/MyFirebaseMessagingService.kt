@@ -20,9 +20,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         val userPrefs = UserSharedPreference(App.context())
-        val fcmTemp  = DataTransferObject<String>(userPrefs.getUserPrefs().id!!,token)
-        DBAccessModule().updateFcmToken(fcmTemp)
-        Log.d("new Token", token)
+        userPrefs.setUserPrefs("fcm",token)
+
+
+        if (!(userPrefs.getUserPrefs().id == "".toInt())){
+            val fcmTemp  = DataTransferObject<String>(userPrefs.getUserPrefs().id!!,token)
+            DBAccessModule().updateFcmToken(fcmTemp)
+            Log.d("new Token", token)
+        }
+
     }
 
     // 메세지 받을때 호출

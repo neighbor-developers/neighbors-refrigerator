@@ -23,7 +23,7 @@ class UserSharedPreference(context: Context) {
             latitude = prefs.getString("latitude", "")!!.toDouble(),
             longitude = prefs.getString("longitude", "")!!.toDouble(),
             createdAt = prefs.getString("createdAt", "")!!,
-            fcm = null
+            fcm = prefs.getString("fcm","")
         )
     }
 
@@ -43,6 +43,7 @@ class UserSharedPreference(context: Context) {
         prefs.edit().putString("latitude", person.latitude.toString()).apply()
         prefs.edit().putString("longitude", person.longitude.toString()).apply()
         prefs.edit().putString("createdAt", person.createdAt).apply()
+        prefs.edit().putString("fcm", person.fcm).apply()
     }
 
     fun setNoticePref(item: String, data: Boolean){
