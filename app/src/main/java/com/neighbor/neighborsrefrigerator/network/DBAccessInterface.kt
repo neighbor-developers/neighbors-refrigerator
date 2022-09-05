@@ -54,6 +54,11 @@ interface DBAccessInterface {
         @Query("id") id : Int
     ) : ReturnObject<ArrayList<UserData>>
 
+    @GET("/user/getInfoByFbId")
+    suspend fun getUserInfoByFbId(
+        @Query("fbId") id : String
+    ) : ReturnObject<ArrayList<UserData>>
+
     @POST("/user/join")
     fun userJoin(
         @Body userData: UserData

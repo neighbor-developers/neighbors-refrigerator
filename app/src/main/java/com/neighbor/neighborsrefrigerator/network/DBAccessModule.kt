@@ -179,9 +179,15 @@ class DBAccessModule {
     }
 
     //id로 UserData 불러오기
-    suspend fun getUserInfoById(id: Int) : ArrayList<UserData>{
+//    suspend fun getUserInfoById(id: Int) : ArrayList<UserData>{
+//        val result = kotlin.runCatching {
+//            dbAccessApi.getUserInfoById(id)}.getOrNull()?.result?: arrayListOf()
+//        return result
+//    }
+    //fbid로 UserData 불러오기
+    suspend fun getUserInfoById(fbId: String) : ArrayList<UserData>{
         val result = kotlin.runCatching {
-            dbAccessApi.getUserInfoById(id)}.getOrNull()?.result?: arrayListOf()
+            dbAccessApi.getUserInfoByFbId(fbId)}.getOrNull()?.result?: arrayListOf()
         return result
     }
 
