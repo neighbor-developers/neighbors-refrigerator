@@ -5,6 +5,6 @@ import com.google.gson.annotations.SerializedName
 data class DataTransferObject<T> (
     @SerializedName("id")
     val id: Int,
-    @SerializedName("content")
+    @SerializedName("data")
     val result: T
 )
