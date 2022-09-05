@@ -20,8 +20,8 @@ class ChatViewModel() : ViewModel() {
     private val dbAccessModule = DBAccessModule()
     private val firebaseDB = FirebaseDatabase.getInstance()
 
-    var chatMessages = MutableStateFlow<List<RdbMessageData>>(emptyList())
-    var chatData = MutableStateFlow<RdbChatData?>(null)
+    var chatMessages = MutableStateFlow<List<ChatMessageData>>(emptyList())
+    var chatData = MutableStateFlow<FirebaseChatData?>(null)
     var postData = MutableStateFlow<PostData?>(null)
 
     // 채팅방 들어감
@@ -35,12 +35,12 @@ class ChatViewModel() : ViewModel() {
                     val result = value as HashMap<String, Any>?
                     val writer = result?.get("writer") as HashMap<String, Any>?
                     val contact = result?.get("contact") as HashMap<String, Any>?
-                    val _chatData = RdbChatData(
+                    val _chatData = FirebaseChatData(
                         result?.get("id") as String,
                         (result["postId"] as Long).toInt(),
-                        RdbUserData((writer?.get("id") as Long).toInt(), writer["nickname"] as String, (writer["level"] as Long).toInt()),
-                        RdbUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
-                        result["messages"] as List<RdbMessageData>
+                        ChatUserData((writer?.get("id") as Long).toInt(), writer["nickname"] as String, (writer["level"] as Long).toInt()),
+                        ChatUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
+                        result["messages"] as List<ChatMessageData>
                     )
                     chatData.value = _chatData
                 }
@@ -51,13 +51,13 @@ class ChatViewModel() : ViewModel() {
 
         val chatListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val _chatMessage = arrayListOf<RdbMessageData>()
+                val _chatMessage = arrayListOf<ChatMessageData>()
                 val messageData = snapshot.value as ArrayList<HashMap<String, Any>>?
 
                 Log.d("변화 리스너", snapshot.value.toString())
                 messageData?.forEach {
                     _chatMessage.add(
-                        RdbMessageData(
+                        ChatMessageData(
                             it["content"] as String,
                             it["_read"] as Boolean,
                             it["createdAt"] as Long,
@@ -77,7 +77,7 @@ class ChatViewModel() : ViewModel() {
         firebaseDB.reference.child("chat").child(chatId).child("messages").addValueEventListener(chatListener)
     }
 
-    fun newMessage(chatId: String, messageData: RdbMessageData){
+    fun newMessage(chatId: String, messageData: ChatMessageData){
         if(chatMessages.value.isEmpty()) {
             // 첫 메세지일때 채팅방 생성
             chatMessages.value = listOf(messageData)
@@ -96,7 +96,7 @@ class ChatViewModel() : ViewModel() {
         }
     }
 
-    private fun newChatRoom(chatId: String, postId: Int, writerId: Int, message :List<RdbMessageData>){
+    private fun newChatRoom(chatId: String, postId: Int, writerId: Int, message :List<ChatMessageData>){
         val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
         var isHave = false
         var usersChatList: List<String> = emptyList()
@@ -119,12 +119,12 @@ class ChatViewModel() : ViewModel() {
 
             if (!isHave) {
                 val writerData: java.util.ArrayList<UserData> = dbAccessModule.getUserInfoById(writerId)
-                val writer = RdbUserData(writerData[0].id, writerData[0].nickname, writerData[0].reportPoint)
+                val writer = ChatUserData(writerData[0].id, writerData[0].nickname, writerData[0].reportPoint)
 
                 val contactData = UserSharedPreference(App.context()).getUserPrefs()
-                val contact = RdbUserData(contactData.id, contactData.nickname, contactData.reportPoint)
+                val contact = ChatUserData(contactData.id, contactData.nickname, contactData.reportPoint)
 
-                val rdbChatData = RdbChatData(chatId, postId, writer, contact, message)
+                val rdbChatData = FirebaseChatData(chatId, postId, writer, contact, message)
 
                 firebaseDB.reference.child("chat").child(chatId).setValue(rdbChatData)
                     .addOnSuccessListener {

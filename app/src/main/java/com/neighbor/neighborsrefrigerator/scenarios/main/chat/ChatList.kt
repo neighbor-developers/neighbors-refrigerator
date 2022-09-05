@@ -32,8 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.data.Chat
-import com.neighbor.neighborsrefrigerator.data.RdbChatData
+import com.neighbor.neighborsrefrigerator.data.FirebaseChatData
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
 
@@ -149,7 +148,7 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatCard(chat: RdbChatData, navController: NavController, viewModel: ChatListViewModel){
+fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: ChatListViewModel){
     viewModel.refreshChatList(chat)
 
     var nickname = viewModel.nickname.collectAsState()

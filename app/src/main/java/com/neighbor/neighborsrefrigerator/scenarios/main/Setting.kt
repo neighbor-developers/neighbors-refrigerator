@@ -1,14 +1,15 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.BiasAlignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -20,14 +21,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.android.datatransport.BuildConfig
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
+import com.neighbor.neighborsrefrigerator.BuildConfig
 
 //@Composable
 //private fun animateAlignmentAsState(
@@ -38,7 +37,7 @@ import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 //}
 
 @Composable
-fun Setting(navController: NavHostController, loginViewModel: LoginViewModel = viewModel(), mainViewModel: MainViewModel) {
+fun Setting(navController: NavHostController, mainViewModel: MainViewModel) {
     val version = "버전 정보 : ${BuildConfig.VERSION_NAME}"
     val scaffoldState = rememberScaffoldState()
 
@@ -128,7 +127,7 @@ fun Setting(navController: NavHostController, loginViewModel: LoginViewModel = v
             Surface(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-
+                    mainViewModel.delChatData()
                 }
             ) {
                 Text(
@@ -155,7 +154,7 @@ fun Setting(navController: NavHostController, loginViewModel: LoginViewModel = v
             Surface(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    mainViewModel.toStartActivity()
+                    mainViewModel.logOut()
                 }
             ){
                 Text(
@@ -169,7 +168,7 @@ fun Setting(navController: NavHostController, loginViewModel: LoginViewModel = v
             Surface(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    mainViewModel.toStartActivity()
+                    mainViewModel.delAuth()
                 }
             ){
                 Text(

@@ -45,10 +45,4 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun signOut(context: Context) = viewModelScope.launch {
-        Firebase.auth.signOut()
-        googleSignInClient.signOut().addOnCompleteListener {
-            tryLogin(context)
-        }
-    }
 }

@@ -23,22 +23,22 @@ import kotlin.io.path.createTempDirectory
 
 
 class ChatListViewModel: ViewModel() {
-    var example: List<RdbChatData> = listOf(
-        RdbChatData(
+    var example: List<FirebaseChatData> = listOf(
+        FirebaseChatData(
         id = "a",
         postId = 1,
-        writer = RdbUserData(id = 1, nickname = "ㅂㅎㅇ", 1),
-        contact = RdbUserData(id = 2, nickname = "zinkiki", 2),
-        messages = listOf(RdbMessageData(content = "안녕하세요", false, 1662288446, 2),
-            RdbMessageData(content = "안녕하세요", false, 1662288446, 2),
-            RdbMessageData(content = "안녕하세요", true, 1662288446, 2),
-            RdbMessageData(content = "안녕하세요", false, 1662288446, 2))),
-        RdbChatData(
+        writer = ChatUserData(id = 1, nickname = "ㅂㅎㅇ", 1),
+        contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
+        messages = listOf(ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+            ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+            ChatMessageData(content = "안녕하세요", true, 1662288446, 2),
+            ChatMessageData(content = "안녕하세요", false, 1662288446, 2))),
+        FirebaseChatData(
             id = "a",
             postId = 1,
-            writer = RdbUserData(id = 1, nickname = "seoyeon", 1),
-            contact = RdbUserData(id = 2, nickname = "zinkiki", 2),
-            messages = listOf(RdbMessageData(content = "안녕하세요", false, 1661518435, 2)))
+            writer = ChatUserData(id = 1, nickname = "seoyeon", 1),
+            contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
+            messages = listOf(ChatMessageData(content = "안녕하세요", false, 1661518435, 2)))
     )
 
     var nickname = MutableStateFlow<String>("")
@@ -47,8 +47,8 @@ class ChatListViewModel: ViewModel() {
     var createAt = MutableStateFlow<String>("")
 
     private val usersChatList = MutableStateFlow<List<String>>(emptyList())
-    val chatListData = MutableStateFlow<List<RdbChatData>>(example)
-    val sortChatList = mutableMapOf<RdbChatData, Long>()
+    val chatListData = MutableStateFlow<List<FirebaseChatData>>(example)
+    val sortChatList = mutableMapOf<FirebaseChatData, Long>()
     private val firebaseDB = FirebaseDatabase.getInstance()
 
 
@@ -84,12 +84,12 @@ class ChatListViewModel: ViewModel() {
                     val result = value as HashMap<String, Any>?
                     val writer = result?.get("writer") as HashMap<String, Any>?
                     val contact = result?.get("contact") as HashMap<String, Any>?
-                    val _chatData = RdbChatData(
+                    val _chatData = FirebaseChatData(
                         result?.get("id") as String,
                         (result["postId"] as Long).toInt(),
-                        RdbUserData((writer?.get("id") as Long).toInt(), writer["nickname"] as String, (writer["level"] as Long).toInt()),
-                        RdbUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
-                        result["messages"] as List<RdbMessageData>
+                        ChatUserData((writer?.get("id") as Long).toInt(), writer["nickname"] as String, (writer["level"] as Long).toInt()),
+                        ChatUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
+                        result["messages"] as List<ChatMessageData>
                     )
 
                     if(usersChatList.value.isNotEmpty()){
@@ -114,7 +114,7 @@ class ChatListViewModel: ViewModel() {
     }
 
 
-    private fun getLastChatTimestamp(chatData: RdbChatData): Long?{
+    private fun getLastChatTimestamp(chatData: FirebaseChatData): Long?{
 
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
         val lastChat = chatData.messages.maxWithOrNull(compareBy { it.createdAt})
@@ -124,7 +124,7 @@ class ChatListViewModel: ViewModel() {
         return lastChat?.createdAt ?: System.currentTimeMillis()
     }
 
-    fun refreshChatList(chat: RdbChatData){
+    fun refreshChatList(chat: FirebaseChatData){
         // 채팅 하나마다 안읽은 메세지 수, 마지막 채팅, 상대방 닉네임 및 정보 가져와야함
 
         // 최근 채팅 순으로 정렬
@@ -138,7 +138,7 @@ class ChatListViewModel: ViewModel() {
     }
 
 
-    private fun checkNewMessage(chatData: RdbChatData){
+    private fun checkNewMessage(chatData: FirebaseChatData){
         newMessage.value = 0
         chatData.messages.forEach {
             if(!it.is_read){
@@ -148,7 +148,7 @@ class ChatListViewModel: ViewModel() {
         Log.d("새로운 메세지",newMessage.value.toString())
     }
 
-    private fun checkLastChat(chatData: RdbChatData) {
+    private fun checkLastChat(chatData: FirebaseChatData) {
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
 
         val lastChat = chatData.messages.maxWithOrNull(compareBy { it.createdAt })
@@ -165,13 +165,13 @@ class ChatListViewModel: ViewModel() {
             Log.d("타임스탬프 에러", "타임스탬프 null")
         }
         else{
-            createAt.value =
-                MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp).toString()
-            lastMessage.value = lastChat.content
+//            createAt.value =
+//                MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp).toString()
+//            lastMessage.value = lastChat.content
         }
     }
 
-    private fun getUserData(chatData: RdbChatData){
+    private fun getUserData(chatData: FirebaseChatData){
         // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
         // int? String? 에러날 수 있음
         if(chatData.writer.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){

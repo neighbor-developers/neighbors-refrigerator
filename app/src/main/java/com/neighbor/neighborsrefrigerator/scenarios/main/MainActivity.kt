@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -34,7 +35,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
@@ -59,10 +65,13 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
     private val auth = FirebaseAuth.getInstance()
+    private lateinit var googleSignInClient : GoogleSignInClient
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        googleLogin()
 
         lifecycleScope.launch {
             launch {
@@ -82,7 +91,8 @@ class MainActivity : ComponentActivity() {
                 viewModel.event.collect { event ->
                     when (event) {
                         MainViewModel.MainEvent.SendEmail -> sendEmail(viewModel.emailContent.value, viewModel.userEmail.value)
-                        MainViewModel.MainEvent.ToStartActivity -> toStartActivity()
+                        MainViewModel.MainEvent.LogOut -> logOut()
+                        MainViewModel.MainEvent.DelAuth -> delAuth()
                     }
                 }
             }
@@ -104,7 +114,30 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    private fun toStartActivity(){
+    // 로그인 객체 생성
+    private fun googleLogin() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            // 빨간줄이지만 토큰 문제라 실행 가능
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+    }
+    private fun logOut(){
+        auth.signOut()
+        googleSignInClient.signOut().addOnCompleteListener {
+            Log.d("logOut", "로그아웃 완료")
+        }
+
+        val intent = Intent(this, StartActivity::class.java)
+        startActivity(intent)
+
+    }
+    private fun delAuth(){
+        auth.currentUser?.delete()?.addOnSuccessListener {
+            Log.d("logOut", "계정삭제 완료")
+        }
         val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)
     }
@@ -229,7 +262,7 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { isDropDownMenuExpanded = true }, contentColor = Color.Black, backgroundColor = Color.White) {
-                Icon(painter = painterResource(id = R.drawable.icon_add), contentDescription = "add", modifier = Modifier.size(35.dp), tint = colorResource(
+                Icon(painter = painterResource(id = R.drawable.icon_add), contentDescription = "add", modifier = Modifier.size(30.dp), tint = colorResource(
                     id = R.color.green
                 ))
                 DropdownMenu(

@@ -1,40 +1,52 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.chat
 
 import android.util.Log
+import androidx.compose.animation.*
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.data.*
+import com.neighbor.neighborsrefrigerator.data.ChatMessageData
+import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.FirebaseChatData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
 import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 @Composable
@@ -70,8 +82,8 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
                 elevation = 0.dp
             )
         }
-    ) { it ->
-        Column(modifier = Modifier.padding(it)) {
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
             if(declarationDialogState){
                 DeclarationDialog(type = 2) {
                     declarationDialogState = false}
@@ -97,7 +109,7 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
         chatViewModel.getPostData(postId)
     }
 }
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController, postData: State<PostData?>, userId: Int, alignment: Alignment.Vertical = Alignment.Top) {
 
@@ -106,9 +118,6 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
     }
     val chatData = chatViewModel.chatData.collectAsState()
 
-    /*
-     postData 가져와서 보여주고, 거래 완료 null에, 작성자면 판매완료 버튼 생성하고, 실시간으로 변경도 가능하게끔 해야함
-    */
     if(completeShareDialog){
         postData.value?.let {
             CompleteDialog(
@@ -118,57 +127,110 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
             )
         }
     }
-    postData.value?.let { postData ->
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .padding(10.dp),
-            onClick = {
-                navController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = postData)
-                if(postData.type == 1){
-                    navController.navigate(NAV_ROUTE.SHARE_DETAIL.routeName)
-                }else{
-                    navController.navigate(NAV_ROUTE.SEEK_DETAIL.routeName)
-                }
-                      },
-            elevation = 5.dp,
-            backgroundColor = Color.LightGray,
-            shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
+    postData.value?.let { post ->
+        var expanded by remember { mutableStateOf(false) }
+        Surface(modifier = Modifier
+            .padding(start = 20.dp, end = 20.dp)
+            .fillMaxWidth(),
+            onClick = { expanded = !expanded }
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 10.dp)) {
-    //            if (true) { // 나눔일때
-    //                Icon(imageVector = Icons.Filled.Face, contentDescription = "상품 이미지", modifier = Modifier.size(45.dp))
-    //                AsyncImage(
-    //                    model = ImageRequest.Builder(LocalContext.current)
-    //                        .data(/* 상품 이미지 */)
-    //                        .crossfade(true)
-    //                        .build(),
-    //                    contentDescription = null,
-    //                    contentScale = ContentScale.Crop,
-    //                    modifier = Modifier.size(100.dp)
-    ////                )
-    //            }
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(text = postData.title, color = Color.Black, fontSize = 17.sp)
-                    chatData.value?.writer?.nickname?.let {
-                        Text(text = it, color = Color.DarkGray, fontSize = 12.sp)
-                    }
+            AnimatedContent(
+                targetState = expanded,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(150, 150)) with
+                            fadeOut(animationSpec = tween(150)) using
+                            SizeTransform { initialSize, targetSize ->
+                                if (targetState) {
+                                    keyframes {
+                                        // Expand horizontally first.
+                                        IntSize(targetSize.width, initialSize.height) at 150
+                                        durationMillis = 300
+                                    }
+                                } else {
+                                    keyframes {
+                                        // Shrink vertically first.
+                                        IntSize(initialSize.width, targetSize.height) at 150
+                                        durationMillis = 300
+                                    }
+                                }
+                            }
                 }
-                if (postData.userId == userId) {
-                    // 포스트 작성자일때 완료 버튼
-                    Button(onClick = { completeShareDialog = true }) {
-                        Text(text = "나눔 완료")
+            ) { targetExpanded ->
+                if (targetExpanded) {
+                        ConstraintLayout(
+                            Modifier.fillMaxWidth()) {
+                            val (title, button) = createRefs()
+                            Row(modifier = Modifier
+                                .constrainAs(title) {
+                                    start.linkTo(parent.start)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (post.type == 1) { // 나눔일때
+                                    Surface(shape = MaterialTheme.shapes.small.copy(CornerSize(10.dp))){
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(post.productimg1)
+                                                .crossfade(true)
+                                                .build(),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.size(70.dp),
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                }
+                                Column{
+                                    Text(text = post.title, color = Color.Black, fontSize = 17.sp)
+                                    chatData.value?.writer?.nickname?.let {
+                                        Text(text = it, color = Color.DarkGray, fontSize = 12.sp)
+                                    }
+                                }
+                            }
+
+                            Row(Modifier.constrainAs(button){
+                                end.linkTo(parent.end)
+                                top.linkTo(parent.top)
+                                bottom.linkTo(parent.bottom)
+                            }) {
+                                if (post.userId == userId) {
+                                    // 포스트 작성자일때 완료 버튼
+                                    Button(onClick = { completeShareDialog = true }) {
+                                        Text(text = "나눔 완료")
+                                    }
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+                                Button(
+                                    onClick = {
+                                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                                            key = "post",
+                                            value = post
+                                        )
+                                        if (post.type == 1) {
+                                            navController.navigate(NAV_ROUTE.SHARE_DETAIL.routeName)
+                                        } else {
+                                            navController.navigate(NAV_ROUTE.SEEK_DETAIL.routeName)
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(Color.LightGray)
+                                ) { Text(text = "상세보기") }
+                            }
+                        }
+                } else {
+                    Surface(modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Filled.ShoppingCart, "")
                     }
                 }
             }
         }
+
     }
 }
 
 @Composable
-fun ChatSection(message: State<List<RdbMessageData>?>, chatData: State<RdbChatData?>, userId: Int, modifier: Modifier = Modifier) {
+fun ChatSection(message: State<List<ChatMessageData>?>, chatData: State<FirebaseChatData?>, userId: Int, modifier: Modifier = Modifier) {
     //userId = 내 아이디
     val writerId: Int? = chatData.value?.writer?.id
 
@@ -197,7 +259,7 @@ fun ChatSection(message: State<List<RdbMessageData>?>, chatData: State<RdbChatDa
 }
 
 @Composable
-fun MessageItem(message: RdbMessageData, userId: Int, nickname: String) {
+fun MessageItem(message: ChatMessageData, userId: Int, nickname: String) {
     val current = System.currentTimeMillis()
 
     val calculateTime = CalculateTime()
@@ -275,7 +337,7 @@ fun SendSection(viewModel: ChatViewModel, chatId: String, userId: Int) {
                         if (sendMessage.value.isNotEmpty()) {
                             Log.d("새로운 메세지", sendMessage.value)
                             timestamp.value = System.currentTimeMillis()
-                            val message = RdbMessageData(sendMessage.value, false, timestamp.value, userId)
+                            val message = ChatMessageData(sendMessage.value, false, timestamp.value, userId)
                             viewModel.newMessage(chatId, message)
                             sendMessage.value = ""
                         }
