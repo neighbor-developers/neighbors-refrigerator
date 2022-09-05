@@ -21,7 +21,7 @@ class MyPagingSource(
         try {
             val position = params.key?: STARTING_PAGE_INDEX
             val result = dbAccessModule.getPostOrderByTime(page = position,reqPostData = reqPostData)
-            Log.d("결과2", result.toString())
+//            Log.d("결과2", result.toString())
             return LoadResult.Page(
                 data = result,
                 prevKey = when(position){

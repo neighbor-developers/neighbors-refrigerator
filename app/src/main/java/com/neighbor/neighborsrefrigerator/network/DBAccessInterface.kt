@@ -60,9 +60,9 @@ interface DBAccessInterface {
     ) : ReturnObject<ArrayList<UserData>>
 
     @POST("/user/join")
-    fun userJoin(
+    suspend fun userJoin(
         @Body userData: UserData
-    ): retrofit2.Call<ReturnObject<Int>>
+    ): ReturnObject<Int>
 
     @GET("/user/checkNickname")
     suspend fun checkNickname(
@@ -70,9 +70,9 @@ interface DBAccessInterface {
     ): ReturnObject<Boolean>
 
     @GET("/user/hasFbId")
-    fun hasFbId(
+    suspend fun hasFbId(
         @Query("id") id: String
-    ): retrofit2.Call<ReturnObject<Boolean>>
+    ): ReturnObject<Boolean>
 
     @POST("post/updateFcmToken")
     fun updateFcmToken(

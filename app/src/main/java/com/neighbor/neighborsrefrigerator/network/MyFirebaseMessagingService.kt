@@ -23,7 +23,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         userPrefs.setUserPrefs("fcm",token)
 
 
-        if (!(userPrefs.getUserPrefs().id == "".toInt())){
+        if (userPrefs.getUserPrefs("id") != ""){
             val fcmTemp  = DataTransferObject<String>(userPrefs.getUserPrefs().id!!,token)
             DBAccessModule().updateFcmToken(fcmTemp)
             Log.d("new Token", token)

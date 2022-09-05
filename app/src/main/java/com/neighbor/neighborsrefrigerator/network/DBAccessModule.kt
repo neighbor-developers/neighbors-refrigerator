@@ -82,29 +82,11 @@ class DBAccessModule {
     }
 
     //유저 데이터 데이터 베이스에 입력
-    fun joinUser(userData: UserData){
-        dbAccessApi.userJoin(userData).enqueue(object : Callback<ReturnObject<Int>>{
-            override fun onResponse(
-                call: Call<ReturnObject<Int>>,
-                response: Response<ReturnObject<Int>>
-            ) {
-                if(response.isSuccessful){
-                    userData.id = response.body()?.result!!.toInt()
-                    // sharedPreference에 저장하기
-                    UserSharedPreference(App.context()).setUserPrefs(userData)
-
-                    UserSharedPreference(App.context()).getUserPrefs("id")?.let { Log.d("성공", it) }
-                    Log.d("DB 값", userData.toString())
-                }
-                else{
-                    Log.d("test","join user response failed")
-                }
-            }
-
-            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
-                Log.d("test",t.localizedMessage)
-            }
-        })
+    suspend fun joinUser(userData: UserData): Int?{
+        val result = kotlin.runCatching {
+            dbAccessApi.userJoin(userData)}.getOrNull()?.result
+        Log.d("id", result.toString())
+        return result
     }
 
     //포스트 데이터 데이터베이스에 입력
@@ -188,27 +170,16 @@ class DBAccessModule {
     suspend fun getUserInfoByFbId(fbId: String) : ArrayList<UserData>{
         val result = kotlin.runCatching {
             dbAccessApi.getUserInfoByFbId(fbId)}.getOrNull()?.result?: arrayListOf()
+        Log.d("userInfo", result.toString())
         return result
     }
 
     //fb아이디에 등록된 유저 아이디인지 확인
-    fun hasFbId(id : String, applyResult: (Boolean) -> Unit){
-        dbAccessApi.hasFbId(id).enqueue(object :
-            Callback<ReturnObject<Boolean>>{
-                override fun onResponse(
-                    call: Call<ReturnObject<Boolean>>,
-                    response: Response<ReturnObject<Boolean>>
-                ) {
-                    if(response.isSuccessful){
-                        applyResult(response.body()!!.result)
-                    }
-                }
-
-                override fun onFailure(call: Call<ReturnObject<Boolean>>, t: Throwable) {
-                    Log.d("test",t.localizedMessage)
-                }
-            }
-        )
+    suspend fun hasFbId(id : String): Boolean{
+        val result = kotlin.runCatching {
+            dbAccessApi.hasFbId(id)}.getOrNull()?.result?: false
+        Log.d("checkLogin", result.toString())
+        return result
     }
 
     fun updateNickname(id : Int, nickname: String){

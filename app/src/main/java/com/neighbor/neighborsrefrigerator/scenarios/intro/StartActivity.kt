@@ -23,6 +23,11 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {
     // Firebase
@@ -30,6 +35,7 @@ class StartActivity : ComponentActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 1313
     private val viewModel by viewModels<LoginViewModel>()
+    private val registerInfoViewModel by viewModels<RegisterInfoViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,31 +45,51 @@ class StartActivity : ComponentActivity() {
                 Text(text = "로그인 확인중", fontSize = 30.sp)
             }
         }
-
         // 로그인 시도
         viewModel.tryLogin(this)
 
         lifecycleScope.launchWhenCreated {
-
-            viewModel.loginResult.collect { isLogin ->
-                if (isLogin) {
-                    if (auth.currentUser != null) {
-                        Log.d("token", auth.currentUser!!.getIdToken(true).toString())
-                        startActivity(Intent(this@StartActivity, MainActivity::class.java))
-                    }
-                } else {
-                    // 로그인 안되어있을 때 로그인 페이지 열림
-                    setContent {
-                        LoginScreen {
-                            googleLogin()
+            launch {
+                viewModel.loginResult.collect { isLogin ->
+                    if (isLogin) {
+                        Log.d("로그인 되어있음", "로그인 되어있음")
+                        if (auth.currentUser != null) {
+                            Log.d("token", auth.currentUser!!.getIdToken(true).toString())
+                            val result = viewModel.hasId(auth.currentUser!!)
+                            Log.d("아이디 있는지", result.toString())
+                            if (result){
+                                Log.d("아이디 있는지", "메인으로")
+                                toMainActivity()
+                            }else{
+                                Log.d("아이디 없어서", "등록으로")
+                                setContent {
+                                    RegisterInfo()
+                                }
+                            }
+                        }else{
+                            Log.d("로그인 되어있음", "로그인 되어있지만? 유저가 없음")
                         }
+                    } else {
+                        Log.d("로그인 안되어있음", "로그인 안되어있음")
+                        // 로그인 안되어있을 때 로그인 페이지 열림
+                        setContent {
+                            LoginScreen {
+                                googleLogin()
+                            }
+                        }
+                    }
+                }
+            }
+            launch {
+                registerInfoViewModel.event.collect{ event ->
+                    when (event) {
+                        RegisterInfoViewModel.RegisterEvent.ToMain -> toMainActivity()
                     }
                 }
             }
         }
 
     }
-
 
     // 로그인 객체 생성
     private fun googleLogin() {
@@ -104,16 +130,21 @@ class StartActivity : ComponentActivity() {
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
+            Log.d("로그인중", "로그인 되어야함1")
             if (task.isSuccessful) {
-                toMainActivity(auth.currentUser)
+                Log.d("로그인중", "로그인 되어야함2")
+                auth.currentUser?.let {
+                    Log.d("로그인중", "로그인 되어야함3")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        viewModel.setLoginResult(true)
+                    }
+                }
             }
         }
     }
 
+    private fun toMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
 
-    private fun toMainActivity(user: FirebaseUser?) {
-        if (user != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-        }
     }
 }

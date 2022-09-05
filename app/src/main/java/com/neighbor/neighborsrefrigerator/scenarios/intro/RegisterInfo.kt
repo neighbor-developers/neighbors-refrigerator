@@ -14,9 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
@@ -27,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
 @Composable
-fun RegisterInfo(navController: NavHostController){
+fun RegisterInfo(){
     Scaffold() {
         Column(
             modifier = Modifier
@@ -39,12 +37,10 @@ fun RegisterInfo(navController: NavHostController){
             val registerInfoViewModel by remember {
                 mutableStateOf(RegisterInfoViewModel())
             }
-            val enabled = registerInfoViewModel.buttonEnabled.collectAsState()
+            var enabled = registerInfoViewModel.buttonEnabled.collectAsState()
             var available = registerInfoViewModel.availableNickname.collectAsState()
             //var enabled by remember { mutableStateOf(false) }
             //var enabled = registerInfoViewModel.buttonEnabled
-
-
 
             GetNickname(registerInfoViewModel)
             GetMainAddress(registerInfoViewModel)
@@ -52,9 +48,11 @@ fun RegisterInfo(navController: NavHostController){
 
             //registerInfoViewModel.check()
 
-            TextButton( onClick = {
-                registerInfoViewModel.registerPersonDB()
-                navController.navigate(NAV_ROUTE.MAIN.routeName)},
+            TextButton(
+                onClick = {
+                    registerInfoViewModel.registerPersonDB()
+                    registerInfoViewModel.toMainActivity()
+                          },
                 enabled = enabled.value
             )
             {

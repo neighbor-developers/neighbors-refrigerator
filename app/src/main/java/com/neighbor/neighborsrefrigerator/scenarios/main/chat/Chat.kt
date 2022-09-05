@@ -130,8 +130,7 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
     postData.value?.let { post ->
         var expanded by remember { mutableStateOf(false) }
         Surface(modifier = Modifier
-            .padding(start = 20.dp, end = 20.dp)
-            .fillMaxWidth(),
+            .padding(start = 20.dp, end = 20.dp),
             onClick = { expanded = !expanded }
         ) {
             AnimatedContent(

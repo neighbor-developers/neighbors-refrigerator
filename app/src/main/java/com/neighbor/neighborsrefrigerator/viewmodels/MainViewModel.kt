@@ -1,13 +1,17 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.neighbor.neighborsrefrigerator.data.UserData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -19,29 +23,21 @@ class MainViewModel: ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val firebaseDB = FirebaseDatabase.getInstance()
 
-    val hasId = MutableStateFlow(true)
-
     private val _event = MutableSharedFlow<MainEvent>()
     val event = _event.asSharedFlow()
 
     var emailContent = MutableStateFlow("")
     var userEmail = MutableStateFlow("")
 
-    init {
-        dbAccessModule.hasFbId(auth.currentUser.toString()) { hasId.value = it }
-        UserSharedPreference(App.context()).getUserPrefs("id")?.let {
-            hasId.value = false
-        }
-    }
-
-    suspend fun nickname(): String{
-        val id = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
-        return if(dbAccessModule.getUserInfoById(id) != arrayListOf<UserData>()){
-            dbAccessModule.getUserInfoById(id)[0].nickname
-        }else{
-            "알수없음"
-        }
-    }
+//    suspend fun nickname(): String{
+//        val id = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+//        return if(dbAccessModule.getUserInfoById(auth.currentUser.toString()) != arrayListOf<UserData>()){
+//            dbAccessModule.getUserInfoById(id)[0].nickname
+//        }else{
+//            Log.d("닉네임",  "알수없음")
+//            "알수없음"
+//        }
+//    }
 
      suspend fun changeNickname(nickname : String): Boolean {
         val result = dbAccessModule.checkNickname(nickname)

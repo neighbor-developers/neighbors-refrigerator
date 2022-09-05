@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -87,8 +84,7 @@ fun SearchPostView(
                     SharePostListByTime(
                         posts = it.collectAsLazyPagingItems(),
                         route = NAV_ROUTE.SHARE_DETAIL,
-                        navHostController = navController,
-                        postViewModel
+                        navHostController = navController
                     )
                 else {
                     SeekPostList(

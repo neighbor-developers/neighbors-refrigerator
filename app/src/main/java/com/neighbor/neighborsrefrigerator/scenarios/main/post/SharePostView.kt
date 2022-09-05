@@ -41,22 +41,35 @@ fun SharePostScreen(
     navController: NavHostController
 ) {
     val state = rememberScrollState()
-
+    val category = postViewModel.category.collectAsState()
     LaunchedEffect(Unit) { state.animateScrollTo(0) }
+
     Column(
         modifier = Modifier
             .verticalScroll(state)
             .height(1000.dp)
     ) {
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
+
         CategoryView(postViewModel)
-        SharePostListByTime(posts = postViewModel.sharePostsByTime.collectAsLazyPagingItems(),  route, navController, postViewModel)
+        SharePostListByTime(posts = when(category.value){
+            0 -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()
+            1 -> postViewModel.sharePostsForCategory100.collectAsLazyPagingItems()
+            2 -> postViewModel.sharePostsForCategory200.collectAsLazyPagingItems()
+            3 -> postViewModel.sharePostsForCategory300.collectAsLazyPagingItems()
+            4 -> postViewModel.sharePostsForCategory400.collectAsLazyPagingItems()
+            5 -> postViewModel.sharePostsForCategory500.collectAsLazyPagingItems()
+            6 -> postViewModel.sharePostsForCategory600.collectAsLazyPagingItems()
+            else -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()
+                                                        },
+        route = route, navController)
     }
 }
 
 
+
 @Composable
-fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController, postViewModel: PostViewModel)
+fun SharePostListByTime(posts : LazyPagingItems<PostData>,route: NAV_ROUTE, navHostController: NavHostController)
 {
     val scrollState = rememberLazyGridState()
 
@@ -69,9 +82,8 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navH
         userScrollEnabled = true,
     ) {
         items(posts.itemCount) { count ->
-            //if(posts[count]?.categoryId == category.value.toString()){
-                ItemCardByTime(posts[count]!!, route, navHostController)
-            //}
+            ItemCardByTime(posts[count]!!, route, navHostController)
+
         }
 
     }
@@ -80,8 +92,8 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navH
 
 @Composable
 fun CategoryView(postViewModel: PostViewModel){
-    val categoryList = mapOf(null to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
-    val categoryIconList = mapOf(null to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
+    val categoryList = mapOf(0 to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
+    val categoryIconList = mapOf(0 to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
 
     var selectedCategory by remember {
         mutableStateOf("전체")
@@ -96,11 +108,7 @@ fun CategoryView(postViewModel: PostViewModel){
                     .height(60.dp),
                 onClick = {
                     selectedCategory = category.value
-                    if(category.key == null){
-                        postViewModel.initPostData()
-                    }else {
-                        postViewModel.getPostForCategory(category.key!!)
-                    }
+                    postViewModel.category.value = category.key
 
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = if(selectedCategory == category.value) colorResource(id = R.color.green) else Color.White),

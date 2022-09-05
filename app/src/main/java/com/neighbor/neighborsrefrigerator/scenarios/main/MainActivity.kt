@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main
 
+/*import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen*/
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -9,20 +10,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -39,14 +36,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
-/*import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen*/
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ReviewScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
@@ -59,7 +53,6 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePost
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import kotlinx.coroutines.launch
-import java.security.DomainLoadStoreParameter
 
 class MainActivity : ComponentActivity() {
 
@@ -73,29 +66,19 @@ class MainActivity : ComponentActivity() {
 
         googleLogin()
 
+        setContent {
+            Screen(mainViewModel = viewModel, startRoute = NAV_ROUTE.MAIN.routeName)
+        }
+
         lifecycleScope.launch {
-            launch {
-                viewModel.hasId.collect {
-                    // 아이디 존재할경우 메인, 존재하지 않을경우 등록 페이지
-                    val route = if (it) {
-                        NAV_ROUTE.MAIN.routeName
-                    } else {
-                        NAV_ROUTE.REGISTER_INFO.routeName
-                    }
-                    setContent {
-                        Screen(mainViewModel = viewModel, startRoute = route)
-                    }
+            viewModel.event.collect { event ->
+                when (event) {
+                    MainViewModel.MainEvent.SendEmail -> sendEmail(viewModel.emailContent.value, viewModel.userEmail.value)
+                    MainViewModel.MainEvent.LogOut -> logOut()
+                    MainViewModel.MainEvent.DelAuth -> delAuth()
                 }
             }
-            launch {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        MainViewModel.MainEvent.SendEmail -> sendEmail(viewModel.emailContent.value, viewModel.userEmail.value)
-                        MainViewModel.MainEvent.LogOut -> logOut()
-                        MainViewModel.MainEvent.DelAuth -> delAuth()
-                    }
-                }
-            }
+
         }
     }
 
@@ -175,7 +158,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             MainScreen(viewModel = mainViewModel, navController)
         }
         composable(NAV_ROUTE.REGISTER_INFO.routeName){
-            RegisterInfo(navController)
+            RegisterInfo()
         }
         composable(NAV_ROUTE.SHARE_DETAIL.routeName){
             val post = remember {

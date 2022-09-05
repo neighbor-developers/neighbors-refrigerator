@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,12 +8,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.neighbor.neighborsrefrigerator.data.DataTransferObject
 import com.neighbor.neighborsrefrigerator.data.UserData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,6 +37,9 @@ class RegisterInfoViewModel: ViewModel() {
     val fillAddressMain = MutableStateFlow(false)
 
     var buttonEnabled = MutableStateFlow(false)
+
+    private val _event = MutableSharedFlow<RegisterEvent>()
+    val event = _event.asSharedFlow()
 
     fun check(){
         buttonEnabled.value = availableNickname.value
@@ -61,7 +69,6 @@ class RegisterInfoViewModel: ViewModel() {
     }
 
     fun registerPersonDB() {
-
         val coordinateData: LatLng = UseGeocoder().addressToLatLng(addressMain + addressDetail)
         val auth: FirebaseAuth = FirebaseAuth.getInstance()
         val uID: String = if (auth.uid != null) {
@@ -74,7 +81,6 @@ class RegisterInfoViewModel: ViewModel() {
         } else {
             ""
         }
-
         val userdata =
             UserData(
                 id = null,
@@ -89,8 +95,21 @@ class RegisterInfoViewModel: ViewModel() {
                 createdAt = timeStamp,
                 fcm = ""
             )
-        UserSharedPreference(App.context()).setUserPrefs(userdata)
+        viewModelScope.launch {
+            var result: Int? = null
+            viewModelScope.async {
+                result = dbAccessModule.joinUser(userdata)
+            }.await()
+            userdata.id = result
+            userdata.fcm  = UserSharedPreference(App.context()).getUserPrefs("fcm")
 
-        dbAccessModule.joinUser(userdata)
+            UserSharedPreference(App.context()).setUserPrefs(userdata)
+            Log.d("저장", "저장성공")
+        }
+    }
+    fun toMainActivity() = viewModelScope.launch { _event.emit(RegisterEvent.ToMain) }
+
+    sealed class RegisterEvent{
+        object ToMain : RegisterEvent()
     }
 }
