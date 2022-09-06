@@ -104,7 +104,8 @@ class RegisterInfoViewModel: ViewModel() {
             userdata.fcm  = UserSharedPreference(App.context()).getUserPrefs("fcm")
 
             UserSharedPreference(App.context()).setUserPrefs(userdata)
-            Log.d("저장", "저장성공")
+
+            Log.d("저장", userdata.toString())
         }
     }
     fun toMainActivity() = viewModelScope.launch { _event.emit(RegisterEvent.ToMain) }

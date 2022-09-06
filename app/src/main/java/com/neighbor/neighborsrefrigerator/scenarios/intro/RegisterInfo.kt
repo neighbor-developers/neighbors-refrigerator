@@ -14,8 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
+import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
 @Composable
-fun RegisterInfo(){
+fun RegisterInfo(loginViewModel: LoginViewModel = viewModel()){
     Scaffold() {
         Column(
             modifier = Modifier
@@ -34,25 +36,19 @@ fun RegisterInfo(){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val registerInfoViewModel by remember {
-                mutableStateOf(RegisterInfoViewModel())
-            }
-            var enabled = registerInfoViewModel.buttonEnabled.collectAsState()
-            var available = registerInfoViewModel.availableNickname.collectAsState()
+            var enabled = loginViewModel.buttonEnabled.collectAsState()
+            var available = loginViewModel.availableNickname.collectAsState()
             //var enabled by remember { mutableStateOf(false) }
             //var enabled = registerInfoViewModel.buttonEnabled
 
-            GetNickname(registerInfoViewModel)
-            GetMainAddress(registerInfoViewModel)
+            GetNickname(loginViewModel)
+            GetMainAddress(loginViewModel)
 
 
             //registerInfoViewModel.check()
 
             TextButton(
-                onClick = {
-                    registerInfoViewModel.registerPersonDB()
-                    registerInfoViewModel.toMainActivity()
-                          },
+                onClick = { loginViewModel.registerPersonDB() },
                 enabled = enabled.value
             )
             {
@@ -64,7 +60,7 @@ fun RegisterInfo(){
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun GetNickname(viewModel:RegisterInfoViewModel) {
+fun GetNickname(viewModel:LoginViewModel) {
     val availableNickname = viewModel.availableNickname.collectAsState()
     // remember: 상태를 가지고 있음
     Column(
@@ -112,7 +108,7 @@ fun GetNickname(viewModel:RegisterInfoViewModel) {
 }
 
 @Composable
-fun GetMainAddress(viewModel: RegisterInfoViewModel) {
+fun GetMainAddress(viewModel: LoginViewModel) {
     var dialogState by remember { mutableStateOf(false) }
     val searchAddressDialogViewModel by remember{
         mutableStateOf(SearchAddressDialogViewModel())

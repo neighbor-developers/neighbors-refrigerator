@@ -121,6 +121,10 @@ class MainActivity : ComponentActivity() {
         auth.currentUser?.delete()?.addOnSuccessListener {
             Log.d("logOut", "계정삭제 완료")
         }
+        auth.signOut()
+        googleSignInClient.signOut().addOnCompleteListener {
+            Log.d("logOut", "로그아웃 완료")
+        }
         val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)
     }

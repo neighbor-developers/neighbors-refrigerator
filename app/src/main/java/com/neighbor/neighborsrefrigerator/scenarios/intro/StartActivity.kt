@@ -81,12 +81,13 @@ class StartActivity : ComponentActivity() {
                 }
             }
             launch {
-                registerInfoViewModel.event.collect{ event ->
+                viewModel.event.collect{ event ->
                     when (event) {
-                        RegisterInfoViewModel.RegisterEvent.ToMain -> toMainActivity()
+                        LoginViewModel.LoginEvent.ToMain -> toMainActivity()
                     }
                 }
             }
+
         }
 
     }
