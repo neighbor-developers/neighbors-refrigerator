@@ -182,6 +182,13 @@ class DBAccessModule {
         return result
     }
 
+    suspend fun deleteUser(id : Int): Boolean{
+        val result = kotlin.runCatching {
+            dbAccessApi.deleteUser(id)}.getOrNull()?.result?: false
+        Log.d("checkLogin", result.toString())
+        return result
+    }
+
     fun updateNickname(id : Int, nickname: String){
         val nicknameData = DataTransferObject<String>(id,nickname)
         dbAccessApi.updateNickname(nicknameData).enqueue(object : Callback<ReturnObject<Int>>{
