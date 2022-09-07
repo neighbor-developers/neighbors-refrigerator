@@ -22,14 +22,18 @@ class MyPagingSource(
             val position = params.key?: STARTING_PAGE_INDEX
             val result = dbAccessModule.getPostOrderByTime(page = position,reqPostData = reqPostData)
 //            Log.d("결과2", result.toString())
-            return LoadResult.Page(
-                data = result,
-                prevKey = when(position){
-                    STARTING_PAGE_INDEX -> null
-                    else -> position -1
-                },
-                nextKey = position + 1
-            )
+            if (result != emptyList<PostData>()){
+                return LoadResult.Page(
+                    data = result,
+                    prevKey = when(position){
+                        STARTING_PAGE_INDEX -> null
+                        else -> position -1
+                    },
+                    nextKey = position + 1
+                )
+            }else{
+                return LoadResult.Invalid()
+            }
 
             // PagingSource가 더 이상 결과의 무결성을 보장할 수 없으므로 무효화되어야 하는 경우
 //            LoadResult.Invalid()

@@ -1,24 +1,19 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -27,12 +22,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SharePostScreen(
@@ -49,10 +49,82 @@ fun SharePostScreen(
             .verticalScroll(state)
             .height(1000.dp)
     ) {
+        Tab(postViewModel = postViewModel, route, navController)
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
 
-        CategoryView(postViewModel)
-        SharePostListByTime(posts = when(category.value){
+    }
+}
+
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHostController)
+{
+    val categoryList = mapOf(0 to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
+    val categoryIconList = mapOf(0 to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
+
+    var selectedCategory by remember {
+        mutableStateOf(0)
+    }
+    val pagerState = rememberPagerState(pageCount = 7)
+    val coroutineScope = rememberCoroutineScope()
+
+
+    TabRow(
+        modifier = Modifier.height(60.dp),
+        selectedTabIndex = pagerState.currentPage,
+        indicator = {
+            tabPositions -> 
+            TabRowDefaults.Indicator(
+                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+            )
+        },
+        backgroundColor = Color.White,
+        contentColor = colorResource(id = R.color.green)
+    ){
+        categoryList.keys.forEachIndexed{ index, title ->
+            Tab(
+                onClick = {
+                    coroutineScope.launch { 
+                        pagerState.scrollToPage(index)
+                    }
+                },
+                selected = pagerState.currentPage == index,
+                content = {
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                        contentPadding = PaddingValues(0.dp),
+                        elevation = ButtonDefaults.elevation(0.dp)
+                    ){
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+                            Icon(painter = painterResource(id = categoryIconList[title]!!), contentDescription = categoryList[title], modifier = Modifier.size(if (title == 200) 31.dp else if (title == 0) 30.dp else 35.dp),
+                                tint =colorResource(id = R.color.green))
+                            Text(text = categoryList[title]!!, fontSize = 10.sp, color =  colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                        }
+//                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
+//
+//                            Icon(painter = painterResource(id = categoryIconList[title]!!), contentDescription = categoryList[title], modifier = Modifier.size(if (title == 200) 31.dp else if (title == 0) 30.dp else 35.dp),
+//                                tint = if(pagerState.currentPage == index) Color.White else colorResource(id = R.color.green))
+//                            Text(text = categoryList[title]!!, fontSize = 10.sp, color = if(pagerState.currentPage == index) Color.White else colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+//                        }
+                    }
+                },
+                selectedContentColor = Color.Transparent,
+                unselectedContentColor = Color.Transparent
+            )
+        }
+    }
+    
+    HorizontalPager(state = pagerState) { page ->
+        SharePostListByTime(posts = when(page) {
             0 -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()
             1 -> postViewModel.sharePostsForCategory100.collectAsLazyPagingItems()
             2 -> postViewModel.sharePostsForCategory200.collectAsLazyPagingItems()
@@ -60,17 +132,12 @@ fun SharePostScreen(
             4 -> postViewModel.sharePostsForCategory400.collectAsLazyPagingItems()
             5 -> postViewModel.sharePostsForCategory500.collectAsLazyPagingItems()
             6 -> postViewModel.sharePostsForCategory600.collectAsLazyPagingItems()
-            else -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()
-                                                        },
-        route = route, navController)
+            else -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()}, route = route, navHostController = navHostController)
+
     }
 }
-
-
-
 @Composable
-fun SharePostListByTime(posts : LazyPagingItems<PostData>,route: NAV_ROUTE, navHostController: NavHostController)
-{
+fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController){
     val scrollState = rememberLazyGridState()
 
     LazyVerticalGrid(
@@ -86,42 +153,6 @@ fun SharePostListByTime(posts : LazyPagingItems<PostData>,route: NAV_ROUTE, navH
 
         }
 
-    }
-}
-
-
-@Composable
-fun CategoryView(postViewModel: PostViewModel){
-    val categoryList = mapOf(0 to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
-    val categoryIconList = mapOf(0 to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
-
-    var selectedCategory by remember {
-        mutableStateOf("전체")
-    }
-    Row(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-    ) {
-        categoryList.forEach { category ->
-            Button(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(60.dp),
-                onClick = {
-                    selectedCategory = category.value
-                    postViewModel.category.value = category.key
-
-                },
-                colors = ButtonDefaults.buttonColors(backgroundColor = if(selectedCategory == category.value) colorResource(id = R.color.green) else Color.White),
-                contentPadding = PaddingValues(0.dp),
-                elevation = ButtonDefaults.elevation(0.dp)
-            ){
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-                    Icon(painterResource(id = categoryIconList[category.key]!!), contentDescription = category.value, modifier = Modifier.size(if (category.key == 200) 31.dp else if (category.key == null) 30.dp else 35.dp),
-                        tint = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green))
-                    Text(text = category.value, fontSize = 10.sp, color = if(selectedCategory == category.value) Color.White else colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-                }
-            }
-        }
     }
 }
 
