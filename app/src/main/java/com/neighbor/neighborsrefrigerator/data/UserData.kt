@@ -27,5 +27,6 @@ data class UserData(
     val createdAt: String,
     @SerializedName("fcm")
     var fcm: String?
+
 )
 

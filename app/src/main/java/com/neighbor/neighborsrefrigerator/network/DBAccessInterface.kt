@@ -1,10 +1,7 @@
 package com.neighbor.neighborsrefrigerator.network
 
 import com.neighbor.neighborsrefrigerator.data.*
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface DBAccessInterface {
     @GET("/post/getPostByUserId")
@@ -84,6 +81,10 @@ interface DBAccessInterface {
         @Body dataTransferObject: DataTransferObject<String>
     ) : retrofit2.Call<ReturnObject<Int>>
 
+    @DELETE("/user")
+    suspend fun deleteUser(
+        @Query("id") id: Int
+    ): ReturnObject<Boolean>
 
 
 }
