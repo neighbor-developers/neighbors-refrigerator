@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.view.CheckNicknameDialog
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
@@ -36,10 +37,14 @@ fun RegisterInfo(loginViewModel: LoginViewModel = viewModel()){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            var enabled = loginViewModel.buttonEnabled.collectAsState()
-            var available = loginViewModel.availableNickname.collectAsState()
-            //var enabled by remember { mutableStateOf(false) }
-            //var enabled = registerInfoViewModel.buttonEnabled
+            val dialogState = remember {
+                mutableStateOf(false)
+            }
+            if (dialogState.value){
+                CheckNicknameDialog {
+                    dialogState.value = false
+                }
+            }
 
             GetNickname(loginViewModel)
             GetMainAddress(loginViewModel)
@@ -48,9 +53,13 @@ fun RegisterInfo(loginViewModel: LoginViewModel = viewModel()){
             //registerInfoViewModel.check()
 
             TextButton(
-                onClick = { loginViewModel.registerPersonDB() },
-                enabled = enabled.value
-            )
+                onClick = {
+                    if (loginViewModel.availableNickname.value && loginViewModel.fillAddressMain.value){
+                        loginViewModel.registerPersonDB()
+                    }else{
+                        dialogState.value = true
+                    }
+                     })
             {
                 Text(text = "확인")
             }
@@ -97,13 +106,17 @@ fun GetNickname(viewModel:LoginViewModel) {
                 onClick = {
                     CoroutineScope(Dispatchers.Main).launch {
                         viewModel.checkNickname()
-                        viewModel.check()
                     }
                 }){
                 Text(text = "Check")
             }
         }
-        Text(text = "닉네임은 중복될 수 없습니다", color = Color.Gray, textAlign = TextAlign.Right)
+        if (viewModel.isOverlap.value){
+            Text(text = "닉네임은 중복될 수 없습니다", color = Color.Gray, textAlign = TextAlign.Right)
+        }
+        if (viewModel.isEmpty.value){
+            Text(text = "닉네임을 한글자 이상 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
+        }
     }
 }
 
@@ -113,6 +126,9 @@ fun GetMainAddress(viewModel: LoginViewModel) {
     val searchAddressDialogViewModel by remember{
         mutableStateOf(SearchAddressDialogViewModel())
     }
+    var address = remember {
+        mutableStateOf("")
+    }
 
     Column(
         modifier = Modifier
@@ -120,10 +136,23 @@ fun GetMainAddress(viewModel: LoginViewModel) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
+        SearchAddressDialog(
+            dialogState = dialogState,
+            onConfirm = {
+                viewModel.fillAddressMain.value = address.value.isNotEmpty()
+                dialogState = false
+            },
+            onDismiss = { dialogState = false },
+            viewModel = searchAddressDialogViewModel,
+            changeAddress = {
+                viewModel.addressMain.value = it
+                address.value = it
+            }
+        )
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = viewModel.addressMain,
-            onValueChange = { viewModel.addressMain = it },
+            value = address.value,
+            onValueChange = { address.value = it },
             label = { Text("집 주소") },
             placeholder = { Text("작성해 주세요") },
             singleLine = true,
@@ -131,17 +160,6 @@ fun GetMainAddress(viewModel: LoginViewModel) {
             leadingIcon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
             trailingIcon = {
                 IconButton(onClick = { dialogState = true }) {
-                    SearchAddressDialog(
-                        dialogState = dialogState,
-                        onConfirm = {
-                            viewModel.addressMain = searchAddressDialogViewModel.userAddressInput
-                            viewModel.fillAddressMain.value = viewModel.addressMain.isNotEmpty()
-                            viewModel.buttonEnabled.value = viewModel.availableNickname.value && viewModel.fillAddressMain.value
-                            dialogState = false
-                        },
-                        onDismiss = { dialogState = false },
-                        viewModel = searchAddressDialogViewModel
-                    )
                     // Icon(imageVector = cons.Default.Search, cntentDescription = null)
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
                 }
@@ -153,10 +171,16 @@ fun GetMainAddress(viewModel: LoginViewModel) {
         )
         Text(text = "동까지 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
 
+        val addressDetail = remember {
+            mutableStateOf("")
+        }
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = viewModel.addressDetail,
-            onValueChange = { viewModel.addressDetail = it },
+            value = addressDetail.value,
+            onValueChange = {
+                addressDetail.value = it
+                viewModel.addressDetail.value = it
+                            },
             label = { Text("상세 주소") },
             placeholder = { Text("작성해 주세요") },
             singleLine = true,

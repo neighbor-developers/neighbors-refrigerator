@@ -75,47 +75,40 @@ class LoginViewModel : ViewModel() {
     // 계정등록
 
     var userNicknameInput by mutableStateOf("")
-    var addressMain by mutableStateOf("")
-    var addressDetail by mutableStateOf("")
+    var addressMain = MutableStateFlow("")
+    var addressDetail = MutableStateFlow("")
+    val isOverlap = MutableStateFlow(true)
+    val isEmpty = MutableStateFlow(false)
     val availableNickname = MutableStateFlow(false)
     val fillAddressMain = MutableStateFlow(false)
-
-    var buttonEnabled = MutableStateFlow(false)
 
     private val _event = MutableSharedFlow<LoginEvent>()
     val event = _event.asSharedFlow()
 
-    fun check(){
-        buttonEnabled.value = availableNickname.value
-    }
 
     val time = System.currentTimeMillis()
     private val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(
         Date(time)
     )
 
-    suspend fun checkNickname(): Boolean {
+    suspend fun checkNickname() {
         if (userNicknameInput.isEmpty()) {
+            isEmpty.value = true
             availableNickname.value = false
-            return false
         }else{
+            isEmpty.value = false
             val result = dbAccessModule.checkNickname(userNicknameInput)
-            return if (!result) {
-                completeCheck()
+            availableNickname.value = if (!result) {
+                isOverlap.value = true
                 true
             }else{
+                isOverlap.value = false
                 false
             }}
     }
 
-    private fun completeCheck() {
-        availableNickname.value = true
-        fillAddressMain.value = addressMain.isNotEmpty()
-        buttonEnabled.value = availableNickname.value && fillAddressMain.value
-    }
-
     fun registerPersonDB() {
-        val coordinateData: LatLng = UseGeocoder().addressToLatLng(addressMain + addressDetail)
+        val coordinateData: LatLng = UseGeocoder().addressToLatLng(addressMain.value + addressDetail.value)
         val auth: FirebaseAuth = FirebaseAuth.getInstance()
         val uID: String = if (auth.uid != null) {
             auth.uid!!
@@ -133,8 +126,8 @@ class LoginViewModel : ViewModel() {
                 fbID = uID,
                 email = email!!,  //  파이어베이스에서 가져오기
                 nickname = userNicknameInput,
-                addressMain = addressMain,
-                addressDetail = addressDetail,
+                addressMain = addressMain.value,
+                addressDetail = addressDetail.value,
                 reportPoint = 0,   //  모듈 만들기
                 latitude = coordinateData.latitude,
                 longitude = coordinateData.longitude,

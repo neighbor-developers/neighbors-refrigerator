@@ -25,6 +25,7 @@ fun SearchAddressDialog(
     dialogState: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    changeAddress: (String) -> Unit,
     viewModel: SearchAddressDialogViewModel
 ) {
     // https://blog.logrocket.com/adding-alertdialog-jetpack-compose-android-apps/
@@ -38,11 +39,12 @@ fun SearchAddressDialog(
                     Text(
                         "동(읍/면/리)과 번지수 또는 건물명을 정확하게 입력해 주세요.",
                         modifier = Modifier
-                            .fillMaxWidth().padding(10.dp),
+                            .fillMaxWidth()
+                            .padding(10.dp),
                         fontSize = 13.sp,
                         lineHeight = 17.sp
                     )
-                    DialogUI(viewModel)
+                    DialogUI(viewModel, changeAddress)
                 }
             },
             dismissButton = {
@@ -54,7 +56,9 @@ fun SearchAddressDialog(
             },
             confirmButton = {
                 TextButton(
-                    onClick = { onConfirm() }
+                    onClick = {
+                        onConfirm()
+                    }
                 ) {
                     Text(text = "확인", color = Color.DarkGray)
                 }
@@ -67,7 +71,10 @@ fun SearchAddressDialog(
 }
 
 @Composable
-fun DialogUI(viewModel: SearchAddressDialogViewModel) {
+fun DialogUI(viewModel: SearchAddressDialogViewModel, changeAddress: (String) -> Unit) {
+    val address = remember {
+        mutableStateOf("")
+    }
     Column {
         /*Divider(
             color = Color.DarkGray,
@@ -76,13 +83,14 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
         )*/
         OutlinedTextField(
             modifier = Modifier
-                .fillMaxWidth().padding(10.dp),
-            value = viewModel.userAddressInput,
-            onValueChange = { viewModel.userAddressInput = it },
+                .fillMaxWidth()
+                .padding(10.dp),
+            value = address.value,
+            onValueChange = { address.value = it },
             singleLine = true,
             trailingIcon = {
                 IconButton(onClick = {
-                    viewModel.setAddress(textField = viewModel.userAddressInput)
+                    viewModel.setAddress(textField = address.value)
                 }) {
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
 
@@ -96,7 +104,7 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
         Box(
             modifier = Modifier.height(100.dp)
         ) {
-            AddressList(viewModel)
+            AddressList(viewModel, changeAddress) { address.value = it}
         }
     }
 }
@@ -105,7 +113,7 @@ fun DialogUI(viewModel: SearchAddressDialogViewModel) {
 @OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("RememberReturnType", "StateFlowValueCalledInComposition")
 @Composable
-fun AddressList(viewModel: SearchAddressDialogViewModel){
+fun AddressList(viewModel: SearchAddressDialogViewModel, changeAddress: (String) -> Unit, changeAddressText: (String) -> Unit){
     val addressList = viewModel.addressList.collectAsState()    // 바로, 계속 변화 감지, 통로
     addressList.value?.let { address ->
         LazyColumn(userScrollEnabled = true) {
@@ -115,6 +123,8 @@ fun AddressList(viewModel: SearchAddressDialogViewModel){
                 Log.d("실행", "있음")
                 Card(onClick = {
                     viewModel.userAddressInput = item
+                    changeAddress(item)
+                    changeAddressText(item)
                 }) {
                     Text(text = item, modifier = Modifier.padding(5.dp))
                 }
@@ -125,26 +135,26 @@ fun AddressList(viewModel: SearchAddressDialogViewModel){
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    Scaffold() {
-        Column(
-            modifier = Modifier
-                .padding(it)
-        ) {
-            var dialogState by remember { mutableStateOf(true) }
-            val searchAddressDialogViewModel = SearchAddressDialogViewModel()
-
-            SearchAddressDialog(
-                dialogState = dialogState,
-                onConfirm = {
-                    dialogState = false
-                },
-                onDismiss = { dialogState = false },
-                viewModel = searchAddressDialogViewModel
-            )
-        }
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview() {
+//    Scaffold() {
+//        Column(
+//            modifier = Modifier
+//                .padding(it)
+//        ) {
+//            var dialogState by remember { mutableStateOf(true) }
+//            val searchAddressDialogViewModel = SearchAddressDialogViewModel()
+//
+//            SearchAddressDialog(
+//                dialogState = dialogState,
+//                onConfirm = {
+//                    dialogState = false
+//                },
+//                onDismiss = { dialogState = false },
+//                viewModel = searchAddressDialogViewModel
+//            )
+//        }
+//    }
+//}
 

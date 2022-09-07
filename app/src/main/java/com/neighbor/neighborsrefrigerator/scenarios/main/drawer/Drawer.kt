@@ -59,7 +59,8 @@ fun Drawer(
                 dialogState = locationDialogState,
                 onConfirm = { locationDialogState = false}, //  나중에 제대로 고치기
                 onDismiss = {locationDialogState = false},
-                viewModel = SearchAddressDialogViewModel()
+                viewModel = SearchAddressDialogViewModel(),
+                changeAddress = {}
             )
         if (inquiryDialogState)
             InquiryDialog(viewModel) {
