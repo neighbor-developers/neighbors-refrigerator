@@ -9,9 +9,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -21,6 +25,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
+import com.neighbor.neighborsrefrigerator.scenarios.main.MainScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +66,19 @@ class StartActivity : ComponentActivity() {
                             }else{
                                 Log.d("아이디 없어서", "등록으로")
                                 setContent {
-                                    RegisterInfo()
+                                    val navController = rememberNavController()
+
+
+                                    // NavHost 로 네비게이션 결정
+                                    NavHost(navController, "RegisterInfo")
+                                    {
+                                        composable("RegisterInfo") {
+                                            RegisterInfo(navController = navController)
+                                        }
+                                        composable("Guide") {
+                                            GuideScreen(viewModel)
+                                        }
+                                    }
                                 }
                             }
                         }else{
@@ -141,8 +159,8 @@ class StartActivity : ComponentActivity() {
         }
     }
 
+
     private fun toMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
-
     }
 }
