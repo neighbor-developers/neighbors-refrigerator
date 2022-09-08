@@ -21,43 +21,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun GuideScreen() {
+fun GuideScreen(loginViewModel: LoginViewModel) {
     val slideImage = remember { mutableStateOf(R.drawable.category_200) }
     val pagerState = rememberPagerState(pageCount = 3)
 
-    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-        when(page)  {
-            0 -> {
-                slideImage.value = R.drawable.category_300
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter){
+
+        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+            when(page)  {
+                0 -> {
+                    slideImage.value = R.drawable.category_300
+                }
+                1 -> {
+                    slideImage.value = R.drawable.category_400
+                }
+                2 -> {
+                    slideImage.value = R.drawable.category_500
+                }
             }
-            1 -> {
-                slideImage.value = R.drawable.category_400
-            }
-            2 -> {
-                slideImage.value = R.drawable.category_500
-            }
+
+            Image(
+                painterResource(slideImage.value),
+                modifier = Modifier.fillMaxSize(),
+                contentDescription = ""
+            )
         }
 
-        Image(
-            painterResource(slideImage.value),
-            modifier = Modifier.fillMaxWidth(),
-            contentDescription = ""
-        )
-    }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally ,modifier = Modifier.fillMaxWidth()) {
         DotsIndicator(
             totalDots = 3,
             selectedIndex = pagerState.currentPage,
             selectedColor = Color.Blue,
-            unSelectedColor = Color.LightGray
+            unSelectedColor = Color.LightGray,
+            modifier = Modifier.padding(bottom = 100.dp)
         )
 
         if (pagerState.currentPage == 2) {
@@ -65,14 +70,15 @@ fun GuideScreen() {
                 content = {
                     Text(text = "시작하기", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 },
-                onClick = { },
+                onClick = { loginViewModel.toMainActivity() },
                 colors = ButtonDefaults.buttonColors(
-                        backgroundColor = colorResource(id = R.color.green),
-                        contentColor = Color.White),
-                modifier = Modifier.height(30.dp)
+                    backgroundColor = colorResource(id = R.color.green),
+                    contentColor = Color.White),
+                modifier = Modifier.padding(bottom = 30.dp)
             )
         }
     }
+
 }
 
 @Composable
@@ -81,12 +87,10 @@ fun DotsIndicator(
     selectedIndex : Int,
     selectedColor: Color,
     unSelectedColor: Color,
+    modifier: Modifier
 ){
     LazyRow(
-        modifier = Modifier
-            .wrapContentWidth()
-            .wrapContentHeight()
-
+        modifier = modifier
     ) {
 
         items(totalDots) { index ->
@@ -111,10 +115,4 @@ fun DotsIndicator(
             }
         }
     }
-}
-
-@Preview(name = "Long greeting")
-@Composable
-fun PreviewGuideScreen() {
-    GuideScreen()
 }

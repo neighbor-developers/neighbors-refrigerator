@@ -40,7 +40,6 @@ import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
-import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatScreen
@@ -64,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
     private val auth = FirebaseAuth.getInstance()
-    private lateinit var googleSignInClient : GoogleSignInClient
+    private lateinit var googleSignInClient: GoogleSignInClient
     private val dbAccessModule = DBAccessModule()
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -80,7 +79,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.event.collect { event ->
                 when (event) {
-                    MainViewModel.MainEvent.SendEmail -> sendEmail(viewModel.emailContent.value, viewModel.userEmail.value)
+                    MainViewModel.MainEvent.SendEmail -> sendEmail(
+                        viewModel.emailContent.value,
+                        viewModel.userEmail.value
+                    )
                     MainViewModel.MainEvent.LogOut -> logOut()
                     MainViewModel.MainEvent.DelAuth -> delAuth()
                 }
@@ -89,7 +91,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun sendEmail(content: String, userEmail: String){
+    private fun sendEmail(content: String, userEmail: String) {
         val email = auth.currentUser?.email
 
         val managerEmail = "haejinjung1110@gmail.com"
@@ -114,7 +116,8 @@ class MainActivity : ComponentActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
-    private fun logOut(){
+
+    private fun logOut() {
         auth.signOut()
         googleSignInClient.signOut().addOnCompleteListener {
             Log.d("logOut", "로그아웃 완료")
@@ -124,14 +127,15 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
 
     }
-    private fun delAuth(){
+
+    private fun delAuth() {
         CoroutineScope(Dispatchers.Main).launch {
             val id = UserSharedPreference(App.context()).getUserPrefs("id")
             var result = false
             CoroutineScope(Dispatchers.Main).async {
                 result = dbAccessModule.deleteUser(id!!.toInt())
             }.await()
-            if (result){
+            if (result) {
                 Log.d("계정삭제", auth.currentUser.toString())
                 Log.d("계정삭제", result.toString())
                 auth.currentUser?.delete()?.addOnSuccessListener {
@@ -163,7 +167,6 @@ enum class NAV_ROUTE(val routeName:String, val description:String){
     TRADE_HISTORY("TRADE_HISTORY", "거래 내역"),
     REVIEW("REVIEW", "리뷰작성"),
     SEARCH_POST("SEARCH_POST", "검색된 리스트화면"),
-    REGISTER_INFO("REGISTER_INFO", "계정등록")
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -178,9 +181,6 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
 
         composable(NAV_ROUTE.MAIN.routeName){
             MainScreen(viewModel = mainViewModel, navController)
-        }
-        composable(NAV_ROUTE.REGISTER_INFO.routeName){
-            RegisterInfo()
         }
         composable(NAV_ROUTE.SHARE_DETAIL.routeName){
             val post = remember {

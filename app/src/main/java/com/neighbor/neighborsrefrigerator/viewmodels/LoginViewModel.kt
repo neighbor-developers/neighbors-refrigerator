@@ -145,7 +145,6 @@ class LoginViewModel : ViewModel() {
 
             UserSharedPreference(App.context()).setUserPrefs(userdata)
             Log.d("저장", userdata.toString())
-            toMainActivity()
         }
     }
     fun toMainActivity() = viewModelScope.launch { _event.emit(LoginEvent.ToMain) }

@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.view.RegisterDialog
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
@@ -32,7 +33,10 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
 @Composable
-fun RegisterInfo(loginViewModel: LoginViewModel = viewModel()){
+fun RegisterInfo(
+    loginViewModel: LoginViewModel = viewModel(),
+    navController: NavHostController
+){
 
     Column(
         modifier = Modifier
@@ -59,6 +63,7 @@ fun RegisterInfo(loginViewModel: LoginViewModel = viewModel()){
             onClick = {
                 if (loginViewModel.availableNickname.value && loginViewModel.fillAddressMain.value){
                     loginViewModel.registerPersonDB()
+                    navController.navigate("Guide")
                 }else{
                     dialogState.value = true
                 }
@@ -193,11 +198,4 @@ fun GetMainAddress(viewModel: LoginViewModel) {
             )
         )
     }
-}
-
-@Preview
-@Composable
-fun Pre(){
-    RegisterInfo()
-
 }
