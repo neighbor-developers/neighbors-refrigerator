@@ -34,8 +34,8 @@ class PostViewModel : ViewModel() {
 
     var timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
 
-    private var initData = MutableStateFlow(ReqPostData(3, 1, null, null, timeStamp, 37.3402, 126.7335))
-    private val initDataSeek = MutableStateFlow(ReqPostData(3, 2, null, null, timeStamp, 37.3402, 126.7335))
+    private var initData = MutableStateFlow(ReqPostData(3, 1, null, null, timeStamp, userLat, userLng))
+    private val initDataSeek = MutableStateFlow(ReqPostData(3, 2, null, null, timeStamp, userLat, userLng))
 
     val category = MutableStateFlow<Int>(0)
 
@@ -51,32 +51,32 @@ class PostViewModel : ViewModel() {
 
     var sharePostsForCategory100 = Pager(
         PagingConfig(pageSize = 15))
-    { MyPagingSource(ReqPostData(1, 1, 100, null, timeStamp, 37.3402, 126.7335))
+    { MyPagingSource(ReqPostData(1, 1, 100, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
     var sharePostsForCategory200 = Pager(
         PagingConfig(pageSize = 15))
-    { MyPagingSource(ReqPostData(1, 1, 200, null, timeStamp, 37.3402, 126.7335))
+    { MyPagingSource(ReqPostData(1, 1, 200, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
     var sharePostsForCategory300 = Pager(
         PagingConfig(pageSize = 15))
-    { MyPagingSource(ReqPostData(1, 1, 300, null, timeStamp, 37.3402, 126.7335))
+    { MyPagingSource(ReqPostData(1, 1, 300, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
     var sharePostsForCategory400 = Pager(
         PagingConfig(pageSize = 15))
-    { MyPagingSource(ReqPostData(1, 1, 400, null, timeStamp, 37.3402, 126.7335))
+    { MyPagingSource(ReqPostData(1, 1, 400, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
     var sharePostsForCategory500 = Pager(
         PagingConfig(pageSize = 15))
-    { MyPagingSource(ReqPostData(1, 1, 500, null, timeStamp, 37.3402, 126.7335))
+    { MyPagingSource(ReqPostData(1, 1, 500, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
     var sharePostsForCategory600 = Pager(
         PagingConfig(pageSize = 15))
-    { MyPagingSource(ReqPostData(1, 1, 600, null, timeStamp, 37.3402, 126.7335))
+    { MyPagingSource(ReqPostData(1, 1, 600, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
     var sharePostsByDistance = MutableStateFlow<ArrayList<PostData>?>(null)
@@ -85,7 +85,7 @@ class PostViewModel : ViewModel() {
         var userData : UserData? = null
 
         viewModelScope.async {
-            userData = dbAccessModule.getUserInfoByFbId(auth.currentUser!!.uid)[0]
+            userData = dbAccessModule.getUserInfoById(userId)[0]
         }.await()
 
         return userData

@@ -23,9 +23,7 @@ import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 @Composable
 fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, viewModel: MainViewModel) {

@@ -2,6 +2,7 @@ package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -11,15 +12,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neighbor.neighborsrefrigerator.R
-import com.neighbor.neighborsrefrigerator.view.CheckNicknameDialog
+import com.neighbor.neighborsrefrigerator.view.RegisterDialog
 import com.neighbor.neighborsrefrigerator.view.SearchAddressDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
-import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,40 +33,45 @@ import kotlinx.coroutines.launch
 @SuppressLint("StateFlowValueCalledInComposition", "FlowOperatorInvokedInComposition")
 @Composable
 fun RegisterInfo(loginViewModel: LoginViewModel = viewModel()){
-    Scaffold() {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            val dialogState = remember {
-                mutableStateOf(false)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(35.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val dialogState = remember {
+            mutableStateOf(false)
+        }
+        if (dialogState.value){
+            RegisterDialog {
+                dialogState.value = false
             }
-            if (dialogState.value){
-                CheckNicknameDialog {
-                    dialogState.value = false
+        }
+        Spacer(modifier = Modifier.height(100.dp))
+        Text(text = "이웃집 냉장고", textAlign = TextAlign.Center, fontSize = 20.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(60.dp))
+        GetNickname(loginViewModel)
+        GetMainAddress(loginViewModel)
+
+        Spacer(modifier = Modifier.height(60.dp))
+        TextButton(
+            onClick = {
+                if (loginViewModel.availableNickname.value && loginViewModel.fillAddressMain.value){
+                    loginViewModel.registerPersonDB()
+                }else{
+                    dialogState.value = true
                 }
-            }
-
-            GetNickname(loginViewModel)
-            GetMainAddress(loginViewModel)
-
-
-            //registerInfoViewModel.check()
-
-            TextButton(
-                onClick = {
-                    if (loginViewModel.availableNickname.value && loginViewModel.fillAddressMain.value){
-                        loginViewModel.registerPersonDB()
-                    }else{
-                        dialogState.value = true
-                    }
-                     })
-            {
-                Text(text = "확인")
-            }
+            },
+            colors = ButtonDefaults.buttonColors(colorResource(id = R.color.green)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(8.dp)
+        )
+        {
+            Text (text = "가입하기", modifier = Modifier
+                .fillMaxWidth(), textAlign = TextAlign.Center, fontSize = 15.sp, color = Color.White)
         }
     }
 }
@@ -73,17 +82,14 @@ fun GetNickname(viewModel:LoginViewModel) {
     val availableNickname = viewModel.availableNickname.collectAsState()
     // remember: 상태를 가지고 있음
     Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
-        Row(){
-            OutlinedTextField(
+        Row(verticalAlignment = Alignment.CenterVertically){
+            TextField(
                 value = viewModel.userNicknameInput,
                 onValueChange = { viewModel.userNicknameInput = it },
-                label = { Text("닉네임") },
-                placeholder = { Text("작성해 주세요") },
+                placeholder = { Text("닉네임") },
                 singleLine = true,
                 leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
                 trailingIcon = {
@@ -94,28 +100,27 @@ fun GetNickname(viewModel:LoginViewModel) {
                         Icon(painter = painterResource(id = R.drawable.ic_check_red), tint = Color.Red, contentDescription = null)
                     }
                 },
-                colors = TextFieldDefaults.textFieldColors(
-                    // 기본 테마 색 지정
-                    backgroundColor = Color.White
-                )
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+                modifier = Modifier.weight(17f)
             )
-            OutlinedButton(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .wrapContentWidth(),
+            Spacer(modifier = Modifier.weight(1f))
+            TextButton(
+                modifier = Modifier.weight(5f),
                 onClick = {
                     CoroutineScope(Dispatchers.Main).launch {
                         viewModel.checkNickname()
                     }
-                }){
-                Text(text = "Check")
-            }
+                },
+                colors = ButtonDefaults.buttonColors(Color.LightGray),
+                content = {Text(text = "중복체크", fontSize = 12.sp)},
+                contentPadding = PaddingValues(7.dp)
+            )
         }
         if (viewModel.isOverlap.value){
-            Text(text = "닉네임은 중복될 수 없습니다", color = Color.Gray, textAlign = TextAlign.Right)
+            Text(text = "닉네임은 중복될 수 없습니다", color = Color.Gray, textAlign = TextAlign.Right, modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
         }
         if (viewModel.isEmpty.value){
-            Text(text = "닉네임을 한글자 이상 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
+            Text(text = "닉네임을 한글자 이상 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right, modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
         }
     }
 }
@@ -131,9 +136,7 @@ fun GetMainAddress(viewModel: LoginViewModel) {
     }
 
     Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
         SearchAddressDialog(
@@ -149,7 +152,7 @@ fun GetMainAddress(viewModel: LoginViewModel) {
                 address.value = it
             }
         )
-        OutlinedTextField(
+        TextField(
             modifier = Modifier.fillMaxWidth(),
             value = address.value,
             onValueChange = { address.value = it },
@@ -166,15 +169,15 @@ fun GetMainAddress(viewModel: LoginViewModel) {
             },
             colors = TextFieldDefaults.textFieldColors(
                 // 기본 테마 색 지정
-                backgroundColor = Color.White
+                backgroundColor = Color.Transparent
             )
         )
-        Text(text = "동까지 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
+        Text(text = "동까지 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right, modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
 
         val addressDetail = remember {
             mutableStateOf("")
         }
-        OutlinedTextField(
+        TextField(
             modifier = Modifier.fillMaxWidth(),
             value = addressDetail.value,
             onValueChange = {
@@ -186,9 +189,15 @@ fun GetMainAddress(viewModel: LoginViewModel) {
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
                 // 기본 테마 색 지정
-                backgroundColor = Color.White
+                backgroundColor = Color.Transparent
             )
         )
-        Text(text = "상세주소를 입력해주세요", color = Color.Gray, textAlign = TextAlign.Right)
     }
+}
+
+@Preview
+@Composable
+fun Pre(){
+    RegisterInfo()
+
 }

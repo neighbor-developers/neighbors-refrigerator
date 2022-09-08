@@ -45,9 +45,7 @@ fun SharePostScreen(
     LaunchedEffect(Unit) { state.animateScrollTo(0) }
 
     Column(
-        modifier = Modifier
-            .verticalScroll(state)
-            .height(1000.dp)
+        modifier = Modifier.fillMaxHeight()
     ) {
         Tab(postViewModel = postViewModel, route, navController)
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
@@ -63,9 +61,6 @@ fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHo
     val categoryList = mapOf(0 to "전체", 100 to "채소", 200 to "과일", 300 to "정육", 400 to "수산", 500 to "냉동식품", 600 to "간편식품")
     val categoryIconList = mapOf(0 to R.drawable.category_all, 100 to R.drawable.category_100, 200 to R.drawable.category_200, 300 to R.drawable.category_300, 400 to R.drawable.category_400, 500 to R.drawable.category_500, 600 to R.drawable.category_600)
 
-    var selectedCategory by remember {
-        mutableStateOf(0)
-    }
     val pagerState = rememberPagerState(pageCount = 7)
     val coroutineScope = rememberCoroutineScope()
 

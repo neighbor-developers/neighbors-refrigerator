@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun CheckNicknameDialog(onChangeState: () -> Unit) {
+fun RegisterDialog(onChangeState: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onChangeState() },
         title = {

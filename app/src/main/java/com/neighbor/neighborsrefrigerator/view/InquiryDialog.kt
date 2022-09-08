@@ -1,15 +1,19 @@
 package com.neighbor.neighborsrefrigerator.view
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 
 @Composable
@@ -25,21 +29,39 @@ fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
         title = { Text(text = "문의", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
         text = {
             Column {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 25.dp)) {
-                    Text(text = "이메일", modifier = Modifier.padding(bottom = 5.dp, end = 7.dp))
-                    TextField(value = userEmail, onValueChange = { userEmail = it })
-                }
-                Spacer(modifier = Modifier.height(15.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "문의 내용", modifier = Modifier.padding(bottom = 5.dp, end = 7.dp))
-                    TextField(value = inquiryContent, onValueChange = { inquiryContent = it })
-                }
+                TextField(
+                    value = userEmail,
+                    onValueChange = { userEmail = it },
+                    placeholder = { Text(text = "답을 받을 닉네임을 입력해주세요", fontSize = 13.sp)},
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = "email")},
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        leadingIconColor = colorResource(id = R.color.green)
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                TextField(
+                    value = inquiryContent,
+                    onValueChange = { inquiryContent = it },
+                    placeholder = { Text(text = "문의 사항을 입력해주세요.", fontSize = 13.sp)},
+                    singleLine = false,
+                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = "문의 내용")},
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        leadingIconColor = colorResource(id = R.color.green)
+                    )
+                )
+
 
             }
         },
         dismissButton = {
             TextButton(onClick = { onChangeState() }) {
-                Text(text = "취소")
+                Text(text = "취소", color = Color.Gray)
             }
         },
         confirmButton = {
@@ -49,7 +71,7 @@ fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
                     viewModel.sendEmail(inquiryContent, userEmail)
 
                 }) {
-                Text(text = "문의")
+                Text(text = "문의", color = colorResource(id = R.color.green))
             }
         }
     )
