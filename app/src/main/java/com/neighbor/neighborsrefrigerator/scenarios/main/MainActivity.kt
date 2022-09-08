@@ -38,6 +38,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.scenarios.intro.RegisterInfo
 import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
 import com.neighbor.neighborsrefrigerator.scenarios.main.chat.ChatListScreen
@@ -50,8 +52,12 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetailScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetailScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -59,6 +65,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
     private val auth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient : GoogleSignInClient
+    private val dbAccessModule = DBAccessModule()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,12 +125,23 @@ class MainActivity : ComponentActivity() {
 
     }
     private fun delAuth(){
-        auth.currentUser?.delete()?.addOnSuccessListener {
-            Log.d("logOut", "계정삭제 완료")
-        }
-        auth.signOut()
-        googleSignInClient.signOut().addOnCompleteListener {
-            Log.d("logOut", "로그아웃 완료")
+        CoroutineScope(Dispatchers.Main).launch {
+            val id = UserSharedPreference(App.context()).getUserPrefs("id")
+            var result = false
+            CoroutineScope(Dispatchers.Main).async {
+                result = dbAccessModule.deleteUser(id!!.toInt())
+            }.await()
+            if (result){
+                Log.d("계정삭제", auth.currentUser.toString())
+                Log.d("계정삭제", result.toString())
+                auth.currentUser?.delete()?.addOnSuccessListener {
+                    Log.d("logOut", "계정삭제 완료")
+                    auth.signOut()
+                    googleSignInClient.signOut().addOnCompleteListener {
+                        Log.d("logOut", "로그아웃 완료")
+                    }
+                }
+            }
         }
         val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)

@@ -18,15 +18,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
-import com.neighbor.neighborsrefrigerator.viewmodels.RegisterInfoViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {
@@ -35,7 +32,6 @@ class StartActivity : ComponentActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 1313
     private val viewModel by viewModels<LoginViewModel>()
-    private val registerInfoViewModel by viewModels<RegisterInfoViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +48,12 @@ class StartActivity : ComponentActivity() {
             launch {
                 viewModel.loginResult.collect { isLogin ->
                     if (isLogin) {
-                        Log.d("로그인 되어있음", "로그인 되어있음")
+                        Log.d("로그인 되어있음", auth.currentUser.toString())
                         if (auth.currentUser != null) {
                             Log.d("token", auth.currentUser!!.getIdToken(true).toString())
                             val result = viewModel.hasId(auth.currentUser!!)
                             Log.d("아이디 있는지", result.toString())
+                            Log.d("아이디 있는지", auth.currentUser!!.uid.toString())
                             if (result){
                                 Log.d("아이디 있는지", "메인으로")
                                 toMainActivity()

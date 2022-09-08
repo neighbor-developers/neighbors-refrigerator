@@ -26,10 +26,10 @@ class CalculateTime {
 
     fun calTimeToPost(_current: Long, _date: String): String{
         val date = _date.split(".")[0].replace("T", " ")
-        val formattedTime = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).parse(date)?.time
-        val cuDate = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(_current)
+        val formattedTime = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).parse(date)?.time
+        val cuDate = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).format(_current)
 
-        val current = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).parse(cuDate)?.time
+        val current = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).parse(cuDate)?.time
         Log.d("current", cuDate)
         Log.d("formatted", date)
         Log.d("current", "$current")

@@ -9,7 +9,7 @@ data class ChatMessageData(
 
 data class ChatUserData(
     val id: Int?,
-    val nickname: String,
+    var nickname: String,
     val level: Int
 )
 

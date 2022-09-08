@@ -136,11 +136,12 @@ class LoginViewModel : ViewModel() {
             )
         viewModelScope.launch {
             var result: Int? = null
+            userdata.fcm  = UserSharedPreference(App.context()).getUserPrefs("fcm")
+
             viewModelScope.async {
                 result = dbAccessModule.joinUser(userdata)
             }.await()
             userdata.id = result
-            userdata.fcm  = UserSharedPreference(App.context()).getUserPrefs("fcm")
 
             UserSharedPreference(App.context()).setUserPrefs(userdata)
             Log.d("저장", userdata.toString())

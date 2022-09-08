@@ -126,7 +126,6 @@ fun ItemText(post: PostData){
 //        else -> { "" }
 //    }
     Column(Modifier.padding(10.dp)) {
-        Text(text = post.categoryId)
         Text(text = post.title, fontSize = 18.sp, color = Color.Black, modifier = Modifier.padding(bottom = 7.dp))
         //Text(text = "$validateType : $validateDate", fontSize = 10.sp, color = Color.Black)
 //        distancePost?.let {
