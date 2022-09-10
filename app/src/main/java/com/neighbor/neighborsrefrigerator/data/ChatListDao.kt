@@ -7,13 +7,13 @@ import androidx.room.Query
 @Dao
 interface ChatListDao {
 
-    @Query("SELECT * FROM ChatListData")
-    fun getChatMessage(): List<ChatListData>
+    @Query("SELECT * FROM ChatData")
+    fun getChatMessage(): List<ChatData>
 
-/*    @Insert
-    fun insert(chatList: ChatListData)
+    @Insert
+    fun insert(chatList: ChatData)
 
-    @Query("DELETE FROM ChatListData WHERE p = :id")
-    fun deleteChatList(id: String)*/
+/*    @Query("Select *")
+    fun getInfo(): List<ChatData>*/
 
 }

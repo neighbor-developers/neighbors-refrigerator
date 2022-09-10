@@ -32,15 +32,21 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.ChatData
 import com.neighbor.neighborsrefrigerator.data.FirebaseChatData
+import com.neighbor.neighborsrefrigerator.data.FirebaseToRoom
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
+import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
 
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel =ChatListViewModel()){
+fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = ChatListViewModel()){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -61,13 +67,12 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
     ) { padding ->
         Surface(modifier = Modifier.padding(padding)) {
 
-
             val chatList = chatListViewModel.chatListData.collectAsState()
-            val chatRemove = chatListViewModel.chatListData
 
             LaunchedEffect(chatList) {
 
             }
+
             LazyColumn {
                 chatList.value.let{ chatlist ->
                     itemsIndexed(items = chatlist!!){ index, chat ->
@@ -82,7 +87,7 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
                                         false
                                     }
                                     DismissValue.DismissedToStart -> { // <- 방향 스와이프 (삭제)
-                                        chatRemove.value?.toMutableList()?.remove(chat)
+                                        chatList.value.toMutableList().removeAt(index)
                                         true
                                     }
                                 }
@@ -148,17 +153,18 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: ChatListViewModel){
-    viewModel.refreshChatList(chat)
+fun ChatCard(chat: ChatData, navController: NavController, viewModel: ChatListViewModel){
+    // chat 내용이 바뀔 때마다 chatcard가 업데이트 되게 하
 
-    var nickname = viewModel.nickname.collectAsState()
-    var lastMessage = viewModel.lastMessage.collectAsState()
-    var createAt = viewModel.createAt.collectAsState()
-    var newMessage = viewModel.newMessage.collectAsState()
-    Log.d("새로운 메세지2", newMessage.value.toString())
+
+    val nickname = getNickname(chat)
+    val createAt = checkLastTime(chat)
+    val lastMessage = checkLastMessage(chat)
+    val newMessage = checkNewMessage(chat)
+
 
     Card(
-        onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.id}/${chat.postId}")},
+        onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.chatId}/${chat.chatData?.postId}")},
         modifier = Modifier.fillMaxWidth().fillMaxHeight()
     ) {
         Row() {
@@ -174,25 +180,88 @@ fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: Ch
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         modifier = Modifier.fillMaxWidth(fraction = 0.2f),
-                        text = nickname.value,
+                        text = nickname,
                         color = MaterialTheme.colors.secondaryVariant,
                         style = MaterialTheme.typography.subtitle2)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         modifier = Modifier.fillMaxWidth(fraction = 0.4f),
-                        text = lastMessage.value,
+                        text = lastMessage,
                         style = MaterialTheme.typography.body2)
                 }
-                Text(
-                    text= createAt.value.toString(),    //   아래
-                    style = MaterialTheme.typography.body2
-                )
+                if (createAt != null) {
+                    Text(
+                        text= createAt,    //   아래
+                        style = MaterialTheme.typography.body2
+                    )
+                }
             }
             Text(
                 modifier = Modifier.fillMaxWidth(fraction = 1f),
-                text = newMessage.value.toString(), //  옆
+                text = newMessage.toString(), //  옆
                 style = MaterialTheme.typography.body2
             )
         }
     }
+}
+
+fun checkLastTime(chatData: ChatData): String? {
+    // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
+
+    val lastChat = chatData.chatData?.message?.maxWithOrNull(compareBy { it.createdAt })
+    val current = System.currentTimeMillis()
+    val lastChatTimeStamp = lastChat?.createdAt
+
+/*        compareBy<ChatMessage>{ it.created_at?.let { it ->
+            MyTypeConverters().convertDateToTimeStamp(
+                it
+            )
+        } }*/
+
+    return if (lastChatTimeStamp == null){
+        Log.d("타임스탬프 에러", "타임스탬프 null")
+        ""
+    }
+    else{
+        MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp)
+    }
+}
+
+fun checkLastMessage(chatData: ChatData): String{
+    val lastChat = chatData.chatData?.message?.maxWithOrNull(compareBy { it.createdAt })
+
+    return if (lastChat == null){
+        Log.d("타임스탬프 에러", "타임스탬프 null")
+        ""
+    }
+    else{
+        lastChat.content
+    }
+}
+
+fun getNickname(chatData: ChatData): String{
+    // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
+    // int? String? 에러날 수 있음 + 널체크 어떻게?
+    var nickname: String = ""
+    if(chatData.chatData?.writer?.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){
+        nickname = chatData.chatData?.contact!!.nickname
+    }
+    else if(chatData.chatData?.contact!!.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){
+        nickname = chatData.chatData?.writer!!.nickname
+    }
+    return nickname
+    // 아닐 경우 writerId 체크해서 상대방 정보 가져오기
+}
+
+fun checkNewMessage(chatData: ChatData):Int{
+    var newMessage: Int = 0
+
+    chatData.chatData?.message?.forEach {
+        if(!it.is_read){
+            newMessage++
+        }
+    }
+    Log.d("새로운 메세지",newMessage.toString())
+
+    return newMessage
 }

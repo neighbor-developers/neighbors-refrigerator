@@ -22,164 +22,45 @@ import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 import kotlin.io.path.createTempDirectory
 
 
+// 채팅 하나마다 안읽은 메세지 수, 마지막 채팅, 상대방 닉네임 및 정보 가져와야함
+
+// 최근 채팅 순으로 정렬
+// chatListDetail에 리스트 정보 저장 방법
+// 가장 최근 채팅 먼저 올리기
+
 class ChatListViewModel: ViewModel() {
-    var example: List<FirebaseChatData> = listOf(
-        FirebaseChatData(
-        id = "a",
-        postId = 1,
-        writer = ChatUserData(id = 1, nickname = "ㅂㅎㅇ", 1),
-        contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
-        messages = listOf(ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
-            ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
-            ChatMessageData(content = "안녕하세요", true, 1662288446, 2),
-            ChatMessageData(content = "안녕하세요", false, 1662288446, 2))),
-        FirebaseChatData(
-            id = "a",
-            postId = 1,
-            writer = ChatUserData(id = 1, nickname = "seoyeon", 1),
-            contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
-            messages = listOf(ChatMessageData(content = "안녕하세요", false, 1661518435, 2)))
+    private var example: List<ChatData> = listOf(
+        ChatData(
+            chatData = ChatDetail(
+                postId = "11",
+                writer = ChatUserData(id = 1, nickname = "서연", 1),
+                contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
+                message = listOf(ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+                    ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+                    ChatMessageData(content = "안녕하세요", true, 1662288446, 2),
+                    ChatMessageData(content = "안녕하세요", true, 1662288446, 2))
+            ),
+            chatId = "12343"
+        ),
+        ChatData(
+            chatData = ChatDetail(
+                postId = "11",
+                writer = ChatUserData(id = 1, nickname = "서연", 1),
+                contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
+                message = listOf(ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+                    ChatMessageData(content = "네 안녕하세요", false, 1662288490, 2),)
+            ),
+            chatId = "12343"
+        )
     )
 
-    var nickname = MutableStateFlow<String>("")
-    var lastMessage = MutableStateFlow<String>("")
-    var newMessage = MutableStateFlow<Int>(0)
-    var createAt = MutableStateFlow<String>("")
+    val chatListData = MutableStateFlow<List<ChatData>>(example)
 
-    private val usersChatList = MutableStateFlow<List<String>>(emptyList())
-    val chatListData = MutableStateFlow<List<FirebaseChatData>>(example)
-    val sortChatList = mutableMapOf<FirebaseChatData, Long>()
-    private val firebaseDB = FirebaseDatabase.getInstance()
 
 
     // 실시간으로 유저의 채팅 리스트 변화 감지 -> 추가되면 추가된 상태로 정렬 다시
     init {
-        val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
+        FirebaseToRoom().getChatID()
 
-        val chatListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.value?.let{
-                    val _usersChatList = it as List<String>
-                    usersChatList.value = _usersChatList
-
-                    usersChatList.value.forEach { chatId ->
-                        initChatList(chatId)
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(ContentValues.TAG, "loadMessage:onCancelled", error.toException())
-            }
-        }
-        firebaseDB.reference.child("user").child(userId).addValueEventListener(chatListener)
-    }
-
-    // 데이터 정렬
-    private fun initChatList(chatId: String){
-        // 처음에 채팅 리스트를 받아오고, 채킹이 추가되었을때만 실행 (리스너 추가와 같음)
-        val chatListener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.value?.let { value ->
-                    val result = value as HashMap<String, Any>?
-                    val writer = result?.get("writer") as HashMap<String, Any>?
-                    val contact = result?.get("contact") as HashMap<String, Any>?
-                    val _chatData = FirebaseChatData(
-                        result?.get("id") as String,
-                        (result["postId"] as Long).toInt(),
-                        ChatUserData((writer?.get("id") as Long).toInt(), writer["nickname"] as String, (writer["level"] as Long).toInt()),
-                        ChatUserData((contact?.get("id") as Long).toInt(), contact["nickname"] as String, (contact["level"] as Long).toInt()),
-                        result["messages"] as List<ChatMessageData>
-                    )
-
-                    if(usersChatList.value.isNotEmpty()){
-                        // 있는 데이터인지 찾아보고 있으면 삭제 후 맨앞, 없으면 그냥 맨앞에 추가
-                        chatListData.value?.let {
-                            chatListData.value.plus(_chatData)
-                            chatListData.value.sortedWith(
-                                compareBy { getLastChatTimestamp(it) }
-                            )
-                        }
-                    }else{
-                        chatListData.value = listOf(_chatData)
-                    }
-                    Log.d("리스트", chatListData.value.toString())
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(ContentValues.TAG, "loadMessage:onCancelled", error.toException())
-            }
-        }
-        firebaseDB.reference.child("chat").child(chatId).addValueEventListener(chatListener)
-    }
-
-
-    private fun getLastChatTimestamp(chatData: FirebaseChatData): Long?{
-
-        // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
-        val lastChat = chatData.messages.maxWithOrNull(compareBy { it.createdAt})
-
-        // 임시로 널 값을 현재값으로 설정, 후에 바꾸기
-        // 아무런 메세지가 없을 때 어떻게 할지 정하기
-        return lastChat?.createdAt ?: System.currentTimeMillis()
-    }
-
-    fun refreshChatList(chat: FirebaseChatData){
-        // 채팅 하나마다 안읽은 메세지 수, 마지막 채팅, 상대방 닉네임 및 정보 가져와야함
-
-        // 최근 채팅 순으로 정렬
-        // chatListDetail에 리스트 정보 저장 방법
-        // 가장 최근 채팅 먼저 올리기
-        checkNewMessage(chat)   //  새 메세지 개수 가져오기
-        checkLastChat(chat)
-
-        // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
-        getUserData(chat)   //  상대 닉네임 가져오기
-    }
-
-
-    private fun checkNewMessage(chatData: FirebaseChatData){
-        newMessage.value = 0
-        chatData.messages.forEach {
-            if(!it.is_read){
-                newMessage.value++
-            }
-        }
-        Log.d("새로운 메세지",newMessage.value.toString())
-    }
-
-    private fun checkLastChat(chatData: FirebaseChatData) {
-        // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
-
-        val lastChat = chatData.messages.maxWithOrNull(compareBy { it.createdAt })
-        val current = System.currentTimeMillis()
-        val lastChatTimeStamp = lastChat?.createdAt
-
-/*        compareBy<ChatMessage>{ it.created_at?.let { it ->
-            MyTypeConverters().convertDateToTimeStamp(
-                it
-            )
-        } }*/
-
-        if (lastChatTimeStamp == null){
-            Log.d("타임스탬프 에러", "타임스탬프 null")
-        }
-        else{
-//            createAt.value =
-//                MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp).toString()
-//            lastMessage.value = lastChat.content
-        }
-    }
-
-    private fun getUserData(chatData: FirebaseChatData){
-        // 상대방 정보 -> contactId 체크해서 본인 아니면 postId로 postData 가져와서 작성자 정보 가져와야함
-        // int? String? 에러날 수 있음
-        if(chatData.writer.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){
-            nickname.value = chatData.contact.nickname
-        }
-        else if(chatData.contact.nickname == UserSharedPreference(App.context()).getUserPrefs("nickname")){
-            nickname.value = chatData.writer.nickname
-        }
-        // 아닐 경우 writerId 체크해서 상대방 정보 가져오기
     }
 }

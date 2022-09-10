@@ -9,13 +9,14 @@ import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 // https://todaycode.tistory.com/39 room + singleton + coroutine
 
 
-@Database(entities = [ChatListData::class], version = 4)
+@Database(entities = [ChatData::class], version = 4)
 @TypeConverters(MyTypeConverters::class)
 abstract class ChatListDB : RoomDatabase() {
     abstract fun chatListDao(): ChatListDao?
 
     companion object {
         private var INSTANCE: ChatListDB? = null
+        @Synchronized
         fun getInstance(context: Context): ChatListDB? {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(

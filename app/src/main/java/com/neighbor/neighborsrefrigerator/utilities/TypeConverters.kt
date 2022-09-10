@@ -2,9 +2,10 @@ package com.neighbor.neighborsrefrigerator.utilities
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import com.neighbor.neighborsrefrigerator.data.ChatMessage
+import com.neighbor.neighborsrefrigerator.data.ChatMessageData
 import java.io.ByteArrayOutputStream
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -13,11 +14,11 @@ import java.util.*
 class MyTypeConverters {
     // List에서 String으로 변환
     @TypeConverter
-    fun convertListToJson(value: List<ChatMessage>?): String = Gson().toJson(value)
+    fun convertListToJson(value: List<ChatMessageData>?): String = Gson().toJson(value)
 
     // string에서 List로 변환
     @TypeConverter
-    fun convertJsonToList(value: String) = Gson().fromJson(value, Array<ChatMessage>::class.java).toList()
+    fun convertJsonToList(value: String) = Gson().fromJson(value, Array<ChatMessageData>::class.java).toList()
 
     // Bitmap -> ByteArray 변환
     @TypeConverter
@@ -44,6 +45,7 @@ class MyTypeConverters {
     }
     // 일단 써보고 맞게 바꾸기
     fun convertTimestampToStringDate(current: Long, timestamp: Long): String? {
+
 
         // 1분 미만
         return if (current - timestamp < 60000)
