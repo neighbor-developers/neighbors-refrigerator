@@ -44,7 +44,7 @@ import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = ChatListViewModel()){
+fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = viewModel()){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,8 +68,9 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
             val chatList = chatListViewModel.chatListData.collectAsState()
 
             LaunchedEffect(chatList) {
-
+                chatListViewModel.initChatList()
             }
+            chatListViewModel.initChatList()
 
             LazyColumn {
                 chatList.value.let{ chatlist ->
@@ -160,7 +161,6 @@ fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: Ch
     val lastMessage = checkLastMessage(chat)
     val newMessage = checkNewMessage(chat)
 
-
     Card(
         onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.id}/${chat.postId}")},
         modifier = Modifier.fillMaxWidth().fillMaxHeight()
@@ -203,6 +203,7 @@ fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: Ch
     }
 }
 
+// 수정 필요 15380일 전이 뭐야 그게
 fun checkLastTime(chatData: FirebaseChatData): String? {
     // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
 
