@@ -59,7 +59,7 @@ class StartActivity : ComponentActivity() {
                             Log.d("token", auth.currentUser!!.getIdToken(true).toString())
                             val result = viewModel.hasId(auth.currentUser!!)
                             Log.d("아이디 있는지", result.toString())
-                            Log.d("아이디 있는지", auth.currentUser!!.uid.toString())
+                            Log.d("uid", auth.currentUser!!.uid.toString())
                             if (result){
                                 Log.d("아이디 있는지", "메인으로")
                                 toMainActivity()

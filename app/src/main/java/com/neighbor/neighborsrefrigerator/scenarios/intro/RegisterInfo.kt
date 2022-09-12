@@ -1,6 +1,7 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -105,7 +106,12 @@ fun GetNickname(viewModel:LoginViewModel) {
                         Icon(painter = painterResource(id = R.drawable.ic_check_red), tint = Color.Red, contentDescription = null)
                     }
                 },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+                colors = TextFieldDefaults.textFieldColors(
+                    // 기본 테마 색 지정
+                    backgroundColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Gray,
+                    cursorColor = Color.DarkGray
+                ),
                 modifier = Modifier.weight(17f)
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -158,11 +164,12 @@ fun GetMainAddress(viewModel: LoginViewModel) {
             }
         )
         TextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clickable{
+                dialogState = true
+            },
             value = address.value,
             onValueChange = { address.value = it },
-            label = { Text("집 주소") },
-            placeholder = { Text("작성해 주세요") },
+            placeholder = { Text("집 주소") },
             singleLine = true,
             enabled = false,
             leadingIcon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
@@ -189,12 +196,13 @@ fun GetMainAddress(viewModel: LoginViewModel) {
                 addressDetail.value = it
                 viewModel.addressDetail.value = it
                             },
-            label = { Text("상세 주소") },
-            placeholder = { Text("작성해 주세요") },
+            placeholder = { Text("상세주소를 작성해 주세요") },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
                 // 기본 테마 색 지정
-                backgroundColor = Color.Transparent
+                backgroundColor = Color.Transparent,
+                focusedIndicatorColor = Color.Gray,
+                cursorColor = Color.DarkGray
             )
         )
     }

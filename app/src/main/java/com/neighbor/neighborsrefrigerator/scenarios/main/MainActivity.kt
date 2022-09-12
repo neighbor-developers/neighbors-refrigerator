@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
@@ -32,6 +33,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -48,7 +50,6 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.drawer.Drawer
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
-import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SeekPostDetailScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetailScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.utilities.App
@@ -136,17 +137,17 @@ class MainActivity : ComponentActivity() {
                 result = dbAccessModule.deleteUser(id!!.toInt())
             }.await()
             if (result) {
-                Log.d("계정삭제", auth.currentUser.toString())
-                Log.d("계정삭제", result.toString())
-                auth.currentUser?.delete()?.addOnSuccessListener {
-                    Log.d("logOut", "계정삭제 완료")
-                    auth.signOut()
-                    googleSignInClient.signOut().addOnCompleteListener {
-                        Log.d("logOut", "로그아웃 완료")
-                    }
+                auth.signOut()
+                googleSignInClient.signOut().addOnCompleteListener {
+                    Log.d("logOut", "로그아웃 완료")
                 }
+                viewModel.delChatData()
+                toStartActivity()
             }
         }
+
+    }
+    private fun toStartActivity(){
         val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)
     }
@@ -158,7 +159,6 @@ class MainActivity : ComponentActivity() {
 enum class NAV_ROUTE(val routeName:String, val description:String){
     MAIN("MAIN","나눔/구함 리스트 화면"),
     SHARE_DETAIL("SHARE_DETAIL", "나눔 상세페이지"),
-    SEEK_DETAIL("SEEK_DETAIL", "구함 상세페이지"),
     SHARE_REGISTER("SHARE_REGISTER", "나눔 등록페이지"),
     SEEK_REGISTER("SEEK_REGISTER", "구함 등록페이지"),
     CHAT_LIST("CHAT_LIST", "채팅 리스트화면"),
@@ -188,12 +188,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             }
             SharePostDetailScreen(navHostController = navController, post = post!!)
         }
-        composable(NAV_ROUTE.SEEK_DETAIL.routeName){
-            val post = remember {
-                navController.previousBackStackEntry?.savedStateHandle?.get<PostData>("post")
-            }
-            SeekPostDetailScreen(navHostController = navController, post = post!!)
-        }
+
         composable(NAV_ROUTE.SHARE_REGISTER.routeName){
             SharePostRegisterScreen(navController)
         }
@@ -228,6 +223,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
 
@@ -242,6 +238,9 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(), verticalArrangement =Arrangement.Bottom) {
+                        Image(painter = painterResource(id = R.drawable.level1), contentDescription = "", modifier = Modifier.size(30.dp))
+                    }
                 },
                 actions = {
                     IconButton(onClick = { navController.navigate(NAV_ROUTE.CHAT_LIST.routeName) }) {
@@ -313,21 +312,7 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
                             color = if(types.value == "share") Color.White else Color.Black,
                             fontWeight = if (types.value == "share") FontWeight.Bold else FontWeight.Normal
                         )
-//                        if(types.value == "share"){
-//                            Canvas(modifier = Modifier
-//                                .fillMaxWidth()
-//                                .height(3.dp)
-//                                .padding(start = 6.dp, end = 6.dp, top = 7.dp)){
-//                                val canvasWidth = size.width
 //
-//                                drawLine(
-//                                    start = Offset(x = canvasWidth, y = 0f),
-//                                    end = Offset(x = 0f, y = 0f),
-//                                    color = Color.Gray,
-//                                    strokeWidth = 13F
-//                                )
-//                            }
-//                        }
                     }
 
                 }
@@ -349,20 +334,6 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
                             color = if(types.value == "seek") Color.White else Color.Black,
                             fontWeight = if (types.value == "seek") FontWeight.Bold else FontWeight.Normal
                         )
-//                        if(types.value == "seek") {
-//                            Canvas(modifier = Modifier
-//                                .fillMaxWidth()
-//                                .height(3.dp)
-//                                .padding(start = 6.dp, end = 6.dp, top = 7.dp)) {
-//                                val canvasWidth = size.width
-//                                drawLine(
-//                                    start = Offset(x = canvasWidth, y = 0f),
-//                                    end = Offset(x = 0f, y = 0f),
-//                                    strokeWidth = 13F,
-//                                    color = Color.Gray
-//                                )
-//                            }
-//                        }
                     }
                 }
                 Surface(modifier = Modifier
@@ -382,7 +353,6 @@ fun MainScreen(viewModel: MainViewModel, navController: NavHostController) {
                 )
                 "seek" -> SeekPostScreen(
                     postViewModel,
-                    route = NAV_ROUTE.SEEK_DETAIL,
                     navHostController = navController
                 )
             }

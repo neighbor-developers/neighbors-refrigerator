@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.view
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -32,7 +33,7 @@ fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
                 TextField(
                     value = userEmail,
                     onValueChange = { userEmail = it },
-                    placeholder = { Text(text = "답을 받을 닉네임을 입력해주세요", fontSize = 13.sp)},
+                    placeholder = { Text(text = "답변을 받을 이메일을 입력해주세요", fontSize = 13.sp)},
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = "email")},
                     colors = TextFieldDefaults.textFieldColors(
@@ -51,8 +52,8 @@ fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
                     leadingIcon = { Icon(Icons.Default.Edit, contentDescription = "문의 내용")},
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Gray,
-                        leadingIconColor = colorResource(id = R.color.green)
+                        leadingIconColor = colorResource(id = R.color.green),
+                        focusedIndicatorColor = colorResource(id = R.color.green)
                     )
                 )
 
@@ -60,19 +61,28 @@ fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
             }
         },
         dismissButton = {
-            TextButton(onClick = { onChangeState() }) {
-                Text(text = "취소", color = Color.Gray)
+            Button(
+                onClick = { onChangeState() },
+                border = BorderStroke(1.3.dp, colorResource(id = R.color.green)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                elevation = ButtonDefaults.elevation(0.dp)
+            ) {
+                Text(text = "취소", color = colorResource(id = R.color.green))
             }
         },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     onChangeState()
                     viewModel.sendEmail(inquiryContent, userEmail)
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.green)),
+                elevation = ButtonDefaults.elevation(0.dp)
 
-                }) {
-                Text(text = "문의", color = colorResource(id = R.color.green))
+            ) {
+                Text(text = "문의", color = Color.White)
             }
+
         }
     )
 }

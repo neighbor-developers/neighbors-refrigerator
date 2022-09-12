@@ -73,8 +73,7 @@ fun SearchPostView(
                         Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")
                     }
                 },
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp
+                backgroundColor = Color.Transparent
             )
         }
     ) { padding ->
@@ -89,7 +88,6 @@ fun SearchPostView(
                 else {
                     SeekPostList(
                         posts = it.collectAsLazyPagingItems(),
-                        route = NAV_ROUTE.SEEK_DETAIL,
                         navHostController = navController,
                         postViewModel
                     )
