@@ -44,7 +44,8 @@ import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatListViewModel = viewModel()){
+fun ChatListScreen(navController: NavHostController){
+    val chatListViewModel = ChatListViewModel()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,9 +69,9 @@ fun ChatListScreen(navController: NavHostController, chatListViewModel: ChatList
             val chatList = chatListViewModel.chatListData.collectAsState()
 
             LaunchedEffect(chatList) {
-                chatListViewModel.initChatList()
+
             }
-            chatListViewModel.initChatList()
+
 
             LazyColumn {
                 chatList.value.let{ chatlist ->
