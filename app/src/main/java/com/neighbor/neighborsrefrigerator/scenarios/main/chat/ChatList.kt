@@ -12,9 +12,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.SnackbarDefaults.backgroundColor
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,21 +21,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.FirebaseChatData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.utilities.MyTypeConverters
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatListViewModel
-
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -170,7 +162,7 @@ fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: Ch
             Column() {
                 Row() {
                     Image(
-                        painter = painterResource(id = R.drawable.sprout2),
+                        painter = painterResource(id = R.drawable.level4_ver3),
                         contentDescription = "async 이미지",
                         modifier = Modifier
                             .size(40.dp)
@@ -223,7 +215,8 @@ fun checkLastTime(chatData: FirebaseChatData): String? {
         ""
     }
     else{
-        MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp)
+        ""
+        //MyTypeConverters().convertTimestampToStringDate(current, lastChatTimeStamp)
     }
 }
 

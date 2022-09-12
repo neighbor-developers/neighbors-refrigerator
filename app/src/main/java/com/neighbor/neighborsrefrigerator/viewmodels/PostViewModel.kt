@@ -37,8 +37,6 @@ class PostViewModel : ViewModel() {
     private var initData = MutableStateFlow(ReqPostData(3, 1, null, null, timeStamp, userLat, userLng))
     private val initDataSeek = MutableStateFlow(ReqPostData(3, 2, null, null, timeStamp, userLat, userLng))
 
-    val category = MutableStateFlow<Int>(0)
-
     var sharePostsByTime = Pager(
                 PagingConfig(pageSize = 15))
             { MyPagingSource(initData.value)

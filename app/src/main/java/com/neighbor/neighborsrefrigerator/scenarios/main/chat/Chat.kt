@@ -201,20 +201,18 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
                                 }
-                                Button(
-                                    onClick = {
-                                        navController.currentBackStackEntry?.savedStateHandle?.set(
-                                            key = "post",
-                                            value = post
-                                        )
-                                        if (post.type == 1) {
+                                if (post.type == 1) {
+                                    Button(
+                                        onClick = {
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                key = "post",
+                                                value = post
+                                            )
                                             navController.navigate(NAV_ROUTE.SHARE_DETAIL.routeName)
-                                        } else {
-                                            navController.navigate(NAV_ROUTE.SEEK_DETAIL.routeName)
-                                        }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(Color.LightGray)
-                                ) { Text(text = "상세보기") }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(Color.LightGray)
+                                    ) { Text(text = "상세보기") }
+                                }
                             }
                         }
                 } else {
@@ -280,7 +278,7 @@ fun MessageItem(message: ChatMessageData, userId: Int, nickname: String) {
                 Row{
                     Text(text = nickname, color = Color.Black, fontSize = 13.sp, modifier = Modifier.padding(bottom = 5.dp, end = 5.dp))
                     Image(
-                        painter = painterResource(R.drawable.sprout),
+                        painter = painterResource(R.drawable.level3_ver2),
                         contentDescription = "App icon",
                         modifier = Modifier
                             .clip(shape = CircleShape)

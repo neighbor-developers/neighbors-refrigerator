@@ -5,10 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MailOutline
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,11 +15,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import com.neighbor.neighborsrefrigerator.view.*
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
@@ -41,26 +41,36 @@ fun Drawer(
     val email by remember {
         mutableStateOf(auth.value.currentUser?.email)
     }
+    val dbAccessModule by remember {
+        mutableStateOf(DBAccessModule())
+    }
+    val searchAddressDialogViewModel by remember{
+        mutableStateOf(SearchAddressDialogViewModel())
+    }
     val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
+    val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
+
 
     var flowerDialogState by remember { mutableStateOf(false) }
     var locationDialogState by remember { mutableStateOf(false) }
     var inquiryDialogState by remember { mutableStateOf(false) }
     var showNicknameDialog by remember { mutableStateOf(false) }
-    val flowerNum = remember { mutableStateOf(1) }
 
     Column(modifier.padding(20.dp))
     {
         if (flowerDialogState)
-            FlowerDialog({flowerDialogState = false}, flowerNum)
+            FlowerDialog { flowerDialogState = false }
 
         if (locationDialogState)
             SearchAddressDialog(
                 dialogState = locationDialogState,
                 onConfirm = { locationDialogState = false}, //  나중에 제대로 고치기
                 onDismiss = {locationDialogState = false},
-                viewModel = SearchAddressDialogViewModel(),
-                changeAddress = {}
+                viewModel = searchAddressDialogViewModel,
+                changeAddress = {
+                    val coordinateData: LatLng = UseGeocoder().addressToLatLng(it)
+                    //dbAccessModule.checkNickname(coordinateData)
+                    }
             )
         if (inquiryDialogState)
             InquiryDialog(viewModel) {
@@ -87,11 +97,11 @@ fun Drawer(
             ) {
                 Image(
                     painter = painterResource(
-                        when (flowerNum.value) {
-                            1 -> R.drawable.sprout
-                            2 -> R.drawable.sprout2
-                            3 -> R.drawable.sprout3
-                            else -> R.drawable.sprout
+                        when (flowerVer) {
+                            1 -> R.drawable.level2_ver1
+                            2 -> R.drawable.level2_ver2
+                            3 -> R.drawable.level2_ver3
+                            else -> R.drawable.level1
                         }
                     ),
                     contentDescription = "level icon"
@@ -102,7 +112,9 @@ fun Drawer(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(nickname.toString(), fontSize = 17.sp)
                     IconButton(
-                        modifier = Modifier.padding(start = 8.dp).size(20.dp),
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .size(20.dp),
                         onClick = {
                             showNicknameDialog = true
                         }
@@ -131,12 +143,14 @@ fun Drawer(
 @Composable
 fun DrawerItem(menu : String, click: () -> Unit){
     Surface(modifier = Modifier.clickable { click() }) {
-        Row(modifier = Modifier.padding(start = 10.dp, bottom = 20.dp, top = 20.dp).fillMaxWidth(),
+        Row(modifier = Modifier
+            .padding(start = 10.dp, bottom = 20.dp, top = 20.dp)
+            .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically)
         {
             Icon(
                 imageVector = when(menu){
-                    "내 위치 바꾸기" -> Icons.Filled.Home
+                    "내 위치 바꾸기" -> Icons.Filled.LocationOn
                     "거래 내역" -> Icons.Filled.Menu
                     "설정" -> Icons.Filled.Settings
                     "문의하기" -> Icons.Filled.MailOutline
