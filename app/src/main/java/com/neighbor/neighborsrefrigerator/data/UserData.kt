@@ -26,7 +26,9 @@ data class UserData(
     @SerializedName("created_at")
     val createdAt: String,
     @SerializedName("fcm")
-    var fcm: String?
+    var fcm: String?,
+    @SerializedName("score")
+    var score: Int = 0
 
 )
 

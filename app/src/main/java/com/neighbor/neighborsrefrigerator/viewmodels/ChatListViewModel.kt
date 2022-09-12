@@ -28,17 +28,22 @@ import kotlin.io.path.createTempDirectory
 // 가장 최근 채팅 먼저 올리기
 
 class ChatListViewModel: ViewModel() {
-    private var example: List<FirebaseChatData> = listOf(
+    var example: List<FirebaseChatData> = listOf(
         FirebaseChatData(
-            id = "",
+        id = "a",
+        postId = 1,
+        writer = ChatUserData(id = 1, nickname = "ㅂㅎㅇ", 1),
+        contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
+        messages = listOf(ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+            ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
+            ChatMessageData(content = "안녕하세요", true, 1662288446, 2),
+            ChatMessageData(content = "안녕하세요", false, 1662288446, 2))),
+        FirebaseChatData(
+            id = "a",
             postId = 1,
-            writer = ChatUserData(id = 1, nickname = "서연", 1),
+            writer = ChatUserData(id = 1, nickname = "seoyeon", 1),
             contact = ChatUserData(id = 2, nickname = "zinkiki", 2),
-            messages = listOf(ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
-                ChatMessageData(content = "안녕하세요", false, 1662288446, 2),
-                ChatMessageData(content = "안녕하세요", true, 1662288446, 2),
-                ChatMessageData(content = "안녕하세요", true, 1662288446, 2))
-        ),
+            messages = listOf(ChatMessageData(content = "안녕하세요", false, 1661518435, 2)))
     )
 
     val chatListData = MutableStateFlow<List<FirebaseChatData>>(emptyList())
@@ -47,7 +52,7 @@ class ChatListViewModel: ViewModel() {
 
 
     // 실시간으로 유저의 채팅 리스트 변화 감지 -> 추가되면 추가된 상태로 정렬 다시
-    fun initChatList(){
+    init {
         val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
 
         val chatListener = object : ValueEventListener {
