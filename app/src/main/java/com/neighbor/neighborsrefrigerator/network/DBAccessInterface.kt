@@ -36,6 +36,12 @@ interface DBAccessInterface {
         @Body postData : PostData
     ): retrofit2.Call<ReturnObject<Int>>
 
+    @POST("/post/sendMail")
+    fun sendMail(
+        @Body reportData : MailData
+    ): ReturnObject<Int>
+
+
     @POST("/post/create")
     suspend fun entryPost(
         @Body postData: PostData

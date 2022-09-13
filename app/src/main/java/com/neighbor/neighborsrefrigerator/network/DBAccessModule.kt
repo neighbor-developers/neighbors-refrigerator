@@ -89,6 +89,13 @@ class DBAccessModule {
         return result
     }
 
+    fun sendMail(mailData: MailData) : Int?{
+        val result = kotlin.runCatching {
+            dbAccessApi.sendMail(mailData)
+        }.getOrNull()?.result ?:0
+        return result
+    }
+
     //포스트 데이터 데이터베이스에 입력
     suspend fun entryPost(postData: PostData): Int {
         val response = kotlin.runCatching {
