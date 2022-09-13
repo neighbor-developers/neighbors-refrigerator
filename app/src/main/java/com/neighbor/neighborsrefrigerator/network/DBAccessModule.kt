@@ -90,27 +90,13 @@ class DBAccessModule {
     }
 
     //포스트 데이터 데이터베이스에 입력
-    fun entryPost(postData: PostData, resultCode: (Int) -> Unit){
-        dbAccessApi.entryPost(postData).enqueue(object : Callback<ReturnObject<Int>>{
-            override fun onResponse(
-                call: Call<ReturnObject<Int>>,
-                response: Response<ReturnObject<Int>>
-            ) {
-                if(response.isSuccessful) {
-                    Log.d("test","entry successful")
-                    response.body()?.let {
-                        resultCode(it.resultCode)
-                    }
-                }
-                else{
-                    Log.d("test","entry post response failed")
-                }
-            }
+    suspend fun entryPost(postData: PostData): Int {
+        val response = kotlin.runCatching {
+            dbAccessApi.entryPost(postData)
+        }.getOrNull()?.result ?: 0
+        Log.d("결과", response.toString())
 
-            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
-                Log.d("test",t.localizedMessage)
-            }
-        })
+        return response
     }
 
     suspend fun getPostOrderByTime(page: Int, reqPostData: ReqPostData) : List<PostData>{

@@ -37,9 +37,9 @@ interface DBAccessInterface {
     ): retrofit2.Call<ReturnObject<Int>>
 
     @POST("/post/create")
-    fun entryPost(
+    suspend fun entryPost(
         @Body postData: PostData
-    ): retrofit2.Call<ReturnObject<Int>>
+    ): ReturnObject<Int>
 
     @POST("/post/review")
     fun reviewPost(

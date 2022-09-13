@@ -3,10 +3,12 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
+import kotlinx.coroutines.async
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -18,7 +20,6 @@ class SeekPostRegisterViewModel: ViewModel() {
     var title = mutableStateOf(TextFieldValue())
     var content = mutableStateOf(TextFieldValue())
     var category = mutableStateOf("")
-    var isSuccessRegist = mutableStateOf(false)
     var myLatitude = mutableStateOf(0.0)
     var myLongitude = mutableStateOf(0.0)
 
@@ -33,7 +34,7 @@ class SeekPostRegisterViewModel: ViewModel() {
         }
     }
 
-    fun registerData() {
+    suspend fun registerPost(): Int {
         val location = myLocation(locationType.value)
 
         val postData = PostData(
@@ -62,10 +63,12 @@ class SeekPostRegisterViewModel: ViewModel() {
             type = 2,
         )
 
-        dbAccessModule.entryPost(postData) {
-            it.let {
-                isSuccessRegist.value = true
-            }
-        }
+        var postId = 0
+
+        viewModelScope.async {
+            postId = dbAccessModule.entryPost(postData)
+        }.await()
+
+        return postId
     }
 }

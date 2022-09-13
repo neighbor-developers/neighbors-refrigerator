@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.viewmodels.SeekPostRegisterViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private var sampleList: List<Pair<String, String>> = listOf(Pair("100", "과일"), Pair("101", "채소"))
 
@@ -43,12 +46,14 @@ fun SeekPostRegisterScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        viewModel.registerData()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            var postId = viewModel.registerPost()
+                            if (postId != 0) {
+                                navHostController.navigateUp()
+                            } else {
+                                Log.d("실패", "상품 등록 실패")
+                            }
 
-                        if (viewModel.isSuccessRegist.value) {
-                            navHostController.navigateUp()
-                        } else {
-                            Log.d("실패", "상품 등록 실패")
                         }
                     })
                     {
