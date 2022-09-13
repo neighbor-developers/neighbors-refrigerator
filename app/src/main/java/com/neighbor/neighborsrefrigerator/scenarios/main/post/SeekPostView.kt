@@ -138,7 +138,7 @@ fun SeekItem(post: PostData,
                 ConstraintLayout(
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 11.dp, start = 20.dp, end = 17.dp)
+                        .padding(top = 17.dp, start = 20.dp, end = 17.dp)
                 ) {
                     val (title, timeText) = createRefs()
                     //Text(text = post.title, fontSize = 15.sp,

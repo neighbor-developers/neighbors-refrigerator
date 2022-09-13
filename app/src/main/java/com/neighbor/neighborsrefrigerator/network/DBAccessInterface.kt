@@ -39,7 +39,7 @@ interface DBAccessInterface {
     @POST("/post/sendMail")
     fun sendMail(
         @Body reportData : MailData
-    ): ReturnObject<Int>
+    ): retrofit2.Call<ReturnObject<Int>>
 
 
     @POST("/post/create")

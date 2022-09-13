@@ -92,5 +92,9 @@ class PostViewModel : ViewModel() {
     fun changeTime(){
         timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(System.currentTimeMillis()))
     }
+    // 판매완료 요청
+    fun completeShare(postData: PostData){
+        dbAccessModule.completeTrade(postData)
+    }
 
 }

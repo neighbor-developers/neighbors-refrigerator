@@ -12,21 +12,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -38,13 +40,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.ChatMessageData
-import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.FirebaseChatData
+import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.CalculateTime
-import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 
@@ -75,7 +76,10 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
                 },
                 actions = {
                     IconButton(onClick = { declarationDialogState = true }) {
-                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(45.dp), tint = Color.Red)
+                        Icon(painterResource(id = R.drawable.icon_decl_color), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = colorResource(
+                            id = R.color.declRed
+                        ))
+                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = Color.White)
                     }
                 },
                 backgroundColor = Color.Transparent,
@@ -85,8 +89,8 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             if(declarationDialogState){
-                DeclarationDialog(type = 2) {
-                    declarationDialogState = false}
+                DeclarationDialog(postId = postId,type = 2, onChangeState =  {
+                    declarationDialogState = false})
             }
 
             TopBarSection(chatViewModel, navController, chatViewModel.postData.collectAsState(), userId)
@@ -113,20 +117,8 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
 @Composable
 fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController, postData: State<PostData?>, userId: Int, alignment: Alignment.Vertical = Alignment.Top) {
 
-    var completeShareDialog by remember {
-        mutableStateOf(false)
-    }
     val chatData = chatViewModel.chatData.collectAsState()
 
-    if(completeShareDialog){
-        postData.value?.let {
-            CompleteDialog(
-                type = "거래",
-                { completeShareDialog = false },
-                { chatViewModel.completeShare(it) }
-            )
-        }
-    }
     postData.value?.let { post ->
         var expanded by remember { mutableStateOf(false) }
         Surface(modifier = Modifier
@@ -142,7 +134,7 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                                 if (targetState) {
                                     keyframes {
                                         // Expand horizontally first.
-                                        IntSize(targetSize.width, initialSize.height) at 150
+                                        IntSize(initialSize.width, initialSize.height) at 150
                                         durationMillis = 300
                                     }
                                 } else {
@@ -156,8 +148,9 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                 }
             ) { targetExpanded ->
                 if (targetExpanded) {
-                        ConstraintLayout(
-                            Modifier.fillMaxWidth()) {
+                        ConstraintLayout(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)) {
                             val (title, button) = createRefs()
                             Row(modifier = Modifier
                                 .constrainAs(title) {
@@ -181,26 +174,22 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                                     }
                                     Spacer(modifier = Modifier.width(15.dp))
                                 }
-                                Column{
-                                    Text(text = post.title, color = Color.Black, fontSize = 17.sp)
-                                    chatData.value?.writer?.nickname?.let {
-                                        Text(text = it, color = Color.DarkGray, fontSize = 12.sp)
-                                    }
+                                Column(modifier = Modifier.padding(end = 80.dp)){
+                                    Text(text = post.title, color = Color.Black, fontSize = 16.sp)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                    Text(text = post.content, color = Color.Gray, fontSize = 12.sp, maxLines = 1, modifier = Modifier.padding(start = 3.dp))
+
                                 }
                             }
 
-                            Row(Modifier.constrainAs(button){
-                                end.linkTo(parent.end)
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                            }) {
-                                if (post.userId == userId) {
-                                    // 포스트 작성자일때 완료 버튼
-                                    Button(onClick = { completeShareDialog = true }) {
-                                        Text(text = "나눔 완료")
-                                    }
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                }
+                            Row(
+                                Modifier
+                                    .width(85.dp)
+                                    .constrainAs(button) {
+                                        end.linkTo(parent.end)
+                                        top.linkTo(parent.top)
+                                        bottom.linkTo(parent.bottom)
+                                    }) {
                                 if (post.type == 1) {
                                     Button(
                                         onClick = {
@@ -210,14 +199,26 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
                                             )
                                             navController.navigate(NAV_ROUTE.SHARE_DETAIL.routeName)
                                         },
-                                        colors = ButtonDefaults.buttonColors(Color.LightGray)
-                                    ) { Text(text = "상세보기") }
+                                        colors = ButtonDefaults.buttonColors(colorResource(id = R.color.green)),
+                                        shape = RoundedCornerShape(20.dp),
+                                        modifier = Modifier.size(85.dp, 33.dp)
+                                    ) { Text(text = "상세보기", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
                                 }
                             }
                         }
                 } else {
-                    Surface(modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Filled.ShoppingCart, "")
+                    Surface() {
+                        Icon(Icons.Filled.Search, "",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .background(
+                                    shape = RoundedCornerShape(10.dp), color = colorResource(
+                                        id = R.color.green
+                                    )
+                                )
+                                .padding(5.dp)
+                        )
+
                     }
                 }
             }
@@ -347,7 +348,23 @@ fun SendSection(viewModel: ChatViewModel, chatId: String, userId: Int) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorResource(id = R.color.green))
+            colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorResource(id = R.color.green)),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Send
+            ),
+            keyboardActions = KeyboardActions(
+                onSend = {
+                    // 메세지 보내기
+                    if (sendMessage.value.isNotEmpty()) {
+                        Log.d("새로운 메세지", sendMessage.value)
+                        timestamp.value = System.currentTimeMillis()
+                        val message =
+                            ChatMessageData(sendMessage.value, false, timestamp.value, userId)
+                        viewModel.newMessage(chatId, message)
+                        sendMessage.value = ""
+                    }
+                }
+            )
         )
     }
 }

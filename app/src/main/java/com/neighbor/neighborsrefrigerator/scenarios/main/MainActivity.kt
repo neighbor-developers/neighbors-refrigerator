@@ -51,6 +51,7 @@ import com.neighbor.neighborsrefrigerator.scenarios.main.post.SearchPostView
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SeekPostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.SharePostScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.detail.SharePostDetailScreen
+import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SeekPostRegisterScreen
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.register.SharePostRegisterScreen
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
@@ -80,10 +81,6 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.event.collect { event ->
                 when (event) {
-                    MainViewModel.MainEvent.SendEmail -> sendEmail(
-                        viewModel.emailContent.value,
-                        viewModel.userEmail.value
-                    )
                     MainViewModel.MainEvent.LogOut -> logOut()
                     MainViewModel.MainEvent.DelAuth -> delAuth()
                 }
@@ -92,20 +89,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun sendEmail(content: String, userEmail: String) {
-        val email = auth.currentUser?.email
-
-        val managerEmail = "haejinjung1110@gmail.com"
-        val uri = Uri.parse("mailto:$managerEmail") // 받는 사람
-
-        val intent = Intent(Intent.ACTION_SENDTO, uri)
-
-        intent.putExtra(Intent.EXTRA_SUBJECT, "이웃집 냉장고 문의")
-        intent.putExtra(Intent.EXTRA_TEXT, "email : $userEmail \n 문의 내용 : $content")
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-
-        startActivity(intent)
-    }
 
     // 로그인 객체 생성
     private fun googleLogin() {
@@ -193,7 +176,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             SharePostRegisterScreen(navController)
         }
         composable(NAV_ROUTE.SEEK_REGISTER.routeName){
-
+            SeekPostRegisterScreen(navController)
         }
         composable("${NAV_ROUTE.CHAT.routeName}/{chatId}/{postId}", arguments = listOf(navArgument("chatId"){type = NavType.StringType},navArgument("postId"){type = NavType.IntType})) {
             ChatScreen(navController = navController, chatId = it.arguments?.getString("chatId")?:"", postId = it.arguments?.getInt("postId") ?:0)
@@ -205,7 +188,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
             Setting(navController = navController,mainViewModel = mainViewModel)
         }
         composable(NAV_ROUTE.TRADE_HISTORY.routeName){
-
+            ShowUserProfile()
         }
         composable(NAV_ROUTE.REVIEW.routeName){
             val post = remember {

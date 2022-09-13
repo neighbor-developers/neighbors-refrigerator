@@ -27,7 +27,7 @@ import com.neighbor.neighborsrefrigerator.view.*
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.SearchAddressDialogViewModel
 
-private val drawerMenu = listOf("내 위치 바꾸기", "거래내역", "설정", "문의하기")
+private val drawerMenu = listOf("내 정보", "내 위치 바꾸기", "설정", "문의하기")
 
 @Composable
 fun Drawer(
@@ -129,8 +129,8 @@ fun Drawer(
         }
         drawerMenu.forEach { menu ->
             when(menu){
+                "내 정보" -> DrawerItem(menu = menu, click = { navController.navigate(NAV_ROUTE.TRADE_HISTORY.routeName) })
                 "내 위치 바꾸기" -> DrawerItem(menu = menu, click = { locationDialogState = true })
-                "거래내역" -> DrawerItem(menu = menu, click = { navController.navigate(NAV_ROUTE.TRADE_HISTORY.routeName) })
                 "설정" -> DrawerItem(menu = menu, click = { navController.navigate(NAV_ROUTE.SETTING.routeName) })
                 "문의하기" -> DrawerItem(menu = menu, click = { inquiryDialogState = true })
                 else -> {}
@@ -150,8 +150,8 @@ fun DrawerItem(menu : String, click: () -> Unit){
         {
             Icon(
                 imageVector = when(menu){
+                    "내 정보" -> Icons.Filled.Person
                     "내 위치 바꾸기" -> Icons.Filled.LocationOn
-                    "거래 내역" -> Icons.Filled.Menu
                     "설정" -> Icons.Filled.Settings
                     "문의하기" -> Icons.Filled.MailOutline
                     else -> Icons.Filled.Menu },

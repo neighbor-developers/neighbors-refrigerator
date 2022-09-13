@@ -1,11 +1,7 @@
 package com.neighbor.neighborsrefrigerator.network
 
 import android.util.Log
-import android.widget.Toast
-import com.google.android.gms.maps.model.LatLng
 import com.neighbor.neighborsrefrigerator.data.*
-import com.neighbor.neighborsrefrigerator.utilities.App
-import com.neighbor.neighborsrefrigerator.utilities.CalDistance
 import com.neighbor.neighborsrefrigerator.viewmodels.ReqPostData
 import retrofit2.Call
 import retrofit2.Callback
@@ -17,7 +13,8 @@ class DBAccessModule {
 
     suspend fun checkNickname(nickname: String): Boolean{
         val result = kotlin.runCatching {
-            dbAccessApi.checkNickname(nickname)}.getOrNull()?.result?: false
+            dbAccessApi.checkNickname(nickname)}.getOrNull()?.result?: true
+        Log.d("닉네임 결과", result.toString())
         //false 가 중복 ㄴㄴ
         return result
     }
@@ -89,11 +86,22 @@ class DBAccessModule {
         return result
     }
 
-    fun sendMail(mailData: MailData) : Int?{
-        val result = kotlin.runCatching {
-            dbAccessApi.sendMail(mailData)
-        }.getOrNull()?.result ?:0
-        return result
+    fun sendMail(mailData: MailData){
+        dbAccessApi.sendMail(mailData).enqueue(object : Callback<ReturnObject<Int>>{
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("메일 결과 : ", response.toString())
+                }
+
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
     }
 
     //포스트 데이터 데이터베이스에 입력

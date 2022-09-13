@@ -74,7 +74,8 @@ fun InquiryDialog(viewModel: MainViewModel, onChangeState: () -> Unit) {
             Button(
                 onClick = {
                     onChangeState()
-                    viewModel.sendEmail(inquiryContent, userEmail)
+                    inquiryContent = userEmail + "\n" + inquiryContent
+                    viewModel.sendEmail(0, inquiryContent)
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.green)),
                 elevation = ButtonDefaults.elevation(0.dp)

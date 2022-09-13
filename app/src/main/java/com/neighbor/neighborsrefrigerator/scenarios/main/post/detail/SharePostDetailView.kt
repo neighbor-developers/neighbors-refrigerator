@@ -3,6 +3,7 @@ package com.neighbor.neighborsrefrigerator.scenarios.main.post.detail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +26,7 @@ import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.ItemImage
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.ChatViewModel
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
@@ -59,7 +62,10 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
                 title = {},
                 actions = {
                     IconButton(onClick = { declarationDialogState = true }) {
-                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(45.dp), tint = Color.Red)
+                        Icon(painterResource(id = R.drawable.icon_decl_color), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = colorResource(
+                            id = R.color.declRed
+                        ))
+                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = Color.White)
                     }
                 },
                 navigationIcon = {
@@ -79,8 +85,21 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
             .padding(it)
             .fillMaxSize()) {
             if (declarationDialogState) {
-                DeclarationDialog(type = 1) {
+                DeclarationDialog(postId = post.id!!, type = 1, onChangeState =  {
                     declarationDialogState = false
+                })
+            }
+            var completeShareDialog by remember {
+                mutableStateOf(false)
+            }
+
+            if(completeShareDialog){
+                post.let {
+                    CompleteDialog(
+                        type = "거래",
+                        { completeShareDialog = false },
+                        { postViewModel.completeShare(it) }
+                    )
                 }
             }
             Column {
@@ -89,7 +108,7 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
                     Spacer(modifier = Modifier.width(30.dp))
                     val modifier = Modifier.size(150.dp)
                     post.productimg1?.let {
-                        ItemImage(productimg1 = post.productimg1, modifier = modifier)
+                        ItemImage(productImg1 = post.productimg1, modifier = modifier)
                     }
                     Spacer(modifier = Modifier.width(30.dp))
                     Text(text = post.title, fontSize = 20.sp)
@@ -109,6 +128,18 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
                             }) {
                                 Text(text = "채팅하기")
                             }
+                        }else{
+                            // 포스트 작성자일때 완료 버튼
+                            Button(
+                                onClick = { completeShareDialog = true },
+                                colors = ButtonDefaults.buttonColors(colorResource(id = R.color.green)),
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.size(85.dp, 33.dp)
+                            ) {
+                                Text(text = "나눔 완료", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+
                         }
                     }
                 }
