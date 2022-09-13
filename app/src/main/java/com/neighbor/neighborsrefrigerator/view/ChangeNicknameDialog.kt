@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +36,7 @@ fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, viewModel: MainVie
 
     Dialog(onDismissRequest = { changeDialogState(false) }) {
         Surface(
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(5.dp),
             color = Color.White
         ) {
             Box(
@@ -46,7 +47,7 @@ fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, viewModel: MainVie
                         val (text, button) = createRefs()
                         Text(
                             text = "닉네임 변경",
-                            fontSize = 18.sp,
+                            fontSize = 14.sp,
                             modifier = Modifier.constrainAs(text) {
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
@@ -70,26 +71,16 @@ fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, viewModel: MainVie
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
 
                     TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                BorderStroke(
-                                    width = 1.dp,
-                                    color = colorResource(id = if (txtFieldError.value.isEmpty()) R.color.green else R.color.green)
-                                ),
-                                shape = RoundedCornerShape(50)
-                            ),
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+                            focusedIndicatorColor = colorResource(id = R.color.green)
                         ),
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Filled.Star,
+                                imageVector = Icons.Filled.Edit,
                                 contentDescription = "",
                                 tint = colorResource(R.color.green),
                                 modifier = Modifier
@@ -103,35 +94,41 @@ fun ChangeNicknameDialog(changeDialogState:(Boolean) -> Unit, viewModel: MainVie
                             nickname.value = it.take(10)
                         })
 
-                    Spacer(modifier = Modifier.height(10.dp))
+
                     if (hasNickname){
                         Text(text = "중복된 닉네임이 있습니다.", color = Color.DarkGray, fontSize = 12.sp)
+                    }else{
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+                    if (txtFieldError.value.isNotEmpty()){
+                        Text(text = txtFieldError.value, color = Color.DarkGray, fontSize = 12.sp)
+                    }else{
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
 
-                    Button(
-                        onClick = {
-                            if (nickname.value.isEmpty()) {
-                                txtFieldError.value = "빈칸은 입력하실 수 없습니다."
-                                return@Button
-                            } else {
-                                CoroutineScope(Dispatchers.Main).launch() {
-                                    val result = viewModel.changeNickname(nickname.value)
-                                    if (result){
-                                        changeDialogState(false)
-                                    }else{
-                                        hasNickname = true
+                    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = {
+                                if (nickname.value.isEmpty()) {
+                                    txtFieldError.value = "빈칸은 입력하실 수 없습니다."
+                                    return@Button
+                                } else {
+                                    CoroutineScope(Dispatchers.Main).launch() {
+                                        val result = viewModel.changeNickname(nickname.value)
+                                        if (result){
+                                            changeDialogState(false)
+                                        }else{
+                                            hasNickname = true
+                                            txtFieldError.value = ""
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                        elevation = ButtonDefaults.elevation(0.dp)
-                    ) {
-                        Text(text = "변경", color = colorResource(id = R.color.green), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.green)),
+                            elevation = ButtonDefaults.elevation(0.dp)
+                        ) {
+                            Text(text = "변경", color = Color.White, textAlign = TextAlign.Center)
+                        }
                     }
 
                 }

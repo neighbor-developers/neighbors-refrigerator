@@ -40,7 +40,7 @@ fun ShowUserProfile() {
                     .padding(30.dp, 20.dp, 15.dp, 20.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.sprout),
+                    painter = painterResource(id = R.drawable.level4_ver3),
                     contentDescription = "profileImage",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

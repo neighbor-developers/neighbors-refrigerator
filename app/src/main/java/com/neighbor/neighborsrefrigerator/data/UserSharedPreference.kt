@@ -54,4 +54,10 @@ class UserSharedPreference(context: Context) {
     fun getNoticePref(item: String): Boolean{
         return prefs.getBoolean(item, true)
     }
+    fun setLevelPref(item: String, data: Int){
+        prefs.edit().putInt(item, data).apply()
+    }
+    fun getLevelPref(item: String): Int{
+        return prefs.getInt(item, 1)
+    }
 }

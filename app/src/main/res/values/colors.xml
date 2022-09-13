@@ -6,8 +6,14 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="backgroundGray">#E7E7E7</color>
-    <color name="green">#22814D</color>
+    <color name="white">#FFFFFF</color>
+    <color name="backgroundGray">#EEEEEE</color>
+    <color name="completeGray">#CCCBCB</color>
+    <color name="green">#219A3F</color>
+    <color name="categoryGreen">#1C632C</color>
+    <color name="yellow">#D2FFFF90</color>
+    <color name="declRed">#E60F0F</color>
+
+
 
 </resources>

@@ -47,7 +47,7 @@ fun SearchAddressDialog(
             dismissButton = {
                 Button(
                     onClick = { onDismiss() },
-                    border = BorderStroke(1.5.dp, colorResource(id = R.color.green)),
+                    border = BorderStroke(1.3.dp, colorResource(id = R.color.green)),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                     elevation = ButtonDefaults.elevation(0.dp)
                 ) {

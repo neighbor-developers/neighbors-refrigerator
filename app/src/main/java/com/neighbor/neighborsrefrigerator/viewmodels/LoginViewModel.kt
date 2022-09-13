@@ -141,10 +141,12 @@ class LoginViewModel : ViewModel() {
             viewModelScope.async {
                 result = dbAccessModule.joinUser(userdata)
             }.await()
+            Log.d("id", result.toString())
             userdata.id = result
 
             UserSharedPreference(App.context()).setUserPrefs(userdata)
             Log.d("저장", userdata.toString())
+            UserSharedPreference(App.context()).setLevelPref("flowerVer", 1)
         }
     }
     fun toMainActivity() = viewModelScope.launch { _event.emit(LoginEvent.ToMain) }

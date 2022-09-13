@@ -4,9 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,7 +53,10 @@ fun ReviewScreen(postData: PostData, navController: NavHostController, chatViewM
                 },
                 actions = {
                     IconButton(onClick = { dialogState = true }) {
-                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(45.dp), tint = Color.Red)
+                        Icon(painterResource(id = R.drawable.icon_decl_color), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = colorResource(
+                            id = R.color.declRed
+                        ))
+                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = Color.White)
                     }
                 },
                 backgroundColor = Color.Transparent,
@@ -69,7 +69,7 @@ fun ReviewScreen(postData: PostData, navController: NavHostController, chatViewM
             .fillMaxSize()) {
 
             if(dialogState) {
-                DeclarationDialog(type = 2) { dialogState = false }
+                DeclarationDialog(postId = postData.id!!, type = 2, onChangeState =  { dialogState = false })
             }
 
             Column(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {

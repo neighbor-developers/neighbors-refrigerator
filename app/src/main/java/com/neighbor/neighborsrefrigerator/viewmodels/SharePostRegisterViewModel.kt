@@ -10,10 +10,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.utilities.App
+import kotlinx.coroutines.async
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -33,7 +35,6 @@ class SharePostRegisterViewModel: ViewModel() {
     var validateImgUriState by mutableStateOf<Uri?>(null)
     var validateImgInputStream by mutableStateOf<InputStream?>(null)
     var category = mutableStateOf("")
-    var isSuccessRegist = mutableStateOf(false)
     var myLatitude = mutableStateOf(0.0)
     var myLongitude = mutableStateOf(0.0)
 
@@ -86,7 +87,7 @@ class SharePostRegisterViewModel: ViewModel() {
         }
     }
 
-    fun registerData() {
+    suspend fun registerPost(): Int {
         val location = myLocation(locationType.value)
 
         val postData = PostData(
@@ -117,12 +118,12 @@ class SharePostRegisterViewModel: ViewModel() {
 
         validatePost(postData)
 
-        if (errorMessage.value.isEmpty()) {
-            dbAccessModule.entryPost(postData) {
-                it.let {
-                    isSuccessRegist.value = true
-                }
-            }
-        }
+        var postId = 0
+
+        viewModelScope.async {
+            postId = dbAccessModule.entryPost(postData)
+        }.await()
+
+        return postId
     }
 }

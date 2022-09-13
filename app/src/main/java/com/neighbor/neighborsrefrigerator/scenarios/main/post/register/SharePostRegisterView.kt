@@ -12,30 +12,32 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 private var sampleList: List<Pair<String, String>> = listOf(Pair("", "선택"), Pair("100", "과일"), Pair("101", "채소"))
@@ -116,10 +118,14 @@ fun SharePostRegisterScreen(
                     type = "등록",
                     { completeShareDialog = false },
                     {
-                        if (viewModel.isSuccessRegist.value) {
-                            navHostController.navigateUp()
-                        } else {
-                            Log.d("실패", "상품 등록 실패")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            var postId = viewModel.registerPost()
+                            if (postId != 0) {
+                                navHostController.navigateUp()
+                            } else {
+                                Log.d("실패", "상품 등록 실패")
+                            }
+
                         }
                     }
                 )
@@ -131,8 +137,9 @@ fun SharePostRegisterScreen(
                     { navHostController.navigateUp()})
 
             }
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.width(160.dp)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(text = "상품사진", modifier = Modifier.padding(start = 7.dp), fontSize = 13.sp, color = Color.DarkGray)
+                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     Image(
                         painter = if (viewModel.imgUriState != null)
                             rememberAsyncImagePainter(
@@ -148,60 +155,58 @@ fun SharePostRegisterScreen(
                                 onClickLabel = "Clickable image",
                                 onClick = { selectImageLauncher.launch("image/*") }
                             )
-                            .fillMaxWidth()
+                            .weight(1f)
                             .aspectRatio(1f)
-                            .padding(10.dp),
+                            .padding(top = 10.dp, end = 5.dp),
                         colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
                     )
-                    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                        Image(
-                            painter = if (viewModel.imgUriState != null)
-                                rememberAsyncImagePainter(
-                                    ImageRequest
-                                        .Builder(LocalContext.current)
-                                        .data(data = viewModel.imgUriState)
-                                        .build()
-                                ) else painterResource(R.drawable.icon_google),
-                            contentDescription = "상품 사진",
-                            modifier = Modifier
-                                .clickable(
-                                    enabled = true,
-                                    onClickLabel = "Clickable image",
-                                    onClick = { selectImageLauncher.launch("image/*") }
-                                )
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .padding(top = 10.dp, end = 5.dp),
-                            colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
-                        )
-                        Image(
-                            painter = if (viewModel.imgUriState != null)
-                                rememberAsyncImagePainter(
-                                    ImageRequest
-                                        .Builder(LocalContext.current)
-                                        .data(data = viewModel.imgUriState)
-                                        .build()
-                                ) else painterResource(R.drawable.icon_google),
-                            contentDescription = "상품 사진",
-                            modifier = Modifier
-                                .clickable(
-                                    enabled = true,
-                                    onClickLabel = "Clickable image",
-                                    onClick = { selectImageLauncher.launch("image/*") }
-                                )
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .padding(top = 10.dp, start = 5.dp)
-
-                            ,
-                            colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
-                        )
-
-                        if (viewModel.imgUriState != null) {
-                            viewModel.imgInputStream = LocalContext.current.contentResolver.openInputStream(
-                                viewModel.imgUriState!!
+                    Image(
+                        painter = if (viewModel.imgUriState != null)
+                            rememberAsyncImagePainter(
+                                ImageRequest
+                                    .Builder(LocalContext.current)
+                                    .data(data = viewModel.imgUriState)
+                                    .build()
+                            ) else painterResource(R.drawable.icon_google),
+                        contentDescription = "상품 사진",
+                        modifier = Modifier
+                            .clickable(
+                                enabled = true,
+                                onClickLabel = "Clickable image",
+                                onClick = { selectImageLauncher.launch("image/*") }
                             )
-                        }
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .padding(top = 10.dp, end = 5.dp),
+                        colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
+                    )
+                    Image(
+                        painter = if (viewModel.imgUriState != null)
+                            rememberAsyncImagePainter(
+                                ImageRequest
+                                    .Builder(LocalContext.current)
+                                    .data(data = viewModel.imgUriState)
+                                    .build()
+                            ) else painterResource(R.drawable.icon_google),
+                        contentDescription = "상품 사진",
+                        modifier = Modifier
+                            .clickable(
+                                enabled = true,
+                                onClickLabel = "Clickable image",
+                                onClick = { selectImageLauncher.launch("image/*") }
+                            )
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .padding(top = 10.dp, start = 5.dp)
+
+                        ,
+                        colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
+                    )
+
+                    if (viewModel.imgUriState != null) {
+                        viewModel.imgInputStream = LocalContext.current.contentResolver.openInputStream(
+                            viewModel.imgUriState!!
+                        )
                     }
                 }
                 Column(
@@ -427,4 +432,11 @@ private fun CategorySpinner(
     }
 }
 
-
+@Preview
+@Composable
+fun registerPreview() {
+    val navController = rememberNavController()
+    SharePostRegisterScreen(
+        navHostController = navController
+    )
+}

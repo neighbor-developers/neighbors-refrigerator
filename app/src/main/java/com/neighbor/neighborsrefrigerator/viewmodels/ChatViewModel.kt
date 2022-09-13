@@ -165,9 +165,6 @@ class ChatViewModel() : ViewModel() {
         dbAccessModule.getPostByPostId(postId){postData.value = it[0] }
     }
 
-    // 판매완료 요청
-    fun completeShare(postData: PostData){
-        dbAccessModule.completeTrade(postData)
-    }
+
 
 }

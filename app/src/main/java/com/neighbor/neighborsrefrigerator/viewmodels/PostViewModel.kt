@@ -37,8 +37,6 @@ class PostViewModel : ViewModel() {
     private var initData = MutableStateFlow(ReqPostData(3, 1, null, null, timeStamp, userLat, userLng))
     private val initDataSeek = MutableStateFlow(ReqPostData(3, 2, null, null, timeStamp, userLat, userLng))
 
-    val category = MutableStateFlow<Int>(0)
-
     var sharePostsByTime = Pager(
                 PagingConfig(pageSize = 15))
             { MyPagingSource(initData.value)
@@ -93,6 +91,10 @@ class PostViewModel : ViewModel() {
 
     fun changeTime(){
         timeStamp = SimpleDateFormat("yyyy-MM-dd HH:MM:ss").format(Date(System.currentTimeMillis()))
+    }
+    // 판매완료 요청
+    fun completeShare(postData: PostData){
+        dbAccessModule.completeTrade(postData)
     }
 
 }

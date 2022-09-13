@@ -1,8 +1,9 @@
 package com.neighbor.neighborsrefrigerator.view
 
 
-import androidx.compose.animation.VectorConverter
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -11,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.neighbor.neighborsrefrigerator.data.PostData
 
 @Composable
 fun CompleteDialog(type: String, onChangeState: () -> Unit, completeTrade: () -> Unit) {
