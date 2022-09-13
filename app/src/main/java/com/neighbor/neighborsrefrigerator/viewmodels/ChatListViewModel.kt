@@ -52,7 +52,7 @@ class ChatListViewModel: ViewModel() {
 
 
     // 실시간으로 유저의 채팅 리스트 변화 감지 -> 추가되면 추가된 상태로 정렬 다시
-    init {
+    fun init() {
         val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
 
         val chatListener = object : ValueEventListener {
