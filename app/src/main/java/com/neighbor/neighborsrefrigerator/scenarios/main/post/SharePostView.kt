@@ -1,22 +1,17 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -34,6 +29,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
+import com.neighbor.neighborsrefrigerator.scenarios.intro.DotsIndicator
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
@@ -50,12 +46,14 @@ fun SharePostScreen(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .verticalScroll(rememberScrollState()).height(900.dp)
             .background(colorResource(id = R.color.backgroundGray))
     ) {
-       // PostDistance()
-        Tab(postViewModel = postViewModel, route, navController)
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
+        Spacer(modifier = Modifier
+            .height(15.dp)
+            .background(color = colorResource(id = R.color.green)))
+        Tab(postViewModel = postViewModel, route, navController)
     }
 }
 
@@ -139,55 +137,16 @@ fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHo
 }
 
 @Composable
-fun PostDistance(){
-    val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
-    Column(modifier = Modifier
-        .background(Color.White)
-        .fillMaxWidth()) {
-        Card(elevation = 10.dp, modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier
-                .padding(start = 10.dp, bottom = 10.dp, top = 5.dp)
-                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "", tint = colorResource(
-                    id = R.color.green
-                ), modifier = Modifier.size(18.dp))
-                Text(
-                    text = "${nickname}님에게 가까운 나눔",
-                    modifier = Modifier.padding(start = 5.dp),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-        Card(elevation = 10.dp) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 7.dp, bottom = 7.dp, start = 25.dp, end = 10.dp)) {
-            Icon(Icons.Default.Add, contentDescription = "", modifier = Modifier.size(7.dp), tint = Color.Red)
-            Text(text = "김밥 재료 나눔합니다", modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 15.dp)
-                )
-
-            }
-        }
-        Card(elevation = 10.dp) {
-            Text(text = "대파가 남아서 나눔해요", modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 7.dp, bottom = 7.dp, start = 25.dp, end = 10.dp))
-        }
-        Card(elevation = 10.dp) {
-            Text(text = "고구마가 남아서 나눔해요", modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 7.dp, bottom = 7.dp, start = 25.dp, end = 10.dp))
-        }
-    }
-}
-@Composable
 fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController){
     LazyColumn(
         userScrollEnabled = true,
-        modifier = Modifier.background(colorResource(id = R.color.backgroundGray))
+        modifier = Modifier
+            .background(colorResource(id = R.color.backgroundGray))
     ) {
         items(posts.itemCount) { count ->
+            Spacer(modifier = Modifier
+                .height(15.dp)
+                .background(Color.Transparent))
             ItemCardByTime(post= posts[count]!!, route = route, navHostController = navHostController)
 
         }
@@ -195,40 +154,52 @@ fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navH
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController){
+
     val userNickname by remember {
         mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("nickname")!!)
     }
+    val pagerState = rememberPagerState(pageCount = 6)
     if (!posts.value.isNullOrEmpty()){
-        Text(
-            text = "# ${userNickname}님 위치에서 가까운 나눔",
-            modifier = Modifier.padding(start = 30.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
-            fontSize = 15.sp
-        )
-        LazyRow (modifier = Modifier
+
+        DrawLine()
+        Row(modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .padding(start = 30.dp, end = 30.dp, top = 10.dp, bottom = 10.dp))
-        {
-            posts.value?.let {
-                items(it){ item ->
-                    //ItemCardByDistance(post = item, route, navHostController)
-                }
-            }
-        }
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 30.dp, end = 30.dp, top = 20.dp)
-        ) {
-            val canvasHeight = size.height
-            drawLine(
-                start = Offset(x = 0f, y = canvasHeight),
-                end = Offset(x = this.size.width, y = canvasHeight),
-                color = Color.DarkGray,
-                strokeWidth = 1F
+            .background(Color.White), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+            Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "", tint = colorResource(
+                id = R.color.green
+            ), modifier = Modifier
+                .size(18.dp)
+                .padding(start = 10.dp))
+            Text(
+                text = "${userNickname}님에게 가까운 나눔",
+                modifier = Modifier.padding(start = 5.dp, bottom = 10.dp, top = 10.dp),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
+        DrawLine()
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp), contentAlignment = Alignment.BottomCenter) {
+            HorizontalPager(state = pagerState) { page ->
+                ItemCardByTime(
+                    post = posts.value!![page],
+                    route = route,
+                    navHostController = navHostController
+                )
+            }
+            DotsIndicator(
+                totalDots = 6,
+                selectedIndex = pagerState.currentPage,
+                selectedColor = colorResource(id = R.color.green),
+                unSelectedColor = Color.LightGray,
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+        }
+
     }
+
 }

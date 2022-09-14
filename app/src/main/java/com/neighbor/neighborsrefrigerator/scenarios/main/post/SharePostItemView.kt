@@ -208,9 +208,7 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData/* 
             }
         }
     }
-    Spacer(modifier = Modifier
-        .height(15.dp)
-        .background(Color.Transparent))
+
 }
 
 @Composable

@@ -77,7 +77,19 @@ class PostViewModel : ViewModel() {
     { MyPagingSource(ReqPostData(1, 1, 600, null, timeStamp, userLat, userLng))
     }.flow.cachedIn(viewModelScope)
 
-    var sharePostsByDistance = MutableStateFlow<ArrayList<PostData>?>(null)
+    var sharePostsByDistance = MutableStateFlow<ArrayList<PostData>?>(arrayListOf(
+        PostData(id=312, title="제목301", categoryId="200", userId=2, content="내용301", type=2, mainAddr="경기도시흥시301", addrDetail="301호", rate=0, review=null, validateType=1, validateDate="2022-08-22T00:00:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null),
+        PostData(id=312, title="제목301", categoryId="200", userId=2, content="내용301", type=2, mainAddr="경기도시흥시301", addrDetail="301호", rate=0, review=null, validateType=1, validateDate="2022-08-22T00:00:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null),
+                PostData(id=312, title="제목301", categoryId="200", userId=2, content="내용301", type=2, mainAddr="경기도시흥시301", addrDetail="301호", rate=0, review=null, validateType=1, validateDate="2022-08-22T00:00:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null),
+            PostData(id=312, title="제목301", categoryId="200", userId=2, content="내용301", type=2, mainAddr="경기도시흥시301", addrDetail="301호", rate=0, review=null, validateType=1, validateDate="2022-08-22T00:00:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null),
+    PostData(id=312, title="제목301", categoryId="200", userId=2, content="내용301", type=2, mainAddr="경기도시흥시301", addrDetail="301호", rate=0, review=null, validateType=1, validateDate="2022-08-22T00:00:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null),
+        PostData(id=312, title="제목301", categoryId="200", userId=2, content="내용301", type=2, mainAddr="경기도시흥시301", addrDetail="301호", rate=0, review=null, validateType=1, validateDate="2022-08-22T00:00:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null)
+
+    ))
+
+    init {
+
+    }
 
     suspend fun getUserNickname(userId: Int): UserData? {
         var userData : UserData? = null

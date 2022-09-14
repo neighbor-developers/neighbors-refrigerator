@@ -23,9 +23,24 @@ class ChatViewModel() : ViewModel() {
     var chatMessages = MutableStateFlow<List<ChatMessageData>>(emptyList())
     var chatData = MutableStateFlow<FirebaseChatData?>(null)
     var postData = MutableStateFlow<PostData?>(null)
+    private var usersChatList = MutableStateFlow<List<String>>(emptyList())
+
+    init {
+        val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
+        firebaseDB.reference.child("user").child(userId).get()
+            .addOnSuccessListener {
+                it.value?.let { it ->
+                    usersChatList.value = it as List<String>
+                }
+                Log.d("유저 채팅 정보 가져옴", usersChatList.value.toString())
+            }
+            .addOnFailureListener {
+            }
+    }
 
     // 채팅방 들어감
     fun enterChatRoom(chatId: String){
+
         // 한번도 채팅하지 않은경우는 조회 불가
         Log.d("채팅방 id", chatId)
         firebaseDB.reference.child("chat").child(chatId).get()
@@ -98,26 +113,9 @@ class ChatViewModel() : ViewModel() {
 
     private fun newChatRoom(chatId: String, postId: Int, writerId: Int, message :List<ChatMessageData>){
         val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
-        var isHave = false
-        var usersChatList: List<String> = emptyList()
 
         viewModelScope.launch {
-            viewModelScope.async {
-                firebaseDB.reference.child("user").child(userId).get()
-                    .addOnSuccessListener {
-                        it.value?.let { it ->
-                            usersChatList = it as List<String>
-                            isHave = chatId in usersChatList
-                        }
-                        Log.d("유저 채팅 정보 가져옴", usersChatList.toString())
-
-                    }
-                    .addOnFailureListener {
-                        isHave = false
-                    }
-            }.await()
-
-            if (!isHave) {
+            if (chatId !in usersChatList.value) {
                 val writerData: java.util.ArrayList<UserData> = dbAccessModule.getUserInfoById(writerId)
                 val writer = ChatUserData(writerData[0].id, writerData[0].nickname, writerData[0].reportPoint)
 
@@ -135,14 +133,17 @@ class ChatViewModel() : ViewModel() {
                         Log.d("채팅룸 생성 실패", it.toString())
                     }
 
-                if (usersChatList.isEmpty()){
-                    usersChatList = listOf(chatId)
+                Log.d("유저 채팅 리스트1", usersChatList.value.toString())
+                if (usersChatList.value.isEmpty()){
+                    usersChatList.value = listOf(chatId)
+                    Log.d("리스트 빔", usersChatList.value.toString())
                 }else {
-                    usersChatList.plus(chatId)
+                    usersChatList.value += chatId
+                    Log.d("리스트 안빔", usersChatList.value.toString())
                 }
-                Log.d("유저 채팅 리스트", usersChatList.toString())
+                Log.d("유저 채팅 리스트", usersChatList.value.toString())
 
-                firebaseDB.reference.child("user").child(userId).setValue(usersChatList)
+                firebaseDB.reference.child("user").child(userId).setValue(usersChatList.value)
                     .addOnSuccessListener {
                     Log.d("newChatRoomSuccess", "유저 정보에 추가 완료")
                     enterChatRoom(chatId)

@@ -54,9 +54,9 @@ fun SeekPostScreen(
         Row(modifier = Modifier
             .padding(start = 10.dp, bottom = 10.dp, top = 10.dp)
             .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-            Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "", tint = colorResource(
-                id = R.color.green
-            ), modifier = Modifier.size(18.dp))
+            Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "",
+                tint = colorResource(id = R.color.green),
+                modifier = Modifier.size(18.dp))
             Text(
                 text = "${nickname}님 주변의 소식",
                 modifier = Modifier.padding(start = 5.dp),
