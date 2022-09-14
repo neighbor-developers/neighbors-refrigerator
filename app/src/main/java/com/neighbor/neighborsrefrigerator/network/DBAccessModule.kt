@@ -221,7 +221,7 @@ class DBAccessModule {
                 call: Call<ReturnObject<Int>>,
                 response: Response<ReturnObject<Int>>
             ) {
-                Log.d("test",response.body()!!.msg)
+                Log.d("test", response.body().toString())
             }
         })
     }

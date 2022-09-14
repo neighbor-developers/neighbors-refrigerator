@@ -23,18 +23,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class ChatListViewModel: ViewModel() {
 
     val chatListData = MutableStateFlow<List<FirebaseChatData>>(emptyList())
-    var usersChatList = MutableStateFlow<List<String>>(emptyList())
+    var usersChatList = MutableStateFlow<ArrayList<String>>(arrayListOf())
     private val firebaseDB = FirebaseDatabase.getInstance()
+    val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
 
 
     // 실시간으로 유저의 채팅 리스트 변화 감지 -> 추가되면 추가된 상태로 정렬 다시
     init {
-        val userId = UserSharedPreference(App.context()).getUserPrefs("id").toString()
 
         val chatListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.value?.let{
-                    val _usersChatList = it as List<String>
+                    val _usersChatList = it as ArrayList<String>
                     usersChatList.value = _usersChatList
                     Log.d("userChatList1", _usersChatList.toString())
 
@@ -121,7 +121,19 @@ class ChatListViewModel: ViewModel() {
         firebaseDB.reference.child("chat").child(chatId).addValueEventListener(chatListener)
     }
 
+    fun delChat(index: Int){
+        Log.d("del", usersChatList.value.toString())
+        usersChatList.value.removeAt(index)
+        Log.d("del", usersChatList.value.toString())
 
+        firebaseDB.reference.child("user").child(userId).setValue(usersChatList.value)
+            .addOnSuccessListener {
+                Log.d("newChatRoomSuccess", "유저 정보에 추가 완료")
+            }
+            .addOnFailureListener {
+                Log.d("유저 정보 추가 실패", it.toString())
+            }
+    }
     private fun getLastChatTimestamp(chatData: FirebaseChatData): Long?{
 
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐

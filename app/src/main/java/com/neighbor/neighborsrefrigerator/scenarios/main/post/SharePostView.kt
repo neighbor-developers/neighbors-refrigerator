@@ -46,7 +46,8 @@ fun SharePostScreen(
 
     Column(
         modifier = Modifier
-            .verticalScroll(rememberScrollState()).height(900.dp)
+            .verticalScroll(rememberScrollState())
+            .height(900.dp)
             .background(colorResource(id = R.color.backgroundGray))
     ) {
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
@@ -68,6 +69,23 @@ fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHo
     val pagerState = rememberPagerState(pageCount = 7)
     val coroutineScope = rememberCoroutineScope()
 
+
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+        Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "", tint = colorResource(
+            id = R.color.green
+        ), modifier = Modifier
+            .size(18.dp)
+            .padding(start = 10.dp))
+        Text(
+            text = "우리 동네 나눔",
+            modifier = Modifier.padding(start = 5.dp, bottom = 10.dp, top = 10.dp),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+    DrawLine()
     TabRow(
         modifier = Modifier.height(60.dp),
         selectedTabIndex = pagerState.currentPage,

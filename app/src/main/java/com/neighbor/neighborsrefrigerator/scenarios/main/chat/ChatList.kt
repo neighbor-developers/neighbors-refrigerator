@@ -81,7 +81,9 @@ fun ChatListScreen(navController: NavHostController){
                                 }
                                 DismissValue.DismissedToStart -> { // <- 방향 스와이프 (삭제)
                                     Log.d("유저챗리스트1", userChatList.toString())
-                                    userChatList.value.toMutableList().removeAt(index)
+                                    chatListViewModel.delChat(index)
+                                    //userChatList.value.
+                                    //userChatList.value.toMutableList().removeAt(index)
                                     // 뷰모델에 파이어 베이스 userChatList 삭제 함수 만들기
                                     Log.d("유저챗리스트2", userChatList.toString())
                                     Log.d("인덱스", index.toString())

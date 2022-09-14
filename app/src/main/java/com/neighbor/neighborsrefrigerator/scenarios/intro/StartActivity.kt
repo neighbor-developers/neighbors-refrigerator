@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.scenarios.intro
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,10 +21,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.MainActivity
+import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.viewmodels.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +63,22 @@ class StartActivity : ComponentActivity() {
                             val result = viewModel.hasId(auth.currentUser!!)
                             Log.d("아이디 있는지", result.toString())
                             Log.d("uid", auth.currentUser!!.uid.toString())
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                                OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                                    return@OnCompleteListener
+                                }
+
+                                // Get new FCM registration token
+                                val token = task.result
+
+                                // Log and toast
+                                val msg = getString(R.string.msg_token_fmt, token)
+                                Log.d("token!!", msg)
+
+                            })
+
                             if (result){
                                 Log.d("아이디 있는지", "메인으로")
                                 toMainActivity()

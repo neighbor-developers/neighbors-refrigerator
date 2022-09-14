@@ -49,6 +49,7 @@ fun Drawer(
     }
     val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
     val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
+    val id = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
 
 
     var flowerDialogState by remember { mutableStateOf(false) }
@@ -69,7 +70,7 @@ fun Drawer(
                 viewModel = searchAddressDialogViewModel,
                 changeAddress = {
                     val coordinateData: LatLng = UseGeocoder().addressToLatLng(it)
-                    //dbAccessModule.checkNickname(coordinateData)
+                    dbAccessModule.updateUserLocation(id, coordinateData.latitude, coordinateData.longitude, it)
                     }
             )
         if (inquiryDialogState)
