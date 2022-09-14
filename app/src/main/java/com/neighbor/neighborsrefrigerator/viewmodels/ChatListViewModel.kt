@@ -121,6 +121,7 @@ class ChatListViewModel: ViewModel() {
         firebaseDB.reference.child("chat").child(chatId).addValueEventListener(chatListener)
     }
 
+
     private fun getLastChatTimestamp(chatData: FirebaseChatData): Long?{
 
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐

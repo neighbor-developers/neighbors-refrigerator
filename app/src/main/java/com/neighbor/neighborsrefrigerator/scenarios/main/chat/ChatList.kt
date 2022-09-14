@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-@SuppressLint("UnrememberedMutableState")
+@SuppressLint("UnrememberedMutableState", "StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatListScreen(navController: NavHostController){
@@ -65,6 +65,7 @@ fun ChatListScreen(navController: NavHostController){
         Surface(modifier = Modifier.padding(padding)) {
 
             val chatList = chatListViewModel.chatListData.collectAsState()
+            var userChatList = chatListViewModel.usersChatList.collectAsState()
 
             LazyColumn {
                 itemsIndexed(items = chatList.value){ index, chat ->
@@ -79,7 +80,11 @@ fun ChatListScreen(navController: NavHostController){
                                     false
                                 }
                                 DismissValue.DismissedToStart -> { // <- 방향 스와이프 (삭제)
-                                    chatList.value.toMutableList().removeAt(index)
+                                    Log.d("유저챗리스트1", userChatList.toString())
+                                    userChatList.value.toMutableList().removeAt(index)
+                                    // 뷰모델에 파이어 베이스 userChatList 삭제 함수 만들기
+                                    Log.d("유저챗리스트2", userChatList.toString())
+                                    Log.d("인덱스", index.toString())
                                     true
                                 }
                             }
@@ -102,7 +107,7 @@ fun ChatListScreen(navController: NavHostController){
                             val icon = when (dismissState.targetValue) {
                                 DismissValue.Default -> painterResource(R.drawable.ic_check_green)
                                 DismissValue.DismissedToEnd -> painterResource(R.drawable.ic_check_green)
-                                DismissValue.DismissedToStart -> painterResource(R.drawable.ic_check_red)
+                                DismissValue.DismissedToStart -> painterResource(R.drawable.delete_button)
                             }
                             val scale by animateFloatAsState(
                                 when (dismissState.targetValue == DismissValue.Default) {
@@ -201,7 +206,6 @@ fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: Ch
     }
 }
 
-// 수정 필요 15380일 전이 뭐야 그게
 fun checkLastTime(chatData: FirebaseChatData): String? {
     // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
 
@@ -230,7 +234,6 @@ fun checkLastMessage(chatData: FirebaseChatData): ChatMessageData?{
     }else{
         null
     }
-
     return lastChat
 }
 
