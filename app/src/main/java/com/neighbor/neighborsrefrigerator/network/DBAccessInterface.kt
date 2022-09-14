@@ -1,7 +1,9 @@
 package com.neighbor.neighborsrefrigerator.network
 
 import com.neighbor.neighborsrefrigerator.data.*
+import retrofit2.Call
 import retrofit2.http.*
+
 
 interface DBAccessInterface {
     @GET("/post/getPostByUserId")
@@ -92,5 +94,13 @@ interface DBAccessInterface {
         @Query("id") id: Int
     ): ReturnObject<Boolean>
 
+    @FormUrlEncoded
+    @PUT("user/updateLocation/{id}")
+    fun updateUserLocation(
+        @Path("id") id: Int,
+        @Field("latitude") latitude: Double,
+        @Field("longitude") longitude: Double,
+        @Field("home_addr") home_addr: String
+    ): retrofit2.Call<ReturnObject<Int>>
 
 }

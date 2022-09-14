@@ -183,6 +183,7 @@ class DBAccessModule {
         return result
     }
 
+
     suspend fun deleteUser(id : Int): Boolean{
         val result = kotlin.runCatching {
             dbAccessApi.deleteUser(id)}.getOrNull()?.result?: false
@@ -207,6 +208,20 @@ class DBAccessModule {
 
             override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
                 Log.d("test",t.localizedMessage)
+            }
+        })
+    }
+    fun updateUserLocation(id: Int, latitude:Double, longitude:Double, home_addr: String){
+        dbAccessApi.updateUserLocation(id,latitude,longitude,home_addr).enqueue(object: Callback<ReturnObject<Int>>{
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                Log.d("test",response.body()!!.msg)
             }
         })
     }
