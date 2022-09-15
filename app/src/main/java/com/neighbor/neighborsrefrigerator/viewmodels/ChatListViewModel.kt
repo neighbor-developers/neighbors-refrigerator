@@ -94,6 +94,8 @@ class ChatListViewModel: ViewModel() {
 
                     if (chatListData.value.isNullOrEmpty()){
                         chatListData.value = listOf(_chatData)
+                        chatListData.value.sortedWith(compareBy { getLastChatTimestamp(it) })
+
                         Log.d("chatList 생성", chatListData.value.toString())
                     }else{
                         chatListData.value += _chatData
@@ -134,6 +136,7 @@ class ChatListViewModel: ViewModel() {
                 Log.d("유저 정보 추가 실패", it.toString())
             }
     }
+
     private fun getLastChatTimestamp(chatData: FirebaseChatData): Long?{
 
         // 마지막 메세지 기준 - 더 최근일수록 숫자가 커짐
