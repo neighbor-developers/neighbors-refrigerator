@@ -103,6 +103,13 @@ interface DBAccessInterface {
         @Field("home_addr") home_addr: String
     ): retrofit2.Call<ReturnObject<Int>>
 
+    @GET("/post/getPostOrderByDistance")
+    fun getPostOrderByDistance(
+        @Query("currentTime") currentTime: String,
+        @Query("latitude") latitude: Double?,
+        @Query("longitude") longitude: Double?
+    ):ReturnObject<ArrayList<PostData>>
+
     @POST("/chat/create")
     fun makeChat(
         @Body chatData:ChatData

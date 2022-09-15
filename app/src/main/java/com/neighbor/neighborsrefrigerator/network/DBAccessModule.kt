@@ -124,6 +124,17 @@ class DBAccessModule {
         return resultPosts
     }
 
+    //거리도 distance로 반환하게 만들었는데 잘 될지는 모르겠네요? 일단 PostData 객체 distance 속성으로 값 들어가게 했어요
+    suspend fun getPostOrderByDistance(currentTime:String, latitude:Double, longitude: Double) : List<PostData>{
+        Log.d("실헹", "실행")
+        val resultPosts = kotlin.runCatching {
+            dbAccessApi.getPostOrderByDistance(currentTime,latitude,longitude)
+        }.getOrNull()?.result ?: emptyList()
+
+        Log.d("결과", resultPosts.toString())
+        return resultPosts
+    }
+
     fun updateFcmToken(dataTransferObject: DataTransferObject<String>){
             dbAccessApi.updateFcmToken(dataTransferObject).enqueue(object : Callback<ReturnObject<Int>>{
                 override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {

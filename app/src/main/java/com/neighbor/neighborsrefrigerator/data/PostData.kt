@@ -51,5 +51,6 @@ data class PostData(
     val longitude : Double,
     @SerializedName("state")
     val state : String,
+    @SerializedName("distance")
     val distance : Double?
 ): Serializable, Parcelable
