@@ -76,7 +76,7 @@ class StartActivity : ComponentActivity() {
                                 // Log and toast
                                 val msg = getString(R.string.msg_token_fmt, token)
                                 Log.d("token!!", msg)
-
+                                UserSharedPreference(App.context()).setUserPrefs("fcm", token)
                             })
 
                             if (result){
