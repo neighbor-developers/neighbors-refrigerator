@@ -100,16 +100,6 @@ class ChatListViewModel: ViewModel() {
                         Log.d("chatList 추가", chatListData.value.toString())
                     }
 
-//                    if(usersChatList.value.isNotEmpty()){
-//                        // 있는 데이터인지 찾아보고 있으면 삭제 후 맨앞, 없으면 그냥 맨앞에 추가
-//
-//                        chatListData.value.let {
-//                            chatListData.value = chatListData.value + chatListData.value.plus(_chatData)
-//                            chatListData.value.sortedWith(compareBy { getLastChatTimestamp(it) })
-//                        }
-//                    } else{
-//                        chatListData.value = listOf(_chatData)
-//                    }
                     Log.d("파이어베이스", chatListData.value.toString())
 
                 }

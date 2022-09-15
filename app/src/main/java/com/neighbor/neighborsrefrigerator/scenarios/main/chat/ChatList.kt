@@ -12,12 +12,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.SnackbarDefaults.backgroundColor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,10 +71,11 @@ fun ChatListScreen(navController: NavHostController){
             val chatList = chatListViewModel.chatListData.collectAsState()
             var userChatList = chatListViewModel.usersChatList.collectAsState()
 
+
             LazyColumn {
                 itemsIndexed(items = chatList.value){ index, chat ->
                     // https://www.youtube.com/watch?v=Q89i4iZK8ko
-                    val dismissState = rememberDismissState(
+                    /*val dismissState = rememberDismissState(
                         confirmStateChange = { dismissValue ->
                             when (dismissValue) {
                                 DismissValue.Default -> { // dismissThresholds 만족 안한 상태
@@ -79,7 +84,7 @@ fun ChatListScreen(navController: NavHostController){
                                 DismissValue.DismissedToEnd ->{
                                     false
                                 }
-                                DismissValue.DismissedToStart -> { // <- 방향 스와이프 (삭제)
+                                DismissValue.DismissedToStart -> { // <- 방향 스이프 (삭제)
                                     Log.d("유저챗리스트1", userChatList.toString())
                                     chatListViewModel.delChat(index)
                                     //userChatList.value.
@@ -90,9 +95,10 @@ fun ChatListScreen(navController: NavHostController){
                                     true
                                 }
                             }
-                        })
+                        })*/
+                    ChatCard(chat = chat, navController = navController, viewModel = chatListViewModel)
 
-                    SwipeToDismiss(
+/*                    SwipeToDismiss(
                         state = dismissState,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -106,14 +112,9 @@ fun ChatListScreen(navController: NavHostController){
                                     DismissValue.DismissedToStart -> Color.Red.copy(alpha = 0.5f) // <- 방향 스와이프 (삭제)
                                 }
                             )
-                            val icon = when (dismissState.targetValue) {
-                                DismissValue.Default -> painterResource(R.drawable.ic_check_green)
-                                DismissValue.DismissedToEnd -> painterResource(R.drawable.ic_check_green)
-                                DismissValue.DismissedToStart -> painterResource(R.drawable.delete_button)
-                            }
                             val scale by animateFloatAsState(
                                 when (dismissState.targetValue == DismissValue.Default) {
-                                    true -> 0.8f
+                                    true -> 0.2f
                                     else -> 1.5f
                                 }
                             )
@@ -128,17 +129,23 @@ fun ChatListScreen(navController: NavHostController){
                                     .padding(horizontal = 30.dp),
                                 contentAlignment = alignment
                             ) {
-                                Icon(
-                                    modifier = Modifier.scale(scale),
-                                    painter = icon,
-                                    contentDescription = null
-                                )
+                                IconButton(
+                                    onClick = {
+                                        chatListViewModel.delChat(index)
+                                    },
+                                    modifier = Modifier.scale(scale)
+                                ){
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = null
+                                    )
+                                }
                             }
                         },
                         dismissContent = {
                             ChatCard(chat = chat, navController, chatListViewModel)
                         },
-                        directions = setOf(DismissDirection.EndToStart))
+                        directions = setOf(DismissDirection.EndToStart))*/
                     Divider()
                 }
 
@@ -157,6 +164,7 @@ fun ChatCard(chat: FirebaseChatData, navController: NavController, viewModel: Ch
     val nickname = getNickname(chat)
     val lastMessage = checkLastMessage(chat)
     val newMessage = checkNewMessage(chat)
+
 
     Card(
         onClick = {navController.navigate(route = "${NAV_ROUTE.CHAT.routeName}/${chat.id}/${chat.postId}")},
