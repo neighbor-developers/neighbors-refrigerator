@@ -33,7 +33,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     // 메세지 받을때 호출
     override fun onMessageReceived(remoteMessage: RemoteMessage) { // 메세지 수신
-        if(remoteMessage.data.isNotEmpty()){
+//        if(remoteMessage.data.isNotEmpty()){
             val title = remoteMessage.notification?.title
             val body = remoteMessage.notification?.body
             val data = remoteMessage.data
@@ -42,7 +42,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 Log.d(TAG, "sendNotification: title: $title, body: $body, data: $data")
                 sendNotification(title, body, data)
             }
-        }
+//        }
     }
 
     private fun sendNotification(title: String?, body: String?, data: Map<String, String>) {
