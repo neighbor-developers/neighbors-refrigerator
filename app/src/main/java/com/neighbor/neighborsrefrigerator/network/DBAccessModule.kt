@@ -225,4 +225,41 @@ class DBAccessModule {
             }
         })
     }
+    fun makeChat(id:Int, postId:Int, contactId:Int, createdAt:String){
+        val chatData = ChatData(id,postId,contactId,createdAt)
+        dbAccessApi.makeChat(chatData).enqueue(object : Callback<ReturnObject<Int>>{
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("test",response.body()!!.msg)
+                }
+
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
+    }
+
+    fun sendMessage(chatId:String, createdAt:String, content:String, from:Int){
+        val messageData = MessageData(chatId, createdAt ,content,from)
+        dbAccessApi.sendMessage(messageData).enqueue(object : Callback<ReturnObject<Int>>{
+            override fun onResponse(
+                call: Call<ReturnObject<Int>>,
+                response: Response<ReturnObject<Int>>
+            ) {
+                if(response.isSuccessful){
+                    Log.d("test",response.body()!!.msg)
+                }
+
+            }
+
+            override fun onFailure(call: Call<ReturnObject<Int>>, t: Throwable) {
+                Log.d("test",t.localizedMessage)
+            }
+        })
+    }
 }

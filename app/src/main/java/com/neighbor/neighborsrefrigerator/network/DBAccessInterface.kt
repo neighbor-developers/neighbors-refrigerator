@@ -79,7 +79,7 @@ interface DBAccessInterface {
         @Query("id") id: String
     ): ReturnObject<Boolean>
 
-    @POST("post/updateFcmToken")
+    @POST("/user/updateFcmToken")
     fun updateFcmToken(
         @Body userdata : UserData
     ) : retrofit2.Call<ReturnObject<Int>>
@@ -95,12 +95,22 @@ interface DBAccessInterface {
     ): ReturnObject<Boolean>
 
     @FormUrlEncoded
-    @PUT("user/updateLocation/{id}")
+    @PUT("/user/updateLocation/{id}")
     fun updateUserLocation(
         @Path("id") id: Int,
         @Field("latitude") latitude: Double,
         @Field("longitude") longitude: Double,
         @Field("home_addr") home_addr: String
+    ): retrofit2.Call<ReturnObject<Int>>
+
+    @POST("/chat/create")
+    fun makeChat(
+        @Body chatData:ChatData
+    ): retrofit2.Call<ReturnObject<Int>>
+
+    @POST("/chat/sendMessage")
+    fun sendMessage(
+        @Body messageData: MessageData
     ): retrofit2.Call<ReturnObject<Int>>
 
 }
