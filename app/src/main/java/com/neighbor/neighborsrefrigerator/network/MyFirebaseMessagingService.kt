@@ -36,16 +36,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 //        if(remoteMessage.data.isNotEmpty()){
             val title = remoteMessage.notification?.title
             val body = remoteMessage.notification?.body
-            val data = remoteMessage.data
+//            val data = remoteMessage.data
 
             if(title != null && body != null){
-                Log.d(TAG, "sendNotification: title: $title, body: $body, data: $data")
-                sendNotification(title, body, data)
+                Log.d(TAG, "sendNotification: title: $title, body: $body")
+                sendNotification(title, body)
             }
 //        }
     }
 
-    private fun sendNotification(title: String?, body: String?, data: Map<String, String>) {
+    private fun sendNotification(title: String?, body: String?) {
 
         // 알림 채널 이름
         val channelId = getString(R.string.default_notification_channel_id)
