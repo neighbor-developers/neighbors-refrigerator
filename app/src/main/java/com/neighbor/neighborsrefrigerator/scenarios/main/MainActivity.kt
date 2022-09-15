@@ -113,10 +113,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun delAuth() {
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val id = UserSharedPreference(App.context()).getUserPrefs("id")
             var result = false
-            CoroutineScope(Dispatchers.Main).async {
+            lifecycleScope.async {
                 result = dbAccessModule.deleteUser(id!!.toInt())
             }.await()
             if (result) {

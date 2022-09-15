@@ -2,7 +2,7 @@ package com.neighbor.neighborsrefrigerator.data
 
 data class ChatMessageData(
     val content: String,
-    val is_read: Boolean,
+    var is_read: Boolean,
     val createdAt: Long,
     val from: Int
 )
@@ -18,5 +18,5 @@ data class FirebaseChatData(
     val postId: Int,
     val writer: ChatUserData,
     val contact: ChatUserData,
-    val messages: List<ChatMessageData>
+    var messages: List<ChatMessageData>
 )

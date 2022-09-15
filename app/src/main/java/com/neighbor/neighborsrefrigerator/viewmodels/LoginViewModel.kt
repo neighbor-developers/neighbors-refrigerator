@@ -135,12 +135,8 @@ class LoginViewModel : ViewModel() {
                 fcm = ""
             )
         viewModelScope.launch {
-            var result: Int? = null
             userdata.fcm  = UserSharedPreference(App.context()).getUserPrefs("fcm")
-
-            viewModelScope.async {
-                result = dbAccessModule.joinUser(userdata)
-            }.await()
+            val result = dbAccessModule.joinUser(userdata)
             Log.d("id", result.toString())
             userdata.id = result
 

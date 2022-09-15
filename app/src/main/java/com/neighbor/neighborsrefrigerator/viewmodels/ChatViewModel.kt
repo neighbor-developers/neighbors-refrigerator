@@ -82,6 +82,9 @@ class ChatViewModel() : ViewModel() {
                 }
                 chatMessages.value = arrayListOf()
                 chatMessages.value = _chatMessage.toList()
+                chatData.value?.let {
+                    readMessage(chatId, chatMessages.value)
+                }
                 Log.d("변화 리스너2", chatMessages.value.toString())
             }
 
@@ -90,6 +93,19 @@ class ChatViewModel() : ViewModel() {
             }
         }
         firebaseDB.reference.child("chat").child(chatId).child("messages").addValueEventListener(chatListener)
+    }
+
+    fun readMessage(chatId: String, chatDataToRead: List<ChatMessageData>){
+        val last = chatDataToRead.lastIndex
+        chatDataToRead[last].is_read = true
+        firebaseDB.reference.child("chat").child(chatId).child("messages").setValue(chatDataToRead)
+            .addOnSuccessListener {
+                Log.d("newChatRoomSuccess", "메세지 보내기 성공")
+            }
+            .addOnFailureListener{
+                Log.d("메세지 보내기 실패", it.toString())
+            }
+
     }
 
     fun newMessage(chatId: String, messageData: ChatMessageData){

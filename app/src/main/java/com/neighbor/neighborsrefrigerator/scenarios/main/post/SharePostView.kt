@@ -1,8 +1,10 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -19,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -48,12 +52,9 @@ fun SharePostScreen(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .height(900.dp)
-            .background(colorResource(id = R.color.backgroundGray))
+            .background(Color.White)
     ) {
         SharePostListByDistance(posts = postViewModel.sharePostsByDistance.collectAsState(), route, navController)
-        Spacer(modifier = Modifier
-            .height(15.dp)
-            .background(color = colorResource(id = R.color.green)))
         Tab(postViewModel = postViewModel, route, navController)
     }
 }
@@ -70,17 +71,20 @@ fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHo
     val coroutineScope = rememberCoroutineScope()
 
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-        Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "", tint = colorResource(
-            id = R.color.green
-        ), modifier = Modifier
-            .size(18.dp)
-            .padding(start = 10.dp))
+    Row(
+        modifier = Modifier.padding(start = 15.dp, bottom = 10.dp, top = 18.dp)
+            .background(Color.White),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Icon(
+            imageVector = Icons.Filled.LocationOn,
+            contentDescription = "",
+            tint = colorResource(id = R.color.green),
+            modifier = Modifier.size(18.dp))
         Text(
             text = "우리 동네 나눔",
-            modifier = Modifier.padding(start = 5.dp, bottom = 10.dp, top = 10.dp),
+            modifier = Modifier.padding(start = 5.dp),
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -125,6 +129,7 @@ fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHo
                                 tint = colorResource(id = R.color.categoryGreen))
                             Text(text = categoryList[title]!!, fontSize = 10.sp, color =  colorResource(id = R.color.categoryGreen), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                         }
+
 //                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
 //
 //                            Icon(painter = painterResource(id = categoryIconList[title]!!), contentDescription = categoryList[title], modifier = Modifier.size(if (title == 200) 31.dp else if (title == 0) 30.dp else 35.dp),
@@ -138,37 +143,35 @@ fun Tab(postViewModel: PostViewModel, route: NAV_ROUTE, navHostController: NavHo
             )
         }
     }
-    
-    HorizontalPager(state = pagerState) { page ->
-        SharePostListByTime(posts = when(page) {
-            0 -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()
-            1 -> postViewModel.sharePostsForCategory100.collectAsLazyPagingItems()
-            2 -> postViewModel.sharePostsForCategory200.collectAsLazyPagingItems()
-            3 -> postViewModel.sharePostsForCategory300.collectAsLazyPagingItems()
-            4 -> postViewModel.sharePostsForCategory400.collectAsLazyPagingItems()
-            5 -> postViewModel.sharePostsForCategory500.collectAsLazyPagingItems()
-            6 -> postViewModel.sharePostsForCategory600.collectAsLazyPagingItems()
-            else -> postViewModel.sharePostsByTime.collectAsLazyPagingItems()}, route = route, navHostController = navHostController)
 
+    Spacer(modifier = Modifier.height(8.dp))
+    HorizontalPager(state = pagerState) { page ->
+        val category = if (page == 0) null else page.toString() + "00"
+        SharePostListByTime(postItems = postViewModel.sharePostsByTime.collectAsLazyPagingItems(), route = route, navHostController = navHostController, category = category)
     }
 
 }
 
 @Composable
-fun SharePostListByTime(posts: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController){
+fun SharePostListByTime(postItems: LazyPagingItems<PostData>, route: NAV_ROUTE, navHostController: NavHostController, category : String?){
+    val posts =
+        if (!category.isNullOrEmpty()) {
+            postItems.itemSnapshotList.items.filter {
+                it.categoryId == category.toString()
+            }
+        }else{
+            postItems.itemSnapshotList.items
+        }
+
     LazyColumn(
         userScrollEnabled = true,
         modifier = Modifier
-            .background(colorResource(id = R.color.backgroundGray))
+            .background(Color.White)
     ) {
-        items(posts.itemCount) { count ->
-            Spacer(modifier = Modifier
-                .height(15.dp)
-                .background(Color.Transparent))
-            ItemCardByTime(post= posts[count]!!, route = route, navHostController = navHostController)
+        items(posts){ post ->
+            ItemCardByTime(post= post, route = route, navHostController = navHostController, type = 1)
 
         }
-
     }
 }
 
@@ -182,42 +185,79 @@ fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE
     val pagerState = rememberPagerState(pageCount = 6)
     if (!posts.value.isNullOrEmpty()){
 
-        DrawLine()
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-            Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "", tint = colorResource(
-                id = R.color.green
-            ), modifier = Modifier
-                .size(18.dp)
-                .padding(start = 10.dp))
-            Text(
-                text = "${userNickname}님에게 가까운 나눔",
-                modifier = Modifier.padding(start = 5.dp, bottom = 10.dp, top = 10.dp),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-        DrawLine()
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp), contentAlignment = Alignment.BottomCenter) {
-            HorizontalPager(state = pagerState) { page ->
-                ItemCardByTime(
-                    post = posts.value!![page],
-                    route = route,
-                    navHostController = navHostController
+        Column {
+            DrawLine2()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White).padding(start = 15.dp, end = 15.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = "",
+                    tint = colorResource(
+                        id = R.color.green
+                    ),
+                    modifier = Modifier
+                        .size(18.dp)
+                )
+                Text(
+                    text = "${userNickname}님에게 가까운 나눔",
+                    modifier = Modifier.padding(start = 5.dp, bottom = 10.dp, top = 10.dp),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
-            DotsIndicator(
-                totalDots = 6,
-                selectedIndex = pagerState.currentPage,
-                selectedColor = colorResource(id = R.color.green),
-                unSelectedColor = Color.LightGray,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
+            DrawLine()
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+            ) {
+                val (item, dot) = createRefs()
+                HorizontalPager(state = pagerState, modifier = Modifier
+                    .height(115.dp)
+                    .constrainAs(item) {
+                        top.linkTo(parent.top)
+                    }) { page ->
+                    ItemCardByTime(
+                        post = posts.value!![page],
+                        route = route,
+                        navHostController = navHostController,
+                        type = 2
+                    )
+                }
+                DotsIndicator(
+                    totalDots = 6,
+                    selectedIndex = pagerState.currentPage,
+                    selectedColor = colorResource(id = R.color.green),
+                    unSelectedColor = Color.LightGray,
+                    modifier = Modifier.constrainAs(dot) {
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+            }
         }
 
     }
 
 }
+@Composable
+fun DrawLine2(){
+    val color = colorResource(id = R.color.completeGray)
+    Canvas(modifier = Modifier.fillMaxWidth()) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+        drawLine(
+            start = Offset(x = 0f, y = canvasHeight),
+            end = Offset(x = canvasWidth, y = canvasHeight),
+            color = color,
+            strokeWidth = 2.5f
+        )
+    }
+}
+

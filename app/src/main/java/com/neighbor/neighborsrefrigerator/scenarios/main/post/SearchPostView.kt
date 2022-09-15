@@ -73,7 +73,8 @@ fun SearchPostView(
                         Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로가기")
                     }
                 },
-                backgroundColor = Color.Transparent
+                backgroundColor = Color.White,
+                elevation = 0.dp
             )
         }
     ) { padding ->
@@ -81,9 +82,10 @@ fun SearchPostView(
             search.value?.let {
                 if (type == "share")
                     SharePostListByTime(
-                        posts = it.collectAsLazyPagingItems(),
+                        postItems = it.collectAsLazyPagingItems(),
                         route = NAV_ROUTE.SHARE_DETAIL,
-                        navHostController = navController
+                        navHostController = navController,
+                        category = null
                     )
                 else {
                     SeekPostList(

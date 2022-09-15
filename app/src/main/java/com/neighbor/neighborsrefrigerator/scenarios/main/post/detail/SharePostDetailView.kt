@@ -1,21 +1,28 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post.detail
 
-import android.util.Log
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
@@ -29,61 +36,26 @@ import com.neighbor.neighborsrefrigerator.view.DeclarationDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.PostViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 
 @Composable
-fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: PostViewModel = viewModel(), post: PostData) {
+fun SharePostDetailScreen(
+    navHostController: NavHostController,
+    postViewModel: PostViewModel = viewModel(),
+    post: PostData
+) {
 
     var nickname by remember {
         mutableStateOf("")
     }
-    var level by remember {
+    val level by remember {
         mutableStateOf(0)
     }
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         val userData = postViewModel.getUserNickname(post.userId)
-        nickname = userData?.nickname?:""
+        nickname = userData?.nickname ?: ""
         //level = userData?.score?:0
-    }
-
-    val current = System.currentTimeMillis()
-    val calTime = CalculateTime()
-    val time = calTime.calTimeToPost(current, post.createdAt)
-
-    val calDistance = CalDistance()
-    val lat  by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
-    }
-    val lng  by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
-    }
-
-    val distance  by remember{
-        mutableStateOf(
-            if(lat != null && lng !=null){
-                calDistance.getDistance(lat!!, lng!!, post.latitude,post.longitude)
-            }else null)
-    }
-
-
-    val contactUserId by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
-    }
-
-    val validateDate = post.validateDate?.let {
-        val date = it.split(".")[0].replace("T", " ")
-        val formattedTime = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).parse(date)?.time
-        SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(formattedTime)
-    }
-    Log.d("validate", validateDate.toString())
-
-    val validateType = when (post.validateType) {
-        1 -> "유통기한"
-        2 -> "제조일자"
-        3 -> "구매일자"
-        else -> {
-            ""
-        }
     }
 
     val scaffoldState = rememberScaffoldState()
@@ -97,17 +69,31 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
                 title = {},
                 actions = {
                     IconButton(onClick = { declarationDialogState = true }) {
-                        Icon(painterResource(id = R.drawable.icon_decl_color), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = colorResource(
-                            id = R.color.declRed
-                        ))
-                        Icon(painterResource(id = R.drawable.icon_decl), contentDescription = "신고하기", modifier = Modifier.size(25.dp), tint = Color.White)
+                        Icon(
+                            painterResource(id = R.drawable.icon_decl_color),
+                            contentDescription = "신고하기",
+                            modifier = Modifier.size(25.dp),
+                            tint = colorResource(
+                                id = R.color.declRed
+                            )
+                        )
+                        Icon(
+                            painterResource(id = R.drawable.icon_decl),
+                            contentDescription = "신고하기",
+                            modifier = Modifier.size(25.dp),
+                            tint = Color.White
+                        )
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick =  { navHostController.navigateUp() }) {
+                    IconButton(onClick = { navHostController.navigateUp() }) {
                         Icon(
-                            painterResource(id = R.drawable.icon_back), contentDescription = "뒤로가기", modifier = Modifier.size(35.dp), tint = colorResource(
-                            id = R.color.green)
+                            painterResource(id = R.drawable.icon_back),
+                            contentDescription = "뒤로가기",
+                            modifier = Modifier.size(35.dp),
+                            tint = colorResource(
+                                id = R.color.green
+                            )
                         )
                     }
                 },
@@ -116,70 +102,411 @@ fun SharePostDetailScreen(navHostController: NavHostController, postViewModel: P
             )
         }
     ) {
-        Surface(modifier = Modifier
-            .padding(it)
-            .fillMaxSize()) {
+        Surface(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+        ) {
             if (declarationDialogState) {
-                DeclarationDialog(postId = post.id!!, type = 1, onChangeState =  {
+                DeclarationDialog(postId = post.id!!, type = 1, onChangeState = {
                     declarationDialogState = false
                 })
             }
-            var completeShareDialog by remember {
-                mutableStateOf(false)
-            }
 
-            if(completeShareDialog){
-                post.let {
-                    CompleteDialog(
-                        type = "거래",
-                        { completeShareDialog = false },
-                        { postViewModel.completeShare(it) }
-                    )
-                }
-            }
-            Column {
-                Text(text = "상품 자세히 보기", fontSize = 20.sp, modifier = Modifier.padding(start = 30.dp, top = 10.dp, bottom = 20.dp))
-                Row() {
-                    Spacer(modifier = Modifier.width(30.dp))
-                    val modifier = Modifier.size(150.dp)
-                    post.productimg1?.let {
-                        ItemImage(productImg1 = post.productimg1, modifier = modifier)
+            PostDataScreen(
+                navHostController = navHostController,
+                postViewModel = postViewModel,
+                post = post,
+                nickname = nickname,
+                level = level
+            )
+        }
+    }
+}
+
+@Composable
+fun PostDataScreen(
+    navHostController: NavHostController,
+    postViewModel: PostViewModel,
+    post: PostData,
+    nickname: String,
+    level: Int
+) {
+    val current = System.currentTimeMillis()
+    val calTime = CalculateTime()
+    val createdTime = calTime.calTimeToPost(current, post.createdAt)
+
+    val calDistance = CalDistance()
+    val lat by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
+    }
+    val lng by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
+    }
+
+    val distance by remember {
+        mutableStateOf(
+            if (lat != null && lng != null) {
+                calDistance.getDistance(lat!!, lng!!, post.latitude, post.longitude)
+            } else null
+        )
+    }
+
+    val contactUserId by remember {
+        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
+    }
+
+    val validateDate = post.validateDate?.let {
+        val date = it.split(".")[0].replace("T", " ")
+        val formattedTime = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).parse(date)?.time
+        SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(formattedTime)
+    }
+
+    val validateType = when (post.validateType) {
+        1 -> "유통기한"
+        2 -> "제조일자"
+        3 -> "구매일자"
+        else -> {
+            ""
+        }
+    }
+
+    var titleFontSize by remember {
+        mutableStateOf(18.sp)
+    }
+    var imageLoadState by remember {
+        mutableStateOf(false)
+    }
+    var expandedImage by remember {
+        mutableStateOf(post.productimg1)
+    }
+
+    var completeShareDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (completeShareDialog) {
+        post.let {
+            CompleteDialog(
+                type = "거래",
+                { completeShareDialog = false },
+                { postViewModel.completeShare(it) }
+            )
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val (main, user) = createRefs()
+            Column(
+                modifier = Modifier
+                    .padding(start = 27.dp, end = 27.dp, bottom = 130.dp)
+                    .constrainAs(main) {
+                        top.linkTo(parent.top)
                     }
-                    Spacer(modifier = Modifier.width(30.dp))
-                    Text(text = post.title, fontSize = 20.sp)
+                    .verticalScroll(
+                        enabled = true,
+                        state = rememberScrollState()
+                    )
+            ) {
+                Spacer(modifier = Modifier.height(30.dp))
+                Text(
+                    text = "나눔 자세히 보기",
+                    fontSize = 20.sp,
+                    color = Color.DarkGray,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(35.dp))
+                Row() {
+                    val modifier = Modifier.size(120.dp)
+                    post.productimg1?.let {
+                        ItemImage(productImg = post.productimg1, modifier = modifier)
+                    }
+
+                    Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
+                        Text(text = post.title,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = titleFontSize,
+                            color = Color.Black,
+                            modifier = Modifier.height(75.dp),
+                            onTextLayout = {
+                                titleFontSize = if(it.lineCount == 1){
+                                    21.sp
+                                } else if (it.lineCount < 3)
+                                    19.sp
+                                else if (it.lineCount == 3)
+                                    16.sp
+                                else
+                                    13.3.sp
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        distance?.let {
+                            Text(
+                                text = "내 위치에서 ${(it / 10).roundToInt() / 100} km",
+                                fontSize = 13.sp,
+                                color = Color.DarkGray
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "$validateType : $validateDate",
+                            fontSize = 13.sp,
+                            color = Color.DarkGray
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                    }
                 }
                 Spacer(modifier = Modifier.height(30.dp))
-                Surface(shape = MaterialTheme.shapes.large.copy(topEnd = CornerSize(70.dp))) {
-                    Column(modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = Color(0xff00ac77))) {
-                        Text(text = "내 위치에서 ${post.distance}km", fontSize = 20.sp, color = Color.White)
-                        Text(text = "$validateType : $validateDate", fontSize = 20.sp, color = Color.White)
-                        if(post.userId != contactUserId) {
-                            Button(onClick = {
-                                val chatId = post.id.toString() + contactUserId.toString()
-                                //postViewModel.newChatRoom(chatId, post.id!!, post.userId)
-                                navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
-                            }) {
-                                Text(text = "채팅하기")
-                            }
-                        }else{
-                            // 포스트 작성자일때 완료 버튼
-                            Button(
-                                onClick = { completeShareDialog = true },
-                                colors = ButtonDefaults.buttonColors(colorResource(id = R.color.green)),
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier.size(85.dp, 33.dp)
-                            ) {
-                                Text(text = "나눔 완료", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                            }
-                            Spacer(modifier = Modifier.width(10.dp))
-
+                ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                    val (text, button) = createRefs()
+                    Text(text = "상세 설명",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        color = Color.DarkGray,
+                        modifier = Modifier.constrainAs(text) {
+                            start.linkTo(parent.start)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }
+                    )
+                    TextButton(
+                        onClick = { /*TODO*/ },
+                        elevation = ButtonDefaults.elevation(0.dp),
+                        colors = if (post.review == null) {
+                            ButtonDefaults.buttonColors(
+                                backgroundColor = colorResource(id = R.color.green),
+                                disabledBackgroundColor = colorResource(id = R.color.green)
+                            )
+                        } else {
+                            ButtonDefaults.buttonColors(
+                                backgroundColor = colorResource(id = R.color.completeGray),
+                                disabledBackgroundColor = colorResource(id = R.color.completeGray)
+                            )
+                        },
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .size(90.dp, 37.dp)
+                            .constrainAs(button) {
+                                end.linkTo(parent.end)
+                                top.linkTo(parent.top)
+                                bottom.linkTo(parent.bottom)
+                            },
+                        enabled = false
+                    ) {
+                        if (post.review == null) {
+                            Text(
+                                text = "나눔중",
+                                color = Color.White,
+                                fontSize = 13.5.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        } else {
+                            Text(
+                                text = "나눔 완료",
+                                color = Color.White,
+                                fontSize = 13.5.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
                 }
+                Text(
+                    text = post.content,
+                    fontSize = 14.sp,
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(top = 25.dp)
+                )
+                Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
+                    Spacer(modifier = Modifier.height(18.dp))
+                    Text(
+                        text = "업로드 : $createdTime",
+                        fontSize = 11.sp,
+                        color = Color.DarkGray
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    text = "사진",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 15.sp,
+                    color = Color.DarkGray
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(modifier = Modifier.padding(bottom = 10.dp)) {
+                    post.productimg1?.let {
+                        ItemImage(productImg = it, modifier = Modifier
+                            .size(85.dp)
+                            .clickable {
+                                imageLoadState = true
+                                expandedImage = it
+                            })
+                        Spacer(modifier = Modifier.width(20.dp))
+                    }
+                    post.productimg2?.let {
+                        ItemImage(productImg = it, modifier = Modifier
+                            .size(85.dp)
+                            .clickable {
+                                imageLoadState = true
+                                expandedImage = it
+                            })
+                        Spacer(modifier = Modifier.width(20.dp))
+                    }
+                    post.productimg3?.let {
+                        ItemImage(productImg = it, modifier = Modifier
+                            .size(85.dp)
+                            .clickable {
+                                imageLoadState = true
+                                expandedImage = it
+                            })
+                    }
+                }
+            }
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(user) {
+                        bottom.linkTo(parent.bottom)
+                    }
+                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(topEnd = 60.dp))
+                    .background(
+                        shape = RoundedCornerShape(topEnd = 60.dp),
+                        color = colorResource(id = R.color.green)
+                    )
+                    .height(130.dp)
+                    .padding(20.dp)
+            ) {
+                val (userData, button) = createRefs()
+                Column(modifier = Modifier.constrainAs(userData) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }) {
+                    if (nickname != "") {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Surface(modifier = Modifier.size(28.dp),
+                                contentColor = Color.White,
+                                color = Color.White,
+                                shape = CircleShape,
+                                content = {
+                                    Image(
+                                        painter = painterResource(R.drawable.level1),
+                                        contentDescription = "App icon",
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                            .padding(4.dp)
+                                            .background(color = Color.White, shape = CircleShape)
+                                    )
+                                }
+                            )
+                            Text(
+                                text = nickname,
+                                color = Color.White,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+
+                        }
+
+                    }
+                }
+                TextButton(
+                    onClick = {
+                        if (post.userId != contactUserId) {
+                            val chatId = post.id.toString() + contactUserId.toString()
+                            navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
+                        } else {
+                            completeShareDialog = true
+                        }
+                    },
+                    elevation = ButtonDefaults.elevation(4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledBackgroundColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .size(90.dp, 37.dp)
+                        .constrainAs(button) {
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
+                    enabled = true
+                ) {
+                    Text(
+                        text = if (post.userId == contactUserId) "나눔 완료" else "채팅하기",
+                        color = colorResource(id = R.color.green),
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+            }
+        }
+        if (imageLoadState){
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        imageLoadState = false
+                    }
+                    .background(color = colorResource(id = R.color.shadowGray))) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(expandedImage)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.icon_google),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+
+                )
             }
         }
     }
 }
 
+
+@Preview
+@Composable
+fun P() {
+    SharePostDetailScreen(
+        navHostController = NavHostController(LocalContext.current), post =
+        PostData(
+            id = 312,
+            title = "명절 선물로 받은 사과 나눔합니당! ",
+            categoryId = "200",
+            userId = 2,
+            content = "이번 추석 선물로 사과 두박스가 들어와서 몇개 나눔할게요:)\n위치는 정왕동입니다! 채팅 주세요이번 추석 선물로 사과 두박스가 들어와서 몇개 나눔할게요:)",
+            type = 2,
+            mainAddr = "경기도시흥시301",
+            addrDetail = "301호",
+            rate = 0,
+            review = null,
+            validateType = 1,
+            validateDate = "2022-08-22T00:00:00.000Z",
+            validateImg = null,
+            productimg1 = "https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg",
+            productimg2 = null,
+            productimg3 = null,
+            createdAt = "2022-08-22T16:45:04.000Z",
+            updatedAt = "2022-08-22T16:47:28.000Z",
+            completedAt = null,
+            latitude = 37.34,
+            longitude = 126.73,
+            state = "1",
+            distance = null
+        )
+    )
+}

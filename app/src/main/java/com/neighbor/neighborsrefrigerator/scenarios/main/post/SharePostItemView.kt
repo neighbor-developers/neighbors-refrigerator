@@ -42,7 +42,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData/* onClick: ()-> Unit */,  route: NAV_ROUTE, navHostController: NavHostController){
+fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, route: NAV_ROUTE, navHostController: NavHostController, type: Int){
     var nickname by remember {
         mutableStateOf("")
     }
@@ -91,29 +91,12 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData/* 
                     .height(80.dp)
                     .aspectRatio(1f)
                 post.productimg1?.let {
-                    ItemImage(productImg1 = post.productimg1, modifier = modifier)
+                    ItemImage(productImg = post.productimg1, modifier = modifier)
                 }
                 Column(
                     modifier = Modifier
                         .padding(start = 15.dp)
                         .fillMaxWidth()) {
-                    distancePost?.let {
-                        //Spacer(modifier = Modifier.height(10.dp))
-                        val distanceText = "${(it / 10).roundToInt() / 100} km"
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp, bottom = 4.dp)) {
-                            Icon(
-                                Icons.Filled.Home, contentDescription = "",
-                                modifier = Modifier.size(14.dp),
-                                tint = colorResource(id = R.color.green)
-                            )
-                            Text(
-                                text = "내 위치에서 $distanceText",
-                                fontSize = 11.sp,
-                                color = Color.DarkGray,
-                                modifier = Modifier.padding(start = 3.dp)
-                            )
-                        }
-                    }
                     Spacer(modifier = Modifier.height(5.dp))
                     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
                         val (title, button) = createRefs()
@@ -123,14 +106,33 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData/* 
                                 top.linkTo(parent.top)
                             }
                             .padding(end = 95.dp)) {
+                            distancePost?.let {
+                                //Spacer(modifier = Modifier.height(10.dp))
+                                val distanceText = "${(it / 10).roundToInt() / 100} km"
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp, bottom = 4.dp)) {
+                                    Icon(
+                                        Icons.Filled.Home, contentDescription = "",
+                                        modifier = Modifier.size(14.dp),
+                                        tint = colorResource(id = R.color.green)
+                                    )
+                                    Text(
+                                        text = "내 위치에서 $distanceText",
+                                        fontSize = 11.sp,
+                                        color = Color.DarkGray,
+                                        modifier = Modifier.padding(start = 3.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(3.dp))
                             Text(
-                                text = "고구마랑 대파 나눔해용",
+                                text = post.title,
                                 fontSize = 15.sp,
                                 color = Color.Black,
                                 fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
                                 modifier = Modifier.padding(start = 2.dp)
                             )
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = post.content,
                                 fontSize = 12.sp,
@@ -146,7 +148,6 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData/* 
                                 top.linkTo(parent.top)
                                 bottom.linkTo(parent.bottom)
                             }
-                            .fillMaxHeight()
                             .width(80.dp)
                         ){
 
@@ -172,51 +173,59 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData/* 
                     }
                 }
             }
-            DrawLine()
-            ConstraintLayout(modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 15.dp, end = 15.dp, top = 8.dp, bottom = 8.dp)) {
-                val (nicknameTextView, distanceTextView) = createRefs()
-                if (nickname != "") {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.constrainAs(nicknameTextView){
-                            start.linkTo(parent.start)
-                            top.linkTo(parent.top)
-                            bottom.linkTo(parent.bottom)
-                        }
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.level1),
-                            contentDescription = "App icon",
-                            modifier = Modifier
-                                .clip(shape = CircleShape)
-                                .size(20.dp)
-                                .padding(end = 5.dp)
-                        )
-                        Text(text = nickname, color = Color.DarkGray, fontSize = 12.sp)
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-                Text(text = time, fontSize = 10.sp, color = Color.DarkGray, textAlign = TextAlign.End,
-                    modifier = Modifier.constrainAs(distanceTextView) {
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    })
-
+            if (type == 1){
+                NicknameText(nickname = nickname, time = time)
+                DrawLine()
             }
+
         }
     }
 
 }
+@Composable
+fun NicknameText(nickname: String, time : String){
+    DrawLine()
+    ConstraintLayout(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 5.dp, bottom = 5.dp, start = 15.dp, end = 15.dp)) {
+        val (nicknameTextView, distanceTextView) = createRefs()
+        if (nickname != "") {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.constrainAs(nicknameTextView){
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.level1),
+                    contentDescription = "App icon",
+                    modifier = Modifier
+                        .clip(shape = CircleShape)
+                        .size(20.dp)
+                        .padding(end = 3.dp)
+                )
+                Text(text = nickname, color = Color.DarkGray, fontSize = 12.sp)
+            }
+
+        }
+        Text(text = time, fontSize = 10.sp, color = Color.DarkGray, textAlign = TextAlign.End,
+            modifier = Modifier.constrainAs(distanceTextView) {
+                end.linkTo(parent.end)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+            })
+    }
+}
 
 @Composable
-fun ItemImage(productImg1:String, modifier: Modifier){
+fun ItemImage(productImg:String, modifier: Modifier){
     Surface (shape = MaterialTheme.shapes.small.copy(CornerSize(8.dp))){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(productImg1)
+                .data(productImg)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
@@ -227,40 +236,6 @@ fun ItemImage(productImg1:String, modifier: Modifier){
     }
 }
 
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun ItemCardByDistance(post: PostData, route: NAV_ROUTE, navHostController: NavHostController) {
-//    Card(
-//        onClick= {
-//            navHostController.currentBackStackEntry?.savedStateHandle?.set(key = "post", value = post)
-//            navHostController.navigate(route = route.routeName) },
-//
-//        modifier = Modifier
-//            .padding(end = 20.dp)
-//            .fillMaxWidth(),
-//        shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp)),
-//        elevation = 0.dp
-//    ) {
-//        Surface(shape = MaterialTheme.shapes.small.copy(CornerSize(20.dp))) {
-//            Row(verticalAlignment = Alignment.Bottom) {
-//                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-//                    val modifier = Modifier.aspectRatio(1f)
-//                    post.productimg1?.let {
-//                        ItemImage(productimg1 = post.productimg1, modifier = modifier)
-//                    }
-//
-//                }
-//                Box(contentAlignment = Alignment.TopEnd) {
-//                    IsTrustMark(isTrust = !post.validateImg.isNullOrEmpty())
-//                    Column(horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Bottom, modifier = Modifier
-//                        .height(100.dp)) {
-//                        ItemText(post = post)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 @Composable
 fun IsTrustMark(isTrust: Boolean) {
     if (isTrust) {
@@ -268,10 +243,4 @@ fun IsTrustMark(isTrust: Boolean) {
             .size(30.dp)
             .padding(end = 10.dp, top = 10.dp))
     }
-}
-@Composable
-@Preview
-fun A(){
-    val post = PostData(id=257, title="제목246", categoryId= "100", userId=1, content="내용246", type=1, mainAddr="경기도시흥시246", addrDetail="246호", rate=0, review=null, validateType=1, validateDate="2022-08-22T0000:00.000Z", validateImg=null, productimg1="https://src.hidoc.co.kr/image/lib/2022/4/13/1649807075785_0.jpg", productimg2=null, productimg3=null, createdAt="2022-08-22T16:45:04.000Z", updatedAt="2022-08-22T16:47:28.000Z", completedAt=null, latitude=37.34, longitude=126.73, state="1", distance=null)
-    ItemCardByTime(post = post, route = NAV_ROUTE.SHARE_DETAIL, navHostController = NavHostController(LocalContext.current))
 }

@@ -52,7 +52,7 @@ fun SeekPostScreen(
     Column() {
         DrawLine()
         Row(modifier = Modifier
-            .padding(start = 10.dp, bottom = 10.dp, top = 10.dp)
+            .padding(start = 15.dp, bottom = 10.dp, top = 10.dp)
             .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
             Icon(imageVector = Icons.Filled.LocationOn, contentDescription = "",
                 tint = colorResource(id = R.color.green),
@@ -142,7 +142,7 @@ fun SeekItem(post: PostData,
                 ) {
                     val (title, timeText) = createRefs()
                     //Text(text = post.title, fontSize = 15.sp,
-                    Text(text = "하나로 마트에서 장 보실분 :)",
+                    Text(text = post.title,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.constrainAs(title) {
@@ -159,7 +159,7 @@ fun SeekItem(post: PostData,
                 Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 12.dp)) {
                     //Text(text = post.content, fontSize = 12.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 15.dp, bottom = 15.dp))
                     Text(
-                        text = "3시 40분쯤에 하나로 마트 xx점에 김밥 재료랑 과일 사러가는데 같이 사서 나누실분 구해요!! 반띵해서 나눠먹어요:)",
+                        text = post.content,
                         fontSize = 13.5.sp,
                         color = Color.DarkGray,
                         modifier = Modifier.padding(
