@@ -111,7 +111,7 @@ fun SharePostRegisterScreen(
         Column(
             modifier = Modifier
                 .padding(it)
-                .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp)
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
         ) {
             if(completeShareDialog){
                 CompleteDialog(
@@ -139,7 +139,7 @@ fun SharePostRegisterScreen(
             }
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(text = "상품사진", modifier = Modifier.padding(start = 7.dp), fontSize = 13.sp, color = Color.DarkGray)
-                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Row() {
                     Image(
                         painter = if (viewModel.imgUriState != null)
                             rememberAsyncImagePainter(
@@ -147,7 +147,7 @@ fun SharePostRegisterScreen(
                                     .Builder(LocalContext.current)
                                     .data(data = viewModel.imgUriState)
                                     .build()
-                            ) else painterResource(R.drawable.icon_google),
+                            ) else painterResource(R.drawable.camera),
                         contentDescription = "상품 사진",
                         modifier = Modifier
                             .clickable(
@@ -155,52 +155,9 @@ fun SharePostRegisterScreen(
                                 onClickLabel = "Clickable image",
                                 onClick = { selectImageLauncher.launch("image/*") }
                             )
-                            .weight(1f)
-                            .aspectRatio(1f)
+                            .width(100.dp)
+                            .height(100.dp)
                             .padding(top = 10.dp, end = 5.dp),
-                        colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
-                    )
-                    Image(
-                        painter = if (viewModel.imgUriState != null)
-                            rememberAsyncImagePainter(
-                                ImageRequest
-                                    .Builder(LocalContext.current)
-                                    .data(data = viewModel.imgUriState)
-                                    .build()
-                            ) else painterResource(R.drawable.icon_google),
-                        contentDescription = "상품 사진",
-                        modifier = Modifier
-                            .clickable(
-                                enabled = true,
-                                onClickLabel = "Clickable image",
-                                onClick = { selectImageLauncher.launch("image/*") }
-                            )
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .padding(top = 10.dp, end = 5.dp),
-                        colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
-                    )
-                    Image(
-                        painter = if (viewModel.imgUriState != null)
-                            rememberAsyncImagePainter(
-                                ImageRequest
-                                    .Builder(LocalContext.current)
-                                    .data(data = viewModel.imgUriState)
-                                    .build()
-                            ) else painterResource(R.drawable.icon_google),
-                        contentDescription = "상품 사진",
-                        modifier = Modifier
-                            .clickable(
-                                enabled = true,
-                                onClickLabel = "Clickable image",
-                                onClick = { selectImageLauncher.launch("image/*") }
-                            )
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .padding(top = 10.dp, start = 5.dp)
-
-                        ,
-                        colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
                     )
 
                     if (viewModel.imgUriState != null) {
@@ -277,7 +234,8 @@ fun SharePostRegisterScreen(
                                 .border(width = 1.dp, color = Color.Black)
                                 .clickable {
                                     periodButtonState = true
-                                },
+                                }
+                                .padding(end = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
@@ -285,12 +243,12 @@ fun SharePostRegisterScreen(
                                 fontSize = 12.sp,
                                 modifier = Modifier
                                     .width(120.dp)
-                                    .padding(start = 10.dp)
+                                    .padding(start = 10.dp, top = 3.dp, bottom = 3.dp)
                             )
                             Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "달력 버튼",
-                                tint = colorResource(id = R.color.green)
+                                painter = painterResource(R.drawable.calendar),
+                                modifier = Modifier.width(15.dp).height(15.dp),
+                                contentDescription = "calendar icon",
                             )
                             if (periodButtonState) {
                                 DatePickerDialog(
@@ -313,9 +271,9 @@ fun SharePostRegisterScreen(
                             onClick = { selectValidateImageLauncher.launch("image/*") }
                         ) {
                             Icon(
-                                Icons.Filled.Refresh,
-                                contentDescription = "Localized description",
-                                tint = Color.Blue
+                                painter = painterResource(R.drawable.picture_icon),
+                                modifier = Modifier.width(20.dp).height(20.dp),
+                                contentDescription = "picture icon",
                             )
                         }
                     }

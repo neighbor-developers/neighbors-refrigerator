@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64.NO_WRAP
 import android.util.Base64.encodeToString
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -115,6 +116,8 @@ class SharePostRegisterViewModel: ViewModel() {
             mainAddr = "",
             type = 1,
         )
+
+        Log.d("product", postData.toString())
 
         validatePost(postData)
 
