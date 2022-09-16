@@ -236,7 +236,7 @@ class DBAccessModule {
             }
         })
     }
-    fun makeChat(id:Int, postId:Int, contactId:Int, createdAt:String){
+    fun makeChat(id:String, postId:Int, contactId:Int, createdAt:String){
         val chatData = ChatData(id,postId,contactId,createdAt)
         dbAccessApi.makeChat(chatData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
