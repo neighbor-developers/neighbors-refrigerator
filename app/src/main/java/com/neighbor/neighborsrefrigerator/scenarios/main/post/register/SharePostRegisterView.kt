@@ -10,14 +10,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -40,7 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-private var sampleList: List<Pair<String, String>> = listOf(Pair("", "선택"), Pair("100", "과일"), Pair("101", "채소"))
+private var sampleList: List<Pair<String, String>> = listOf(Pair("", "선택"), Pair("100", "채소"), Pair("200", "과일"), Pair("300", "정육"), Pair("400", "수산"), Pair("500", "냉동"), Pair("600", "간편"))
 
 @Composable
 fun SharePostRegisterScreen(
@@ -51,7 +51,13 @@ fun SharePostRegisterScreen(
     }
 
     val selectImageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        viewModel.imgUriState = uri
+        viewModel.imgUriState1 = uri
+    }
+    val selectImage2Launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.imgUriState2 = uri
+    }
+    val selectImage3Launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        viewModel.imgUriState3 = uri
     }
     val selectValidateImageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         viewModel.validateImgUriState = uri
@@ -111,7 +117,7 @@ fun SharePostRegisterScreen(
         Column(
             modifier = Modifier
                 .padding(it)
-                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
+                .padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 20.dp)
         ) {
             if(completeShareDialog){
                 CompleteDialog(
@@ -135,40 +141,149 @@ fun SharePostRegisterScreen(
                     type = "취소",
                     { completeBackDialog = false},
                     { navHostController.navigateUp()})
-
             }
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(text = "상품사진", modifier = Modifier.padding(start = 7.dp), fontSize = 13.sp, color = Color.DarkGray)
-                Row() {
-                    Image(
-                        painter = if (viewModel.imgUriState != null)
-                            rememberAsyncImagePainter(
-                                ImageRequest
-                                    .Builder(LocalContext.current)
-                                    .data(data = viewModel.imgUriState)
-                                    .build()
-                            ) else painterResource(R.drawable.camera),
-                        contentDescription = "상품 사진",
+                Text(text = "상품사진", modifier = Modifier.padding(bottom = 10.dp), fontSize = 13.sp, color = Color.DarkGray)
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Box(
                         modifier = Modifier
-                            .clickable(
-                                enabled = true,
-                                onClickLabel = "Clickable image",
-                                onClick = { selectImageLauncher.launch("image/*") }
-                            )
-                            .width(100.dp)
-                            .height(100.dp)
-                            .padding(top = 10.dp, end = 5.dp),
-                    )
-
-                    if (viewModel.imgUriState != null) {
-                        viewModel.imgInputStream = LocalContext.current.contentResolver.openInputStream(
-                            viewModel.imgUriState!!
+                            .size(100.dp, 100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (viewModel.imgUriState1 == null) {
+                            Canvas(modifier = Modifier.fillMaxSize()) {
+                                drawRoundRect(
+                                    color = Color.Black,
+                                    style = Stroke(width = 2f,
+                                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                                    )
+                                )
+                            }
+                        }
+                        Image(
+                            painter = if (viewModel.imgUriState1 != null)
+                                rememberAsyncImagePainter(
+                                    ImageRequest
+                                        .Builder(LocalContext.current)
+                                        .data(data = viewModel.imgUriState1)
+                                        .build()
+                                ) else painterResource(R.drawable.ic_baseline_add_24),
+                            contentDescription = "상품 사진",
+                            modifier = Modifier
+                                .clickable(
+                                    enabled = true,
+                                    onClickLabel = "Clickable image",
+                                    onClick = { selectImageLauncher.launch("image/*") }
+                                )
+                                .size(if (viewModel.imgUriState1 != null) 100.dp else 60.dp)
+                                .aspectRatio(1f)
+                                .padding(end = 5.dp),
+                            contentScale = ContentScale.Crop
                         )
+                    }
+                    if (viewModel.imgUriState1 != null) {
+                        viewModel.imgInputStream1 = LocalContext.current.contentResolver.openInputStream(
+                            viewModel.imgUriState1!!
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .size(100.dp, 100.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (viewModel.imgUriState2 == null) {
+                                Canvas(modifier = Modifier.fillMaxSize()) {
+                                    drawRoundRect(
+                                        color = Color.Black,
+                                        style = Stroke(width = 2f,
+                                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                                        )
+                                    )
+                                }
+                            }
+                            Image(
+                                painter = if (viewModel.imgUriState2 != null)
+                                    rememberAsyncImagePainter(
+                                        ImageRequest
+                                            .Builder(LocalContext.current)
+                                            .data(data = viewModel.imgUriState2)
+                                            .build()
+                                    ) else painterResource(R.drawable.ic_baseline_add_24),
+                                contentDescription = "상품 사진",
+                                modifier = Modifier
+                                    .clickable(
+                                        enabled = true,
+                                        onClickLabel = "Clickable image",
+                                        onClick = { selectImage2Launcher.launch("image/*") }
+                                    )
+                                    .size(if (viewModel.imgUriState2 != null) 100.dp else 60.dp)
+                                    .aspectRatio(1f)
+                                    .padding(end = 5.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        if (viewModel.imgUriState2 != null) {
+                            viewModel.imgInputStream2 =
+                                LocalContext.current.contentResolver.openInputStream(
+                                    viewModel.imgUriState2!!
+                                )
+
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp, 100.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (viewModel.imgUriState3 == null) {
+                                    Canvas(modifier = Modifier.fillMaxSize()) {
+                                        drawRoundRect(
+                                            color = Color.Black,
+                                            style = Stroke(
+                                                width = 2f,
+                                                pathEffect = PathEffect.dashPathEffect(
+                                                    floatArrayOf(
+                                                        10f,
+                                                        10f
+                                                    ), 0f
+                                                )
+                                            )
+                                        )
+                                    }
+                                }
+                                Image(
+                                    painter = if (viewModel.imgUriState3 != null)
+                                        rememberAsyncImagePainter(
+                                            ImageRequest
+                                                .Builder(LocalContext.current)
+                                                .data(data = viewModel.imgUriState3)
+                                                .build()
+                                        ) else painterResource(R.drawable.ic_baseline_add_24),
+                                    contentDescription = "상품 사진",
+                                    modifier = Modifier
+                                        .clickable(
+                                            enabled = true,
+                                            onClickLabel = "Clickable image",
+                                            onClick = { selectImage3Launcher.launch("image/*") }
+                                        )
+                                        .size(if (viewModel.imgUriState3 != null) 100.dp else 60.dp)
+                                        .aspectRatio(1f)
+                                        .padding(end = 5.dp),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                            if (viewModel.imgUriState3 != null) {
+                                viewModel.imgInputStream3 =
+                                    LocalContext.current.contentResolver.openInputStream(
+                                        viewModel.imgUriState3!!
+                                    )
+                            }
+                        }
                     }
                 }
                 Column(
                     modifier = Modifier
-                        .padding(start = 7.dp, end = 7.dp),
+                        .padding(end = 7.dp, top = 7.dp),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     Text(text = "상품명", fontSize = 13.sp, color = Color.DarkGray)
@@ -177,18 +292,9 @@ fun SharePostRegisterScreen(
                         value = viewModel.title.value,
                         onValueChange = { input -> viewModel.title.value = input },
                         modifier = Modifier
-                            .height(38.dp),
+                            .height(45.dp),
                         shape = MaterialTheme.shapes.large.copy(cornerSize),
-                        placeholder = {
-                            Text(
-                                text = "상품명 입력",
-                                style = TextStyle(
-                                    fontSize = 11.5.sp,
-                                    textDecoration = TextDecoration.None
-                                ),
-                                modifier = Modifier.padding(bottom = 0.dp)
-                            )
-                        },
+                        placeholder = { Text(text = "상품명 입력", style = TextStyle(fontSize = 11.5.sp, textDecoration = TextDecoration.None), modifier = Modifier.padding(bottom = 0.dp)) },
                         maxLines = 1,
                         colors = TextFieldDefaults.textFieldColors(
                             textColor = Color.DarkGray,
@@ -215,8 +321,8 @@ fun SharePostRegisterScreen(
                         }
                     }
 
-                    Text(text = "기간", fontSize = 13.sp, color = Color.DarkGray)
-                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text(text = "유통기한", fontSize = 13.sp, color = Color.DarkGray)
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
                         Surface(modifier = Modifier.weight(1f)) {
                             PeriodButton("유통", viewModel.validateTypeName)
                         }
@@ -226,39 +332,49 @@ fun SharePostRegisterScreen(
                         Surface(modifier = Modifier.weight(1f)) {
                             PeriodButton("구매", viewModel.validateTypeName)
                         }
+                        Surface(modifier = Modifier
+                            .weight(2f)
+                            .padding(start = 10.dp)) {
+                            Row(modifier = Modifier.clickable {
+                                periodButtonState = true
+                            }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.calendar),
+                                    modifier = Modifier.size(20.dp),
+                                    contentDescription = "calendar icon",
+                                )
+                                Text(
+                                    text = viewModel.validateDate.value,
+                                    color = Color.Gray,
+                                    modifier = Modifier.padding(start = 15.dp),
+                                    fontSize = 13.sp,
+                                )
+                                if (periodButtonState) {
+                                    DatePickerDialog(
+                                        LocalContext.current,
+                                        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                                            viewModel.validateDate.value =
+                                                "$mYear/${mMonth + 1}/$mDayOfMonth"
+                                        }, mYear, mMonth, mDay
+                                    ).show()
+                                    periodButtonState = false
+                                }
+                            }
+                        }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Row(
-                            modifier = Modifier
-                                .border(width = 1.dp, color = Color.Black)
-                                .clickable {
-                                    periodButtonState = true
-                                }
-                                .padding(end = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = viewModel.validateDate.value,
-                                fontSize = 12.sp,
-                                modifier = Modifier
-                                    .width(120.dp)
-                                    .padding(start = 10.dp, top = 3.dp, bottom = 3.dp)
-                            )
-                            Icon(
-                                painter = painterResource(R.drawable.calendar),
-                                modifier = Modifier.width(15.dp).height(15.dp),
-                                contentDescription = "calendar icon",
-                            )
-                            if (periodButtonState) {
-                                DatePickerDialog(
-                                    LocalContext.current,
-                                    { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-                                        viewModel.validateDate.value =
-                                            "$mYear/${mMonth + 1}/$mDayOfMonth"
-                                    }, mYear, mMonth, mDay
-                                ).show()
-                                periodButtonState = false
+                    if (viewModel.validateDate.value != "") {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = { selectValidateImageLauncher.launch("image/*") }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.picture_icon),
+                                    modifier = Modifier
+                                        .width(20.dp)
+                                        .height(20.dp),
+                                    contentDescription = "picture icon",
+                                )
                             }
 
                             if (viewModel.validateImgUriState != null) {
@@ -266,28 +382,33 @@ fun SharePostRegisterScreen(
                                     viewModel.validateImgUriState!!
                                 )
                             }
-                        }
-                        IconButton(
-                            onClick = { selectValidateImageLauncher.launch("image/*") }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.picture_icon),
-                                modifier = Modifier.width(20.dp).height(20.dp),
-                                contentDescription = "picture icon",
+
+                            Text(text = if (viewModel.validateImgUriState != null) "사진이 등록되었습니다" else "유통기한 인증 사진을 올려주세요",
+                                color = Color.Gray,
+                                textAlign = TextAlign.Right,
+                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                             )
                         }
                     }
                 }
             }
-            Text("카테고리", fontSize = 12.sp, color = Color.DarkGray)
-            CategorySpinner(sampleList, Pair("", "선택"), viewModel)
+            Row(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "카테고리",
+                    fontSize = 12.sp,
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(end = 10.dp)
+                )
+                CategorySpinner(sampleList, Pair("", "선택"), viewModel)
+            }
             OutlinedTextField(
                 value = viewModel.content.value,
                 onValueChange = { input -> viewModel.content.value = input },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .padding(top = 10.dp)
+                    .padding(top = 10.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorResource(id = R.color.green))
             )
         }
     }

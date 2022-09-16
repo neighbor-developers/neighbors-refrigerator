@@ -30,9 +30,13 @@ class SharePostRegisterViewModel: ViewModel() {
     var validateTypeName = mutableStateOf("유통")
     var title = mutableStateOf(TextFieldValue())
     var content = mutableStateOf(TextFieldValue())
-    var imgUriState by mutableStateOf<Uri?>(null)
-    var imgInputStream by mutableStateOf<InputStream?>(null)
-    var validateDate = mutableStateOf("0000/00/00")
+    var imgUriState1 by mutableStateOf<Uri?>(null)
+    var imgUriState2 by mutableStateOf<Uri?>(null)
+    var imgUriState3 by mutableStateOf<Uri?>(null)
+    var imgInputStream1 by mutableStateOf<InputStream?>(null)
+    var imgInputStream2 by mutableStateOf<InputStream?>(null)
+    var imgInputStream3 by mutableStateOf<InputStream?>(null)
+    var validateDate = mutableStateOf("")
     var validateImgUriState by mutableStateOf<Uri?>(null)
     var validateImgInputStream by mutableStateOf<InputStream?>(null)
     var category = mutableStateOf("")
@@ -44,7 +48,7 @@ class SharePostRegisterViewModel: ViewModel() {
         val img: Bitmap = BitmapFactory.decodeStream(ins)
         val resized = Bitmap.createScaledBitmap(img, 256, 256, true)
         val byteArrayOutputStream = ByteArrayOutputStream()
-        resized.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream)
+        resized.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
         val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
 
         return encodeToString(byteArray, NO_WRAP)
@@ -103,11 +107,11 @@ class SharePostRegisterViewModel: ViewModel() {
             updatedAt = "",
             state = "1",
             validateType = validateType,
-            validateDate = validateDate.value,
+            validateDate = validateImgInputStream?.let { encodeImgToBase64(it) },
             validateImg = validateImgInputStream?.let { encodeImgToBase64(it) },
-            productimg1 = imgInputStream?.let { encodeImgToBase64(it) },
-            productimg2 = "",
-            productimg3 = "",
+            productimg1 = imgInputStream1?.let { encodeImgToBase64(it) },
+            productimg2 = imgInputStream2?.let { encodeImgToBase64(it) },
+            productimg3 = imgInputStream3?.let { encodeImgToBase64(it) },
             latitude = location[0],
             longitude = location[1],
             distance = 0.0,
