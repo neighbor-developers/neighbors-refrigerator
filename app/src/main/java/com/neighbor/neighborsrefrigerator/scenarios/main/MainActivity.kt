@@ -192,7 +192,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
         composable("${NAV_ROUTE.TRADE_HISTORY.routeName}/{userId}", arguments = listOf(navArgument("userId"){type = NavType.IntType})){
             ShowUserProfile(
                 navController = navController,
-                userId = it.arguments?.getInt("chatId") ?:0)
+                userId = it.arguments?.getInt("userId") ?:0)
         }
         composable(NAV_ROUTE.REVIEW.routeName){
             val post = remember {

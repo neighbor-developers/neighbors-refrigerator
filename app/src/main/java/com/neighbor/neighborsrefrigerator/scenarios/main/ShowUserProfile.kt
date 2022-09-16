@@ -16,21 +16,20 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.ReviewData
 import com.neighbor.neighborsrefrigerator.data.UserData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
-import com.neighbor.neighborsrefrigerator.ui.theme.NeighborsRefrigeratorTheme
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,8 +65,15 @@ fun userDataScreen(userData: UserData, navController: NavHostController, postDat
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        val userFlower = UserSharedPreference(App.context()).getLevelPref("flowerVer")
         val postCount = postData.count{true}
+        val calLevel = CalLevel()
+        val level = calLevel.GetUserLevel(postData)
+        val userId : Int = userData.id!!
+        val userFlower = UserSharedPreference(App.context()).getLevelPref("flowerVer")
+
+        var reviewData : ArrayList<ReviewData> by remember {
+            mutableStateOf(arrayListOf())
+        }
 
         Column(
             modifier = Modifier
@@ -79,21 +85,39 @@ fun userDataScreen(userData: UserData, navController: NavHostController, postDat
                     .padding(30.dp, 20.dp, 15.dp, 20.dp)
             ) {
                 Image(
-                    painter = painterResource(when (userFlower) {
-                        1 -> R.drawable.level2_ver1
-                        2 -> R.drawable.level2_ver2
-                        3 -> R.drawable.level2_ver3
-                        else -> R.drawable.level1
-                    }),
+                    painter = painterResource(
+                        when(level) {
+                            2 ->
+                                when (userFlower) {
+                                    1 -> R.drawable.level2_ver1
+                                    2 -> R.drawable.level2_ver2
+                                    3 -> R.drawable.level2_ver3
+                                    else -> R.drawable.level1
+                                }
+                            3 ->
+                                when(userFlower){
+                                    1 -> R.drawable.level3_ver1
+                                    2 -> R.drawable.level3_ver2
+                                    3 -> R.drawable.level3_ver3
+                                    else -> R.drawable.level1
+                                }
+                            4 ->
+                                when(userFlower){
+                                    1 -> R.drawable.level4_ver1
+                                    2 -> R.drawable.level4_ver2
+                                    3 -> R.drawable.level4_ver3
+                                    else -> R.drawable.level1
+                                }
+                            else -> R.drawable.level1
+                        }
+                    ),
                     contentDescription = "profileImage",
-                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.LightGray, CircleShape)
+                        .size(120.dp)
+                        .border(2.dp, Color.LightGray, RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(10.dp))
 
                 )
-
                 Text(
                     text = userData.nickname,
                     style = MaterialTheme.typography.overline,
@@ -114,8 +138,12 @@ fun userDataScreen(userData: UserData, navController: NavHostController, postDat
                 modifier = Modifier
                     .padding(30.dp, 0.dp, 0.dp, 20.dp)
             )
-            ShowReviewList(postData)
-            ShowPostList(postData)
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ShowPostList(postData, userId)
+                ShowReviewList(postData, userId, reviewData)
+            }
         }
     }
 }
@@ -159,18 +187,32 @@ fun RatingBar(
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
-fun ShowPostList(post: ArrayList<PostData>) {
-    var nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
+fun ShowPostList(post: ArrayList<PostData>, userId: Int?) {
+    var dbAccessModule by remember {
+        mutableStateOf(DBAccessModule())
+    }
+
+    var userData : UserData? by  remember {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(Unit){
+        CoroutineScope(Dispatchers.Main).launch {
+            if (userId != 0) {
+                userData = dbAccessModule.getUserInfoById(userId!!)[0]
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-            .fillMaxWidth()
+            .fillMaxHeight()
             .padding(30.dp, 8.dp, 30.dp, 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "$nickname 님의 거래 내역",
+            text = userData?.nickname + " 님의 거래 내역",
             color = Color.DarkGray,
             fontSize = 25.sp
         )
@@ -200,18 +242,34 @@ fun ShowPostList(post: ArrayList<PostData>) {
 
 
 @Composable
-fun ShowReviewList(post: ArrayList<PostData>) {
-    var nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
+fun ShowReviewList(post: ArrayList<PostData>, userId: Int?, review: ArrayList<ReviewData>) {
+    var dbAccessModule by remember {
+        mutableStateOf(DBAccessModule())
+    }
+
+    var userData : UserData? by  remember {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(Unit){
+        CoroutineScope(Dispatchers.Main).launch {
+            if (userId != 0) {
+                userData = dbAccessModule.getUserInfoById(userId!!)[0]
+            }
+        }
+    }
+
+
+
     Column(
         modifier = Modifier
             .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-            .fillMaxWidth()
+            .fillMaxHeight()
             .padding(30.dp, 8.dp, 30.dp, 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
-            text = "$nickname 님의 후기 내역",
+            text = userData?.nickname + " 님의 후기 내역",
             color = Color.DarkGray,
             fontSize = 25.sp
         )
@@ -225,9 +283,9 @@ fun ShowReviewList(post: ArrayList<PostData>) {
             )
         } else {
             LazyColumn {
-                items(post) { post ->
+                items(review) { review ->
                     Text(
-                        post.title,
+                        review.review,
                         color = Color.DarkGray,
                         fontSize = 18.sp
                     )
