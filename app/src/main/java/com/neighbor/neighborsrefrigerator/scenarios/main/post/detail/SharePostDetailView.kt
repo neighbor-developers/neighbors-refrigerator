@@ -146,22 +146,16 @@ fun PostDataScreen(
     val calTime = CalculateTime()
     val createdTime = calTime.calTimeToPost(current, post.createdAt)
 
-    val calDistance = CalDistance()
-    val lat by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
-    }
-    val lng by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
-    }
+//    val calDistance = CalDistance()
+//    val lat by remember {
+//        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
+//    }
+//    val lng by remember {
+//        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
+//    }
+//
 
-    val distance by remember {
-        mutableStateOf(
-            if (lat != null && lng != null) {
-                calDistance.getDistance(lat!!, lng!!, post.latitude, post.longitude)
-            } else null
-        )
-    }
-
+    val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${post.distance}m"
     val contactUserId by remember {
         mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
     }
@@ -253,13 +247,11 @@ fun PostDataScreen(
                             }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        distance?.let {
-                            Text(
-                                text = "내 위치에서 ${(it / 10).roundToInt() / 100} km",
-                                fontSize = 13.sp,
-                                color = Color.DarkGray
-                            )
-                        }
+                        Text(
+                            text = distance,
+                            fontSize = 13.sp,
+                            color = Color.DarkGray
+                        )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "$validateType : $validateDate",

@@ -102,21 +102,6 @@ fun SeekItem(post: PostData,
         mutableStateOf(null)
     }
 
-    val calDistance = CalDistance()
-    val lat by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
-    }
-    val lng by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
-    }
-
-    val distancePost by remember {
-        mutableStateOf(
-            if (lat != null && lng != null) {
-                calDistance.getDistance(lat!!, lng!!, post.latitude, post.longitude)
-            } else null
-        )
-    }
     var level by remember {
         mutableStateOf(0)
     }
@@ -172,22 +157,19 @@ fun SeekItem(post: PostData,
                             bottom = 30.dp
                         )
                     )
-                    distancePost?.let {
-                        val distanceText = "${(it / 10).roundToInt() / 100} km"
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Filled.Home, contentDescription = "",
-                                modifier = Modifier.size(20.dp),
-                                tint = colorResource(id = R.color.green)
-                            )
-                            Text(
-                                text = "내 위치에서 $distanceText",
-                                fontSize = 12.sp,
-                                color = Color.DarkGray,
-                                modifier = Modifier.padding(start = 5.dp)
-                            )
-                        }
-
+                    val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${post.distance}m"
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Filled.Home, contentDescription = "",
+                            modifier = Modifier.size(20.dp),
+                            tint = colorResource(id = R.color.green)
+                        )
+                        Text(
+                            text = "내 위치에서 $distance",
+                            fontSize = 12.sp,
+                            color = Color.DarkGray,
+                            modifier = Modifier.padding(start = 5.dp)
+                        )
                     }
                 }
                 DrawLine()

@@ -27,6 +27,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import kotlin.math.roundToInt
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
@@ -58,20 +59,6 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, r
     val calTime = CalculateTime()
     val time = calTime.calTimeToPost(current, post.createdAt)
 
-    val calDistance = CalDistance()
-    val lat  by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("latitude")?.toDouble())
-    }
-    val lng  by remember {
-        mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("longitude")?.toDouble())
-    }
-
-    val distancePost  by remember{
-        mutableStateOf(
-            if(lat != null && lng !=null){
-                calDistance.getDistance(lat!!, lng!!, post.latitude,post.longitude)
-            }else null)
-    }
 
     Card(
         onClick= {
@@ -104,24 +91,24 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, r
                                 start.linkTo(parent.start)
                                 top.linkTo(parent.top)
                             }
-                            .padding(end = 95.dp)) {
-                            distancePost?.let {
+                            .padding(end = 95.dp)
+                        ) {
                                 //Spacer(modifier = Modifier.height(10.dp))
-                                val distanceText = "${(it / 10).roundToInt() / 100} km"
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp, bottom = 4.dp)) {
-                                    Icon(
-                                        Icons.Filled.Home, contentDescription = "",
-                                        modifier = Modifier.size(14.dp),
-                                        tint = colorResource(id = R.color.green)
-                                    )
-                                    Text(
-                                        text = "내 위치에서 $distanceText",
-                                        fontSize = 11.sp,
-                                        color = Color.DarkGray,
-                                        modifier = Modifier.padding(start = 3.dp)
-                                    )
-                                }
+                            val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${post.distance}m"
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp, bottom = 4.dp)) {
+                                Icon(
+                                    Icons.Filled.Home, contentDescription = "",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = colorResource(id = R.color.green)
+                                )
+                                Text(
+                                    text = "내 위치에서 $distance",
+                                    fontSize = 11.sp,
+                                    color = Color.DarkGray,
+                                    modifier = Modifier.padding(start = 3.dp)
+                                )
                             }
+
                             Spacer(modifier = Modifier.height(3.dp))
                             Text(
                                 text = post.title,

@@ -120,7 +120,7 @@ class DBAccessModule {
             dbAccessApi.getPostOrderByTime(page, reqPostData.reqType, reqPostData.postType, reqPostData.categoryId, reqPostData.title, reqPostData.currentTime, reqPostData.latitude, reqPostData.longitude)
         }.getOrNull()?.result ?: emptyList()
 
-        Log.d("결과", resultPosts.toString())
+        //Log.d("결과", resultPosts.toString())
         return resultPosts
     }
 
@@ -131,7 +131,7 @@ class DBAccessModule {
             dbAccessApi.getPostOrderByDistance(currentTime,latitude,longitude)
         }.getOrNull()?.result ?: emptyList()
 
-//        Log.d("결과", resultPosts.toString())
+        Log.d("결과", resultPosts.toString())
         return resultPosts
     }
 

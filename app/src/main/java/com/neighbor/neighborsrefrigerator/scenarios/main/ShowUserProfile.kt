@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.neighbor.neighborsrefrigerator.R
@@ -61,8 +62,9 @@ fun ShowUserProfile(navController: NavHostController, userId: Int, viewModel: Ma
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "프로필", modifier = Modifier.fillMaxWidth()
-                    .padding(end = 30.dp), fontSize = 15.sp, textAlign = TextAlign.Center, color = Color.Black)
+                    Text(text = "프로필", modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 30.dp), fontSize = 15.sp, textAlign = TextAlign.Center, color = Color.Black)
                         },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
@@ -95,17 +97,17 @@ fun UserDataScreen(userData: UserData, navController: NavHostController, postDat
         modifier = Modifier.fillMaxSize()
     ) {
         val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
-        val postCount = postData.count{true}
+        val postCount = postData.count { true }
         val calLevel = CalLevel()
         val level = calLevel.GetUserLevel(postData)
-        val userId : Int = userData.id!!
+        val userId: Int = userData.id!!
         val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
 
-        val reviewData : ArrayList<ReviewData> by remember {
+        val reviewData: ArrayList<ReviewData> by remember {
             mutableStateOf(arrayListOf())
         }
         var showNicknameDialog by remember { mutableStateOf(false) }
-        if (showNicknameDialog){
+        if (showNicknameDialog) {
             ChangeNicknameDialog(
                 changeDialogState = { showNicknameDialog = it },
                 viewModel
@@ -116,84 +118,118 @@ fun UserDataScreen(userData: UserData, navController: NavHostController, postDat
             FlowerDialog { flowerDialogState = false }
 
         Column(
-            modifier = Modifier.fillMaxWidth()
-                .weight(1f).padding(start = 20.dp, end = 20.dp, top = 30.dp)
-        ) {
-            Text(text = "마이페이지", fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
-            Column(modifier = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                ) {
-                Row(
-                   verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (nickname != null) {
-                        Text(nickname, fontSize = 17.sp)
-                    }
-                    IconButton(
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .size(20.dp),
-                        onClick = {
-                            showNicknameDialog = true
-                        }
-                    ) {
-                        Icon(Icons.Filled.Settings, "contentDescription", tint = colorResource(id = R.color.green))
-                    }
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
+            Text(
+                text = "마이페이지", fontSize = 30.sp, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 40.dp, bottom = 50.dp)
+            )
+            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                val (nicknameText, button) = createRefs()
+                if (nickname != null) {
+                    Text(nickname, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, modifier = Modifier.constrainAs(nicknameText) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    })
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "레벨", fontSize = 14.sp)
-                    Button(
-                        onClick = {
-                            flowerDialogState = true
-                        },
-                        modifier = Modifier.size(60.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White, disabledBackgroundColor = Color.White, disabledContentColor = Color.White),
-                        elevation = ButtonDefaults.elevation(0.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(
-                                when(level) {
-                                    2 ->
-                                        when (flowerVer) {
-                                            1 -> R.drawable.level2_ver1
-                                            2 -> R.drawable.level2_ver2
-                                            3 -> R.drawable.level2_ver3
-                                            else -> R.drawable.level1
-                                        }
-                                    3 ->
-                                        when(flowerVer){
-                                            1 -> R.drawable.level3_ver1
-                                            2 -> R.drawable.level3_ver2
-                                            3 -> R.drawable.level3_ver3
-                                            else -> R.drawable.level1
-                                        }
-                                    4 ->
-                                        when(flowerVer){
-                                            1 -> R.drawable.level4_ver1
-                                            2 -> R.drawable.level4_ver2
-                                            3 -> R.drawable.level4_ver3
-                                            else -> R.drawable.level1
-                                        }
-                                    else -> R.drawable.level1
-                                }
-                            ),
-                            contentDescription = "level icon"
+                Button(
+                    modifier = Modifier.constrainAs(button) {
+                        end.linkTo(parent.end)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    },
+                    onClick = {
+                        showNicknameDialog = true
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    elevation = ButtonDefaults.elevation(0.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "닉네임 바꾸기")
+                        Icon(
+                            Icons.Filled.Settings,
+                            "contentDescription",
+                            tint = colorResource(id = R.color.green),
+                            modifier = Modifier
+                                .size(22.dp)
+                                .padding(start = 5.dp)
                         )
                     }
                 }
             }
+            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                val (nicknameText, button) = createRefs()
+                if (nickname != null) {
+                    Text(nickname, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, modifier = Modifier.constrainAs(nicknameText) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    })
+                }
+
+                Button(
+                    onClick = {
+                        flowerDialogState = true
+                    },
+                    modifier = Modifier.size(60.dp).constrainAs(button) {
+                        end.linkTo(parent.end)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                                                                        },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        disabledBackgroundColor = Color.White,
+                        disabledContentColor = Color.White
+                    ),
+                    elevation = ButtonDefaults.elevation(0.dp)
+                ) {
+                    Image(
+                        painter = painterResource(
+                            when (level) {
+                                2 ->
+                                    when (flowerVer) {
+                                        1 -> R.drawable.level2_ver1
+                                        2 -> R.drawable.level2_ver2
+                                        3 -> R.drawable.level2_ver3
+                                        else -> R.drawable.level1
+                                    }
+                                3 ->
+                                    when (flowerVer) {
+                                        1 -> R.drawable.level3_ver1
+                                        2 -> R.drawable.level3_ver2
+                                        3 -> R.drawable.level3_ver3
+                                        else -> R.drawable.level1
+                                    }
+                                4 ->
+                                    when (flowerVer) {
+                                        1 -> R.drawable.level4_ver1
+                                        2 -> R.drawable.level4_ver2
+                                        3 -> R.drawable.level4_ver3
+                                        else -> R.drawable.level1
+                                    }
+                                else -> R.drawable.level1
+                            }
+                        ),
+                        contentDescription = "level icon"
+                    )
+                }
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "레벨", fontSize = 14.sp)
+
 
         }
         Column(modifier = Modifier
-            .fillMaxWidth()
-            .weight(3f)) {
+            .fillMaxWidth()) {
             Text(
                 text = "거래 횟수: $postCount",
                 style = MaterialTheme.typography.overline,
                 color = Color.DarkGray,
                 fontSize = 25.sp,
-                modifier = Modifier
-                    .padding(30.dp, 0.dp, 0.dp, 20.dp)
             )
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -264,8 +300,7 @@ fun ShowPostList(post: ArrayList<PostData>, userId: Int?) {
     Column(
         modifier = Modifier
             .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-            .fillMaxHeight()
-            .padding(30.dp, 8.dp, 30.dp, 8.dp),
+            .fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -321,9 +356,7 @@ fun ShowReviewList(post: ArrayList<PostData>, userId: Int?, review: ArrayList<Re
 
     Column(
         modifier = Modifier
-            .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-            .fillMaxHeight()
-            .padding(30.dp, 8.dp, 30.dp, 8.dp),
+            .border(border = BorderStroke(width = 1.dp, Color.LightGray)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
