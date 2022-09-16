@@ -96,11 +96,8 @@ fun UserDataScreen(userData: UserData, navController: NavHostController, postDat
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
-        val postCount = postData.count { true }
         val calLevel = CalLevel()
         val level = calLevel.GetUserLevel(postData)
-        val userId: Int = userData.id!!
         val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
 
         val reviewData: ArrayList<ReviewData> by remember {
@@ -124,207 +121,141 @@ fun UserDataScreen(userData: UserData, navController: NavHostController, postDat
         ) {
             Text(
                 text = "마이페이지", fontSize = 30.sp, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 40.dp, bottom = 50.dp)
+                modifier = Modifier.padding(top = 100.dp, bottom = 70.dp)
             )
             ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
                 val (nicknameText, button) = createRefs()
-                if (nickname != null) {
-                    Text(nickname, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, modifier = Modifier.constrainAs(nicknameText) {
+                Row(
+                    modifier = Modifier.constrainAs(nicknameText) {
                         start.linkTo(parent.start)
-                        top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                    })
-                }
-                Button(
-                    modifier = Modifier.constrainAs(button) {
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    },
-                    onClick = {
-                        showNicknameDialog = true
-                    },
-                    colors = ButtonDefaults.buttonColors(Color.Transparent),
-                    elevation = ButtonDefaults.elevation(0.dp)
+                    }
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "닉네임 바꾸기")
-                        Icon(
-                            Icons.Filled.Settings,
-                            "contentDescription",
-                            tint = colorResource(id = R.color.green),
-                            modifier = Modifier
-                                .size(22.dp)
-                                .padding(start = 5.dp)
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(text = "'${userData.nickname}'", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            " 님의 레벨 : ",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Image(
+                            painter = painterResource(
+                                when (level) {
+                                    2 ->
+                                        when (flowerVer) {
+                                            1 -> R.drawable.level2_ver1
+                                            2 -> R.drawable.level2_ver2
+                                            3 -> R.drawable.level2_ver3
+                                            else -> R.drawable.level1
+                                        }
+                                    3 ->
+                                        when (flowerVer) {
+                                            1 -> R.drawable.level3_ver1
+                                            2 -> R.drawable.level3_ver2
+                                            3 -> R.drawable.level3_ver3
+                                            else -> R.drawable.level1
+                                        }
+                                    4 ->
+                                        when (flowerVer) {
+                                            1 -> R.drawable.level4_ver1
+                                            2 -> R.drawable.level4_ver2
+                                            3 -> R.drawable.level4_ver3
+                                            else -> R.drawable.level1
+                                        }
+                                    else -> R.drawable.level1
+                                }
+                            ),
+                            contentDescription = "level icon",
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
-            }
-            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                val (nicknameText, button) = createRefs()
-                if (nickname != null) {
-                    Text(nickname, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, modifier = Modifier.constrainAs(nicknameText) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    })
-                }
-
-                Button(
-                    onClick = {
-                        flowerDialogState = true
-                    },
-                    modifier = Modifier.size(60.dp).constrainAs(button) {
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                                                                        },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.White,
-                        disabledBackgroundColor = Color.White,
-                        disabledContentColor = Color.White
-                    ),
-                    elevation = ButtonDefaults.elevation(0.dp)
+                Column(
+                    modifier = Modifier.constrainAs(button) {
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    }, horizontalAlignment = Alignment.End
                 ) {
-                    Image(
-                        painter = painterResource(
-                            when (level) {
-                                2 ->
-                                    when (flowerVer) {
-                                        1 -> R.drawable.level2_ver1
-                                        2 -> R.drawable.level2_ver2
-                                        3 -> R.drawable.level2_ver3
-                                        else -> R.drawable.level1
-                                    }
-                                3 ->
-                                    when (flowerVer) {
-                                        1 -> R.drawable.level3_ver1
-                                        2 -> R.drawable.level3_ver2
-                                        3 -> R.drawable.level3_ver3
-                                        else -> R.drawable.level1
-                                    }
-                                4 ->
-                                    when (flowerVer) {
-                                        1 -> R.drawable.level4_ver1
-                                        2 -> R.drawable.level4_ver2
-                                        3 -> R.drawable.level4_ver3
-                                        else -> R.drawable.level1
-                                    }
-                                else -> R.drawable.level1
-                            }
-                        ),
-                        contentDescription = "level icon"
-                    )
+                    Row(
+                        modifier = Modifier.clickable {
+                            showNicknameDialog = true
+                        },
+                    ) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Icon(
+                                Icons.Filled.Settings,
+                                "contentDescription",
+                                tint = colorResource(id = R.color.green),
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .padding(end = 5.dp)
+                            )
+                            Text(text = "닉네임 바꾸기", fontSize = 14.sp)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.clickable {
+                            flowerDialogState = true
+                        },
+                    ) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Icon(
+                                Icons.Filled.Settings,
+                                "contentDescription",
+                                tint = colorResource(id = R.color.green),
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .padding(end = 5.dp)
+                            )
+                            Text(text = "꽃 변경하기", fontSize = 14.sp)
+                        }
+                    }
                 }
             }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "레벨", fontSize = 14.sp)
-
-
-        }
-        Column(modifier = Modifier
-            .fillMaxWidth()) {
-            Text(
-                text = "거래 횟수: $postCount",
-                style = MaterialTheme.typography.overline,
-                color = Color.DarkGray,
-                fontSize = 25.sp,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ShowPostList(postData, userId)
-                ShowReviewList(postData, userId, reviewData)
+        Column(modifier = Modifier.fillMaxWidth()
+        ) {
+            Surface(modifier = Modifier.weight(1f)) {
+                ShowPostList(postData, navController)
+            }
+            Surface(modifier = Modifier.weight(1f)) {
+                ShowReviewList(postData, userData, reviewData)
             }
         }
     }
 }
 
-/*@Composable
-fun RatingBar(
-    modifier: Modifier = Modifier,
-    rating: Int
-) {
-    var ratingState by remember { mutableStateOf(rating) }
-
-    Row(
-        modifier = modifier
-            .padding(30.dp, 0.dp, 0.dp, 0.dp)
-    ) {
-        for (i in 1..5) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_star_24),
-                contentDescription = "star",
-                modifier = modifier
-                    .width(33.dp)
-                    .height(33.dp)
-                    .clickable {
-                        ratingState = i
-                    },
-                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
-            )
-        }
-        Text(
-            text = "3.7점",
-            style = MaterialTheme.typography.overline,
-            color = Color.LightGray,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = modifier
-                .padding(5.dp, 9.dp, 0.dp, 0.dp)
-                .wrapContentSize(align = Alignment.BottomCenter)
-        )
-    }
-}*/
-
-@OptIn(ExperimentalUnitApi::class)
 @Composable
-fun ShowPostList(post: ArrayList<PostData>, userId: Int?) {
-    var dbAccessModule by remember {
-        mutableStateOf(DBAccessModule())
-    }
-
-    var userData : UserData? by  remember {
-        mutableStateOf(null)
-    }
-
-    LaunchedEffect(Unit){
-        CoroutineScope(Dispatchers.Main).launch {
-            if (userId != 0) {
-                userData = dbAccessModule.getUserInfoById(userId!!)[0]
-            }
-        }
-    }
-
+fun ShowPostList(post: ArrayList<PostData>, navController: NavHostController) {
     Column(
-        modifier = Modifier
-            .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = userData?.nickname + " 님의 거래 내역",
-            color = Color.DarkGray,
-            fontSize = 25.sp
-        )
-
-        if (post.isEmpty()) {
-            Text(
-                text = "아직 올린 게시물이 없어요!",
+        Spacer(modifier = Modifier.height(25.dp))
+        Title(title = "게시글 목록")
+        if (post.isEmpty()){
+            Text(text = "게시한 글이 없습니다",
                 color = Color.DarkGray,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 10.dp)
+                fontSize = 14.sp,
+                modifier = Modifier.padding(10.dp)
             )
-        } else {
+        }
+         else {
             LazyColumn {
                 items(post) { post ->
                     Text(
                         post.title,
                         color = Color.DarkGray,
-                        fontSize = 18.sp
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clickable {
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    key = "post",
+                                    value = post
+                                )
+                                navController.navigate(route = NAV_ROUTE.SHARE_DETAIL.routeName)
+                            }
+                            .padding(10.dp)
                     )
                     Divider()
                 }
@@ -335,51 +266,26 @@ fun ShowPostList(post: ArrayList<PostData>, userId: Int?) {
 
 
 @Composable
-fun ShowReviewList(post: ArrayList<PostData>, userId: Int?, review: ArrayList<ReviewData>) {
-    var dbAccessModule by remember {
-        mutableStateOf(DBAccessModule())
-    }
-
-    var userData : UserData? by  remember {
-        mutableStateOf(null)
-    }
-
-    LaunchedEffect(Unit){
-        CoroutineScope(Dispatchers.Main).launch {
-            if (userId != 0) {
-                userData = dbAccessModule.getUserInfoById(userId!!)[0]
-            }
-        }
-    }
-
-
+fun ShowReviewList(post: ArrayList<PostData>, userData: UserData, review: ArrayList<ReviewData>) {
 
     Column(
-        modifier = Modifier
-            .border(border = BorderStroke(width = 1.dp, Color.LightGray)),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = userData?.nickname + " 님의 후기 내역",
-            color = Color.DarkGray,
-            fontSize = 25.sp
-        )
-        if (post.isEmpty()) {
-            Text(
-                text = "아직 후기 내역이 없어요!",
+        Title(title = "후기 목록")
+        if (post.isEmpty()){
+            Text(text = "등록된 후기가 없습니다",
                 color = Color.DarkGray,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 10.dp)
+                fontSize = 14.sp,
+                modifier = Modifier.padding(10.dp)
             )
+
         } else {
             LazyColumn {
                 items(review) { review ->
                     Text(
                         review.review,
                         color = Color.DarkGray,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(10.dp)
                     )
                     Divider()
                 }
