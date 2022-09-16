@@ -222,12 +222,14 @@ fun SharePostListByDistance(posts: State<List<PostData>?>, route: NAV_ROUTE, nav
                     .constrainAs(item) {
                         top.linkTo(parent.top)
                     }) { page ->
-                    ItemCardByTime(
-                        post = posts.value!![page],
-                        route = route,
-                        navHostController = navHostController,
-                        type = 2
-                    )
+                    posts.value?.let {
+                        ItemCardByTime(
+                            post = it[page],
+                            route = route,
+                            navHostController = navHostController,
+                            type = 2
+                        )
+                    }
                 }
                 DotsIndicator(
                     totalDots = 6,
