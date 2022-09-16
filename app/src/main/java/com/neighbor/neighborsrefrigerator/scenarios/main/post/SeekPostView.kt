@@ -117,15 +117,18 @@ fun SeekItem(post: PostData,
             } else null
         )
     }
-
+    var level by remember {
+        mutableStateOf(0)
+    }
+    val userFlower = UserSharedPreference(App.context()).getLevelPref("flowerVer")
     val current = System.currentTimeMillis()
     val calTime = CalculateTime()
     val time = calTime.calTimeToPost(current, post.createdAt)
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.Main).launch {
-            userData = viewModel.getUserNickname(post.userId)
-
+            userData = viewModel.getUserData(post.userId)
+            level = viewModel.getUserLevel(post.userId)
         }
     }
     Column {
@@ -211,7 +214,30 @@ fun SeekItem(post: PostData,
                                 modifier = Modifier
                             )
                             Image(
-                                painter = painterResource(R.drawable.level1),
+                                painter = painterResource(when(level) {
+                                    2 ->
+                                        when (userFlower) {
+                                            1 -> R.drawable.level2_ver1
+                                            2 -> R.drawable.level2_ver2
+                                            3 -> R.drawable.level2_ver3
+                                            else -> R.drawable.level1
+                                        }
+                                    3 ->
+                                        when(userFlower){
+                                            1 -> R.drawable.level3_ver1
+                                            2 -> R.drawable.level3_ver2
+                                            3 -> R.drawable.level3_ver3
+                                            else -> R.drawable.level1
+                                        }
+                                    4 ->
+                                        when(userFlower){
+                                            1 -> R.drawable.level4_ver1
+                                            2 -> R.drawable.level4_ver2
+                                            3 -> R.drawable.level4_ver3
+                                            else -> R.drawable.level1
+                                        }
+                                    else -> R.drawable.level1
+                                }),
                                 contentDescription = "App icon",
                                 modifier = Modifier
                                     .size(20.dp)
@@ -229,7 +255,7 @@ fun SeekItem(post: PostData,
                             .clickable {
                                 val contactUserId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
                                 // chatId는 포스트 아이디와 접근한 유저 아이디를 합쳐서 만듬
-                                val chatId = post.id.toString() + contactUserId.toString()
+                                val chatId = post.id.toString() + " " +contactUserId.toString()
 
                                 navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
                             }

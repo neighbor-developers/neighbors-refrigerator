@@ -57,20 +57,15 @@ fun Drawer(
     val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
     val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
     val id = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
-    val CalLevel = CalLevel()
-    val level = CalLevel.GetUserLevel(postData)
+    val calLevel = CalLevel()
+    val level = calLevel.GetUserLevel(postData)
 
-
-    var flowerDialogState by remember { mutableStateOf(false) }
     var locationDialogState by remember { mutableStateOf(false) }
     var inquiryDialogState by remember { mutableStateOf(false) }
-    var showNicknameDialog by remember { mutableStateOf(false) }
+
 
     Column(modifier.padding(20.dp))
     {
-        if (flowerDialogState)
-            FlowerDialog { flowerDialogState = false }
-
         if (locationDialogState)
             SearchAddressDialog(
                 dialogState = locationDialogState,
@@ -86,12 +81,7 @@ fun Drawer(
             InquiryDialog(viewModel) {
                 inquiryDialogState = false
             }
-        if (showNicknameDialog){
-            ChangeNicknameDialog(
-                changeDialogState = { showNicknameDialog = it },
-                viewModel
-            )
-        }
+
         Row(
             Modifier
                 .fillMaxWidth()
@@ -100,12 +90,13 @@ fun Drawer(
         ){
             Button(
                 onClick = {
-                    flowerDialogState = true
                 },
                 modifier.size(100.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White, disabledBackgroundColor = Color.White),
+                enabled = false
             ) {
                 Image(
+                    modifier = Modifier.size(100.dp),
                     painter = painterResource(
                         when(level) {
                             2 ->
@@ -137,20 +128,7 @@ fun Drawer(
             }
             Column(modifier = Modifier.padding(20.dp))
             {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(nickname.toString(), fontSize = 17.sp)
-                    IconButton(
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .size(20.dp),
-                        onClick = {
-                            showNicknameDialog = true
-                        }
-                    ) {
-                        Icon(Icons.Filled.Settings, "contentDescription", tint = colorResource(id = R.color.green))
-                    }
-
-                }
+                Text(nickname.toString(), fontSize = 17.sp)
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(text = email.toString(), fontSize = 11.sp, color = Color.Gray, modifier = Modifier.padding(start = 3.dp))
             }

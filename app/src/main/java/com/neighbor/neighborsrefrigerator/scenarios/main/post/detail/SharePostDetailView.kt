@@ -56,13 +56,14 @@ fun SharePostDetailScreen(
     var nickname by remember {
         mutableStateOf("")
     }
-    val level by remember {
+    var level by remember {
         mutableStateOf(0)
     }
+    val userId = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
     LaunchedEffect(Unit) {
-        val userData = postViewModel.getUserNickname(post.userId)
+        val userData = postViewModel.getUserData(post.userId)
+        level = postViewModel.getUserLevel(userId)
         nickname = userData?.nickname ?: ""
-        //level = userData?.score?:0
     }
 
     val scaffoldState = rememberScaffoldState()
@@ -191,6 +192,7 @@ fun PostDataScreen(
     var completeShareDialog by remember {
         mutableStateOf(false)
     }
+    val userFlower = UserSharedPreference(App.context()).getLevelPref("flowerVer")
 
     if (completeShareDialog) {
         post.let {
@@ -402,13 +404,37 @@ fun PostDataScreen(
                                 navHostController.navigate("${NAV_ROUTE.TRADE_HISTORY.routeName}/${post.userId}")
                             }
                         ) {
+
                             Surface(modifier = Modifier.size(28.dp),
                                 contentColor = Color.White,
                                 color = Color.White,
                                 shape = CircleShape,
                                 content = {
                                     Image(
-                                        painter = painterResource(R.drawable.level1),
+                                        painter = painterResource(when(level) {
+                                            2 ->
+                                                when (userFlower) {
+                                                    1 -> R.drawable.level2_ver1
+                                                    2 -> R.drawable.level2_ver2
+                                                    3 -> R.drawable.level2_ver3
+                                                    else -> R.drawable.level1
+                                                }
+                                            3 ->
+                                                when(userFlower){
+                                                    1 -> R.drawable.level3_ver1
+                                                    2 -> R.drawable.level3_ver2
+                                                    3 -> R.drawable.level3_ver3
+                                                    else -> R.drawable.level1
+                                                }
+                                            4 ->
+                                                when(userFlower){
+                                                    1 -> R.drawable.level4_ver1
+                                                    2 -> R.drawable.level4_ver2
+                                                    3 -> R.drawable.level4_ver3
+                                                    else -> R.drawable.level1
+                                                }
+                                            else -> R.drawable.level1
+                                        }),
                                         contentDescription = "App icon",
                                         modifier = Modifier
                                             .size(25.dp)
@@ -432,7 +458,7 @@ fun PostDataScreen(
                 TextButton(
                     onClick = {
                         if (post.userId != contactUserId) {
-                            val chatId = post.id.toString() + contactUserId.toString()
+                            val chatId = post.id.toString() + " " + contactUserId.toString()
                             navHostController.navigate("${NAV_ROUTE.CHAT.routeName}/${chatId}/${post.id!!}")
                         } else {
                             completeShareDialog = true

@@ -49,9 +49,9 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, r
         mutableStateOf(0)
     }
     LaunchedEffect(Unit){
-        val userData = postViewModel.getUserNickname(post.userId)
+        val userData = postViewModel.getUserData(post.userId)
+        level = postViewModel.getUserLevel(post.userId)
         nickname = userData?.nickname?:""
-        //level = userData?.score?:0
     }
 
     val current = System.currentTimeMillis()
@@ -189,7 +189,6 @@ fun NicknameText(nickname: String, time : String){
         .padding(top = 5.dp, bottom = 5.dp, start = 15.dp, end = 15.dp)) {
         val (nicknameTextView, distanceTextView) = createRefs()
         if (nickname != "") {
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.constrainAs(nicknameTextView){

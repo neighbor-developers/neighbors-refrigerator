@@ -6,6 +6,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -99,7 +100,7 @@ fun ChatScreen(navController : NavHostController, chatViewModel: ChatViewModel =
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Bottom
             ) {
-                ChatSection(chatViewModel.chatMessages.collectAsState(),chatViewModel.chatData.collectAsState(), userId, Modifier.weight(1f))
+                ChatSection(chatViewModel.chatMessages.collectAsState(),chatViewModel.chatData.collectAsState(), userId, Modifier.weight(1f), navController)
                 SendSection(chatViewModel, chatId, userId)
             }
         }
@@ -228,7 +229,7 @@ fun TopBarSection(chatViewModel: ChatViewModel, navController: NavHostController
 }
 
 @Composable
-fun ChatSection(message: State<List<ChatMessageData>?>, chatData: State<FirebaseChatData?>, userId: Int, modifier: Modifier = Modifier) {
+fun ChatSection(message: State<List<ChatMessageData>?>, chatData: State<FirebaseChatData?>, userId: Int, modifier: Modifier = Modifier, navController: NavHostController) {
     //userId = 내 아이디
     val writerId: Int? = chatData.value?.writer?.id
 
@@ -237,6 +238,11 @@ fun ChatSection(message: State<List<ChatMessageData>?>, chatData: State<Firebase
         chatData.value?.contact?.nickname
     }else{
         chatData.value?.writer?.nickname
+    }
+    val level = if(writerId == userId){
+        chatData.value?.contact?.level
+    }else{
+        chatData.value?.writer?.level
     }
 
 
@@ -248,7 +254,9 @@ fun ChatSection(message: State<List<ChatMessageData>?>, chatData: State<Firebase
         message.value?.let {
             items(it) { message ->
                 nickname?.let { nickname ->
-                    MessageItem(message, userId, nickname)
+                    if (level != null) {
+                        MessageItem(message, userId, nickname, level, navController)
+                    }
                     Spacer(modifier = Modifier.height(13.dp))
                 }
             }
@@ -257,12 +265,12 @@ fun ChatSection(message: State<List<ChatMessageData>?>, chatData: State<Firebase
 }
 
 @Composable
-fun MessageItem(message: ChatMessageData, userId: Int, nickname: String) {
+fun MessageItem(message: ChatMessageData, userId: Int, nickname: String, level: Int, navController: NavHostController) {
     val current = System.currentTimeMillis()
 
     val calculateTime = CalculateTime()
     val time = calculateTime.calTimeToChat(current, message.createdAt)
-
+    val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
 
     // 본인일때 true
     val isMe = message.from == userId
@@ -276,10 +284,35 @@ fun MessageItem(message: ChatMessageData, userId: Int, nickname: String) {
         }
         Column {
             if (!isMe) {
-                Row{
+                Row(modifier = Modifier.clickable {
+                    navController.navigate("${NAV_ROUTE.TRADE_HISTORY.routeName}/${message.from}")
+                }){
                     Text(text = nickname, color = Color.Black, fontSize = 13.sp, modifier = Modifier.padding(bottom = 5.dp, end = 5.dp))
                     Image(
-                        painter = painterResource(R.drawable.level3_ver2),
+                        painter = painterResource(when(level) {
+                            2 ->
+                                when (flowerVer) {
+                                    1 -> R.drawable.level2_ver1
+                                    2 -> R.drawable.level2_ver2
+                                    3 -> R.drawable.level2_ver3
+                                    else -> R.drawable.level1
+                                }
+                            3 ->
+                                when(flowerVer){
+                                    1 -> R.drawable.level3_ver1
+                                    2 -> R.drawable.level3_ver2
+                                    3 -> R.drawable.level3_ver3
+                                    else -> R.drawable.level1
+                                }
+                            4 ->
+                                when(flowerVer){
+                                    1 -> R.drawable.level4_ver1
+                                    2 -> R.drawable.level4_ver2
+                                    3 -> R.drawable.level4_ver3
+                                    else -> R.drawable.level1
+                                }
+                            else -> R.drawable.level1
+                        }),
                         contentDescription = "App icon",
                         modifier = Modifier
                             .clip(shape = CircleShape)

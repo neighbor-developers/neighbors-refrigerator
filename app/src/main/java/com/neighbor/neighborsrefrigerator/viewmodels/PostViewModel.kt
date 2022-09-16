@@ -3,16 +3,17 @@ package com.neighbor.neighborsrefrigerator.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.data.*
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.network.MyPagingSource
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalLevel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 data class ReqPostData(
     val reqType: Int,
@@ -58,7 +59,7 @@ class PostViewModel : ViewModel() {
     }
 
 
-    suspend fun getUserNickname(userId: Int): UserData? {
+    suspend fun getUserData(userId: Int): UserData? {
         var userData : UserData? = null
 
         viewModelScope.async {
@@ -66,6 +67,16 @@ class PostViewModel : ViewModel() {
         }.await()
 
         return userData
+    }
+
+    suspend fun getUserLevel(userId: Int): Int {
+        var posts: ArrayList<PostData> = arrayListOf()
+        viewModelScope.async {
+            dbAccessModule.getPostByUserId(userId) { posts = it }
+        }.await()
+        val calLevel = CalLevel()
+
+        return calLevel.GetUserLevel(posts)
     }
 
     fun changeTime(){

@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.utilities
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,6 +31,7 @@ class CalculateTime {
 
         val current = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).parse(cuDate)?.time
 
+        Log.d("time", "${current!! - formattedTime!!}")
 
         // 1분 미만
         return if (current != null && formattedTime != null) {
