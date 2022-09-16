@@ -8,9 +8,18 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -46,8 +55,11 @@ class StartActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Surface(color = Color.White) {
-                Text(text = "로그인 확인중", fontSize = 30.sp)
+            Surface(modifier = Modifier.fillMaxSize(), color = colorResource(id = R.color.backGreen)) {
+                Image(painter = painterResource(id = R.drawable.back), contentDescription = "", modifier = Modifier.padding(20.dp))
+//                Text(text = "로그인 확인중", fontSize = 30.sp, modifier = Modifier.background(color = colorResource(
+//                    id = R.color.backGreen
+//                )))
             }
         }
         // 로그인 시도

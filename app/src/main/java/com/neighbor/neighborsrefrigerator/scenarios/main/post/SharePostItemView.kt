@@ -21,7 +21,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -154,7 +153,7 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, r
                             TextButton(
                                 onClick = { /*TODO*/ },
                                 elevation = ButtonDefaults.elevation(0.dp),
-                                colors = if (post.review == null){
+                                colors = if (post.completedAt == null){
                                     ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.green), disabledBackgroundColor = colorResource(id = R.color.green))
                                 }else{
                                     ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.completeGray), disabledBackgroundColor = colorResource(id = R.color.completeGray))
@@ -163,7 +162,7 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, r
                                 modifier = Modifier.size(80.dp, 33.dp),
                                 enabled = false
                             ) {
-                                if (post.review == null){
+                                if (post.completedAt == null){
                                     Text(text = "나눔중", color = Color.White, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)
                                 }else{
                                     Text(text = "나눔 완료", color = Color.White, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)

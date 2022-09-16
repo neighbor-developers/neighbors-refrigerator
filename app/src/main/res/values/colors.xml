@@ -9,11 +9,12 @@
     <color name="white">#FFFFFF</color>
     <color name="backgroundGray">#EEEEEE</color>
     <color name="completeGray">#CCCBCB</color>
-    <color name="green">#3EA358</color>
+    <color name="green">#219A3F</color>
     <color name="categoryGreen">#1C632C</color>
     <color name="yellow">#D2FFFF90</color>
     <color name="declRed">#E60F0F</color>
     <color name="shadowGray">#791B1B1B</color>
+    <color name="backGreen">#2E9841</color>
 
 
 

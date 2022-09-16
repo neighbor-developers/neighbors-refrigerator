@@ -177,7 +177,7 @@ fun SharePostListByTime(postItems: LazyPagingItems<PostData>, route: NAV_ROUTE, 
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun SharePostListByDistance(posts: State<ArrayList<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController){
+fun SharePostListByDistance(posts: State<List<PostData>?>, route: NAV_ROUTE, navHostController: NavHostController){
 
     val userNickname by remember {
         mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("nickname")!!)

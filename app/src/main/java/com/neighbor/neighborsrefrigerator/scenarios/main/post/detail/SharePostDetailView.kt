@@ -48,6 +48,11 @@ fun SharePostDetailScreen(
     post: PostData
 ) {
 
+    val imageLoadState = remember {
+        mutableStateOf(false)
+    }
+    val shadowColor = colorResource(id = R.color.shadowGray)
+
     var nickname by remember {
         mutableStateOf("")
     }
@@ -99,7 +104,7 @@ fun SharePostDetailScreen(
                         )
                     }
                 },
-                backgroundColor = Color.Transparent,
+                backgroundColor = if (imageLoadState.value) shadowColor else Color.Transparent,
                 elevation = 0.dp
             )
         }
@@ -120,7 +125,8 @@ fun SharePostDetailScreen(
                 postViewModel = postViewModel,
                 post = post,
                 nickname = nickname,
-                level = level
+                level = level,
+                imageLoadState
             )
         }
     }
@@ -132,7 +138,8 @@ fun PostDataScreen(
     postViewModel: PostViewModel,
     post: PostData,
     nickname: String,
-    level: Int
+    level: Int,
+    imageLoadState : MutableState<Boolean>
 ) {
     val current = System.currentTimeMillis()
     val calTime = CalculateTime()
@@ -176,9 +183,7 @@ fun PostDataScreen(
     var titleFontSize by remember {
         mutableStateOf(18.sp)
     }
-    var imageLoadState by remember {
-        mutableStateOf(false)
-    }
+
     var expandedImage by remember {
         mutableStateOf(post.productimg1)
     }
@@ -220,8 +225,11 @@ fun PostDataScreen(
                 )
                 Spacer(modifier = Modifier.height(35.dp))
                 Row() {
-                    val modifier = Modifier.size(120.dp)
                     post.productimg1?.let {
+                        val modifier = Modifier.size(120.dp).clickable {
+                            imageLoadState.value = true
+                            expandedImage = it
+                        }
                         ItemImage(productImg = post.productimg1, modifier = modifier)
                     }
 
@@ -276,7 +284,7 @@ fun PostDataScreen(
                     TextButton(
                         onClick = { /*TODO*/ },
                         elevation = ButtonDefaults.elevation(0.dp),
-                        colors = if (post.review == null) {
+                        colors = if (post.completedAt == null) {
                             ButtonDefaults.buttonColors(
                                 backgroundColor = colorResource(id = R.color.green),
                                 disabledBackgroundColor = colorResource(id = R.color.green)
@@ -297,7 +305,7 @@ fun PostDataScreen(
                             },
                         enabled = false
                     ) {
-                        if (post.review == null) {
+                        if (post.completedAt == null) {
                             Text(
                                 text = "나눔중",
                                 color = Color.White,
@@ -343,7 +351,7 @@ fun PostDataScreen(
                         ItemImage(productImg = it, modifier = Modifier
                             .size(85.dp)
                             .clickable {
-                                imageLoadState = true
+                                imageLoadState.value = true
                                 expandedImage = it
                             })
                         Spacer(modifier = Modifier.width(20.dp))
@@ -352,7 +360,7 @@ fun PostDataScreen(
                         ItemImage(productImg = it, modifier = Modifier
                             .size(85.dp)
                             .clickable {
-                                imageLoadState = true
+                                imageLoadState.value = true
                                 expandedImage = it
                             })
                         Spacer(modifier = Modifier.width(20.dp))
@@ -361,7 +369,7 @@ fun PostDataScreen(
                         ItemImage(productImg = it, modifier = Modifier
                             .size(85.dp)
                             .clickable {
-                                imageLoadState = true
+                                imageLoadState.value = true
                                 expandedImage = it
                             })
                     }
@@ -390,6 +398,9 @@ fun PostDataScreen(
                     if (nickname != "") {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(10.dp).clickable {
+                                navHostController.navigate("${NAV_ROUTE.TRADE_HISTORY.routeName}/${post.userId}")
+                            }
                         ) {
                             Surface(modifier = Modifier.size(28.dp),
                                 contentColor = Color.White,
@@ -406,19 +417,14 @@ fun PostDataScreen(
                                     )
                                 }
                             )
-                            val navController = rememberNavController()
-                            TextButton(
-                                onClick = {
-                                    navHostController.navigate("${NAV_ROUTE.TRADE_HISTORY.routeName}/${post.userId!!}")
-                                }){
-                                    Text(
-                                        text = nickname,
-                                        color = Color.White,
-                                        fontSize = 17.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.padding(start = 8.dp)
-                                    )
-                                }
+                            Text(
+                                text = nickname,
+                                color = Color.White,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+
                         }
 
                     }
@@ -457,13 +463,13 @@ fun PostDataScreen(
 
             }
         }
-        if (imageLoadState){
+        if (imageLoadState.value){
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
-                        imageLoadState = false
+                        imageLoadState.value = false
                     }
                     .background(color = colorResource(id = R.color.shadowGray))) {
                 AsyncImage(

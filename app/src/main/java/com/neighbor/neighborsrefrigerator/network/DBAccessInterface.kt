@@ -104,7 +104,7 @@ interface DBAccessInterface {
     ): retrofit2.Call<ReturnObject<Int>>
 
     @GET("/post/getPostOrderByDistance")
-    fun getPostOrderByDistance(
+    suspend fun getPostOrderByDistance(
         @Query("currentTime") currentTime: String,
         @Query("latitude") latitude: Double?,
         @Query("longitude") longitude: Double?
