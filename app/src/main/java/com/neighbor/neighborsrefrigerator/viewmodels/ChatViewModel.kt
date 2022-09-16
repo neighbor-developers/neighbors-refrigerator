@@ -113,18 +113,18 @@ class ChatViewModel() : ViewModel() {
 
     fun newMessage(chatId: String, messageData: ChatMessageData){
         val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
+        val userPrefs = UserSharedPreference(App.context())
         if(chatMessages.value.isEmpty()) {
             // 첫 메세지일때 채팅방 생성
-            val userPrefs = UserSharedPreference(App.context())
             dbAccessModule.makeChat(chatId,postData.value!!.id!!,userPrefs.getUserPrefs("id")!!.toInt(),timeStamp)
-            dbAccessModule.sendMessage(chatId,timeStamp,messageData.content,messageData.from)
+            dbAccessModule.sendMessage(chatId,timeStamp,messageData.content,messageData.from,userPrefs.getNoticePref("chat"))
             chatMessages.value = listOf(messageData)
             newChatRoom(chatId, postId = postData.value!!.id!!, postData.value!!.userId, chatMessages.value)
             Log.d("빈 리스트에 추가됨", chatMessages.value.toString())
         }else{
             chatMessages.value += messageData
             Log.d("추가됨", chatMessages.value.toString())
-            dbAccessModule.sendMessage(chatId,timeStamp,messageData.content,messageData.from)
+            dbAccessModule.sendMessage(chatId,timeStamp,messageData.content,messageData.from,userPrefs.getNoticePref("chat"))
             firebaseDB.reference.child("chat").child(chatId).child("messages").setValue(chatMessages.value)
                 .addOnSuccessListener {
                     Log.d("newChatRoomSuccess", "메세지 보내기 성공")

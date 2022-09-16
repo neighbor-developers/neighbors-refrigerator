@@ -11,7 +11,9 @@ data class MessageData(
     @SerializedName("content")
     val content: String,
     @SerializedName("from")
-    val from: Int
+    val from: Int,
+    @SerializedName("notice")
+    val notice: Boolean
 )
 
 

@@ -255,8 +255,8 @@ class DBAccessModule {
         })
     }
 
-    fun sendMessage(chatId:String, createdAt:String, content:String, from:Int){
-        val messageData = MessageData(chatId, createdAt ,content,from)
+    fun sendMessage(chatId:String, createdAt:String, content:String, from:Int, notice:Boolean){
+        val messageData = MessageData(chatId, createdAt ,content,from,notice)
         dbAccessApi.sendMessage(messageData).enqueue(object : Callback<ReturnObject<Int>>{
             override fun onResponse(
                 call: Call<ReturnObject<Int>>,

@@ -7,7 +7,7 @@ import retrofit2.create
 
 
 object DBApiClient {
-        private const val BASE_URL = "http://ec2-54-153-11-221.us-west-1.compute.amazonaws.com:3000/"
+        private const val BASE_URL = "http://ec2-13-52-122-41.us-west-1.compute.amazonaws.com:3000/"
         private var retrofit: Retrofit? = null
 
         fun getApiClient() : Retrofit {
