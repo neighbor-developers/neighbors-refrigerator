@@ -14,12 +14,15 @@ import com.neighbor.neighborsrefrigerator.utilities.App
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ChatViewModel() : ViewModel() {
 
     private val dbAccessModule = DBAccessModule()
     private val firebaseDB = FirebaseDatabase.getInstance()
-
     var chatMessages = MutableStateFlow<List<ChatMessageData>>(emptyList())
     var chatData = MutableStateFlow<FirebaseChatData?>(null)
     var postData = MutableStateFlow<PostData?>(null)
@@ -111,6 +114,9 @@ class ChatViewModel() : ViewModel() {
     fun newMessage(chatId: String, messageData: ChatMessageData){
         if(chatMessages.value.isEmpty()) {
             // 첫 메세지일때 채팅방 생성
+            val userPrefs = UserSharedPreference(App.context())
+            val timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:MM:ss", Locale.KOREA).format(Date(System.currentTimeMillis()))
+            dbAccessModule.makeChat(userPrefs.getUserPrefs("id")!!.toInt(),postData.value!!.id!!,postData.value!!.userId,timeStamp)
             chatMessages.value = listOf(messageData)
             newChatRoom(chatId, postId = postData.value!!.id!!, postData.value!!.userId, chatMessages.value)
             Log.d("빈 리스트에 추가됨", chatMessages.value.toString())
