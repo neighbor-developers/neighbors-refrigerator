@@ -40,13 +40,10 @@ fun GuideScreen(loginViewModel: LoginViewModel) {
         HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
             when(page)  {
                 0 -> {
-                    slideImage.value = R.drawable.category_300
+                    slideImage.value = R.drawable.img_1
                 }
                 1 -> {
-                    slideImage.value = R.drawable.category_400
-                }
-                2 -> {
-                    slideImage.value = R.drawable.category_500
+                    slideImage.value = R.drawable.img
                 }
             }
 
@@ -58,14 +55,14 @@ fun GuideScreen(loginViewModel: LoginViewModel) {
         }
 
         DotsIndicator(
-            totalDots = 3,
+            totalDots = 2,
             selectedIndex = pagerState.currentPage,
             selectedColor = Color.Blue,
             unSelectedColor = Color.LightGray,
             modifier = Modifier.padding(bottom = 100.dp)
         )
 
-        if (pagerState.currentPage == 2) {
+        if (pagerState.currentPage == 1) {
             Button(
                 content = {
                     Text(text = "시작하기", fontSize = 12.sp, fontWeight = FontWeight.Bold)
