@@ -94,7 +94,7 @@ fun ItemCardByTime(postViewModel: PostViewModel = viewModel(), post: PostData, r
                             .padding(end = 95.dp)
                         ) {
                                 //Spacer(modifier = Modifier.height(10.dp))
-                            val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${post.distance}m"
+                            val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${(post.distance).roundToInt()}m"
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 5.dp, bottom = 4.dp)) {
                                 Icon(
                                     Icons.Filled.Home, contentDescription = "",

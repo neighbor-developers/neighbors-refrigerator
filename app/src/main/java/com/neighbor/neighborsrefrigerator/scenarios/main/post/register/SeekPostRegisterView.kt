@@ -55,7 +55,7 @@ fun SeekPostRegisterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("나눔 등록", fontSize = 15.sp, textAlign = TextAlign.Center) },
+                title = { Text("구함 등록", fontSize = 15.sp, textAlign = TextAlign.Center) },
                 navigationIcon = {
                     IconButton(onClick = { completeBackDialog = true }) {
                         Icon(
@@ -92,7 +92,7 @@ fun SeekPostRegisterScreen(
         ) {
             if (completeSeekDialog) {
                 CompleteDialog(
-                    type = "등록",
+                    type = "구함",
                     { completeSeekDialog = false },
                     {
                         CoroutineScope(Dispatchers.Main).launch {
@@ -116,15 +116,15 @@ fun SeekPostRegisterScreen(
             }
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(text = "제목", fontSize = 13.sp, color = Color.DarkGray)
+                Text(text = "제목", fontSize = 13.sp, color = Color.DarkGray, modifier = Modifier.padding(bottom = 10.dp))
                 val cornerSize = CornerSize(10.dp)
                 TextField(
                     value = viewModel.title.value,
                     onValueChange = { input -> viewModel.title.value = input },
                     modifier = Modifier
-                        .height(45.dp),
+                        .height(45.dp).padding(bottom = 10.dp),
                     shape = MaterialTheme.shapes.large.copy(cornerSize),
-                    placeholder = { Text(text = "상품명 입력", style = TextStyle(fontSize = 11.5.sp, textDecoration = TextDecoration.None), modifier = Modifier.padding(bottom = 0.dp)) },
+                    placeholder = { Text(text = "제목 입력", style = TextStyle(fontSize = 11.5.sp, textDecoration = TextDecoration.None), modifier = Modifier.padding(bottom = 0.dp)) },
                     maxLines = 1,
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = Color.DarkGray,
@@ -140,7 +140,7 @@ fun SeekPostRegisterScreen(
                         textDecoration = TextDecoration.None
                     ),
                 )
-                Text(text = "위치", fontSize = 13.sp, color = Color.DarkGray)
+                Text(text = "위치", fontSize = 13.sp, color = Color.DarkGray, modifier = Modifier.padding(bottom = 10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     Surface(modifier = Modifier.weight(1f)) {
                         LocationButton("홈", viewModel.locationType)

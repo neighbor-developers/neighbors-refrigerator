@@ -146,7 +146,7 @@ fun PostDataScreen(
     val calTime = CalculateTime()
     val createdTime = calTime.calTimeToPost(current, post.createdAt)
 
-    val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${post.distance}m"
+    val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${(post.distance).roundToInt()}m"
     val contactUserId by remember {
         mutableStateOf(UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt())
     }

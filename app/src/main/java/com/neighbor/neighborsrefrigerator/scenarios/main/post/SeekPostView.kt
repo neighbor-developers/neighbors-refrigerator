@@ -157,7 +157,7 @@ fun SeekItem(post: PostData,
                             bottom = 30.dp
                         )
                     )
-                    val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${post.distance}m"
+                    val distance = if (post.distance!! > 1000.0) "${((post.distance / 100).roundToInt().toDouble())/10} km" else "${(post.distance).roundToInt()}m"
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Filled.Home, contentDescription = "",
