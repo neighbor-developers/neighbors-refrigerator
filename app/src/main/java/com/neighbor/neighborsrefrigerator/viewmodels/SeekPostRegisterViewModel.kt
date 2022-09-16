@@ -1,5 +1,6 @@
 package com.neighbor.neighborsrefrigerator.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ class SeekPostRegisterViewModel: ViewModel() {
     var category = mutableStateOf("")
     var myLatitude = mutableStateOf(0.0)
     var myLongitude = mutableStateOf(0.0)
+    var errorMessage = mutableStateOf("")
 
     private fun myLocation(location: String): Array<Double> {
         return when (location) {
@@ -31,6 +33,24 @@ class SeekPostRegisterViewModel: ViewModel() {
             )
             "내위치" -> arrayOf(myLatitude.value, myLongitude.value)
             else -> arrayOf(0.0, 0.0)
+        }
+    }
+
+    private fun validatePost(post: PostData) {
+        if (post.title.isEmpty()) {
+            errorMessage.value = "상품명을 입력해주세요"
+        }
+        else if (post.latitude.equals(0.0)) {
+            errorMessage.value = "위치를 설정해주세요"
+        }
+        else if (post.categoryId.isEmpty()) {
+            errorMessage.value = "카테고리를 설정해주세요"
+        }
+        else if (post.content.isEmpty()) {
+            errorMessage.value = "내용을 입력해주세요"
+        }
+        else {
+            errorMessage.value = ""
         }
     }
 
@@ -62,6 +82,9 @@ class SeekPostRegisterViewModel: ViewModel() {
             mainAddr = "",
             type = 2,
         )
+        Log.d("구함 등록 데이터", postData.toString())
+
+        validatePost(postData)
 
         var postId = 0
 

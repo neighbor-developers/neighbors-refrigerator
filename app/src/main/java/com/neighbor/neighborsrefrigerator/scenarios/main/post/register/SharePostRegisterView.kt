@@ -3,6 +3,7 @@ package com.neighbor.neighborsrefrigerator.scenarios.main.post.register
 import android.app.DatePickerDialog
 import android.util.Log
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
@@ -131,10 +132,13 @@ fun SharePostRegisterScreen(
                             } else {
                                 Log.d("실패", "상품 등록 실패")
                             }
-
                         }
                     }
                 )
+
+                if (viewModel.errorMessage.value.isNotEmpty()) {
+                    Toast.makeText(LocalContext.current, viewModel.errorMessage.value, Toast.LENGTH_LONG).show()
+                }
             }
             if (completeBackDialog){
                 CompleteDialog(

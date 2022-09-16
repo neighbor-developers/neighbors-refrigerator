@@ -1,9 +1,11 @@
 package com.neighbor.neighborsrefrigerator.scenarios.main.post.register
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,90 +16,158 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.view.CompleteDialog
 import com.neighbor.neighborsrefrigerator.viewmodels.SeekPostRegisterViewModel
+import com.neighbor.neighborsrefrigerator.viewmodels.SharePostRegisterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private var sampleList: List<Pair<String, String>> = listOf(Pair("100", "과일"), Pair("101", "채소"))
+private var sampleList: List<Pair<String, String>> = listOf(Pair("", "선택"), Pair("100", "채소"), Pair("200", "과일"), Pair("300", "정육"), Pair("400", "수산"), Pair("500", "냉동"), Pair("600", "간편"))
 
 @Composable
 fun SeekPostRegisterScreen(
     navHostController: NavHostController,
-    viewModel: SeekPostRegisterViewModel = viewModel()
 ) {
+    val viewModel by remember {
+        mutableStateOf(SeekPostRegisterViewModel())
+    }
+
+    var completeSeekDialog by remember {
+        mutableStateOf(false)
+    }
+    // 뒤로가기 눌렀을때
+    var completeBackDialog by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("구함 등록") },
+                title = { Text("나눔 등록", fontSize = 15.sp, textAlign = TextAlign.Center) },
                 navigationIcon = {
-                    IconButton(onClick = { navHostController.navigateUp() }) {
+                    IconButton(onClick = { completeBackDialog = true }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "뒤로가기 버튼"
+                            painter = painterResource(id = R.drawable.icon_back),
+                            tint = colorResource(id = R.color.green),
+                            contentDescription = "뒤로가기 버튼",
+                            modifier = Modifier.size(35.dp)
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            var postId = viewModel.registerPost()
-                            if (postId != 0) {
-                                navHostController.navigateUp()
-                            } else {
-                                Log.d("실패", "상품 등록 실패")
-                            }
-
-                        }
+                        completeSeekDialog = true
                     })
                     {
                         Icon(
-                            imageVector = Icons.Filled.Send,
-                            contentDescription = "등록"
+                            painter = painterResource(id = R.drawable.icon_register),
+                            tint = colorResource(id = R.color.green),
+                            contentDescription = "등록",
+                            modifier = Modifier.size(35.dp)
                         )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = MaterialTheme.colors.background
+                backgroundColor = MaterialTheme.colors.background,
+                elevation = 0.dp
             )
         }
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
-                .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp)
+                .padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 20.dp)
         ) {
-            Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                Text(text = "제목", fontSize = 20.sp)
+            if (completeSeekDialog) {
+                CompleteDialog(
+                    type = "등록",
+                    { completeSeekDialog = false },
+                    {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            var postId = viewModel.registerPost()
+                            if (postId != 0) {
+                                navHostController.navigateUp()
+                            }
+                        }
+                    }
+                )
+
+                if (viewModel.errorMessage.value.isNotEmpty()) {
+                    Toast.makeText(LocalContext.current, viewModel.errorMessage.value, Toast.LENGTH_LONG).show()
+                }
+            }
+            if (completeBackDialog) {
+                CompleteDialog(
+                    type = "취소",
+                    { completeBackDialog = false },
+                    { navHostController.navigateUp() })
+            }
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(text = "제목", fontSize = 13.sp, color = Color.DarkGray)
+                val cornerSize = CornerSize(10.dp)
                 TextField(
                     value = viewModel.title.value,
                     onValueChange = { input -> viewModel.title.value = input },
                     modifier = Modifier
-                        .padding(start = 5.dp),
+                        .height(45.dp),
+                    shape = MaterialTheme.shapes.large.copy(cornerSize),
+                    placeholder = { Text(text = "상품명 입력", style = TextStyle(fontSize = 11.5.sp, textDecoration = TextDecoration.None), modifier = Modifier.padding(bottom = 0.dp)) },
+                    maxLines = 1,
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = Color.DarkGray,
+                        disabledTextColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        cursorColor = Color.DarkGray,
+                        backgroundColor = colorResource(id = R.color.backgroundGray),
+                    ),
+                    textStyle = TextStyle(
+                        fontSize = 13.sp,
+                        textDecoration = TextDecoration.None
+                    ),
+                )
+                Text(text = "위치", fontSize = 13.sp, color = Color.DarkGray)
+                Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Surface(modifier = Modifier.weight(1f)) {
+                        LocationButton("홈", viewModel.locationType)
+                    }
+                    Surface(modifier = Modifier.weight(1f)) {
+                        LocationButton("내위치", viewModel.locationType)
+                    }
+                }
+                Row(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        "카테고리",
+                        fontSize = 12.sp,
+                        color = Color.DarkGray,
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
+                    CategorySpinner(sampleList, Pair("", "선택"), viewModel)
+                }
+                OutlinedTextField(
+                    value = viewModel.content.value,
+                    onValueChange = { input -> viewModel.content.value = input },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(top = 10.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = colorResource(id = R.color.green))
                 )
             }
-            Row(modifier = Modifier.padding(bottom = 5.dp)) {
-                Text(text = "위치", fontSize = 20.sp, modifier = Modifier.padding(end = 5.dp))
-                LocationButton("홈", viewModel.locationType)
-                LocationButton("내위치", viewModel.locationType)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("카테고리")
-                CategorySpinner(sampleList, Pair("100", "과일"), viewModel)
-            }
-            TextField(
-                value = viewModel.content.value,
-                onValueChange = { input -> viewModel.content.value = input },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
         }
     }
 }

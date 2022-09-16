@@ -121,7 +121,7 @@ class SharePostRegisterViewModel: ViewModel() {
             type = 1,
         )
 
-        Log.d("product", postData.toString())
+        Log.d("나눔 등록 데이터", postData.toString())
 
         validatePost(postData)
 
