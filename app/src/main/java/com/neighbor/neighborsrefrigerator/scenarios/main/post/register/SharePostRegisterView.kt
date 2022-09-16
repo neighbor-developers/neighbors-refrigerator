@@ -8,11 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -185,7 +182,7 @@ fun SharePostRegisterScreen(
                         )
                     }
                     if (viewModel.imgUriState1 != null) {
-                        viewModel.imgInputStream = LocalContext.current.contentResolver.openInputStream(
+                        viewModel.imgInputStream1 = LocalContext.current.contentResolver.openInputStream(
                             viewModel.imgUriState1!!
                         )
 
@@ -227,7 +224,7 @@ fun SharePostRegisterScreen(
                         }
 
                         if (viewModel.imgUriState2 != null) {
-                            viewModel.imgInputStream =
+                            viewModel.imgInputStream2 =
                                 LocalContext.current.contentResolver.openInputStream(
                                     viewModel.imgUriState2!!
                                 )
@@ -276,7 +273,7 @@ fun SharePostRegisterScreen(
                             }
 
                             if (viewModel.imgUriState3 != null) {
-                                viewModel.imgInputStream =
+                                viewModel.imgInputStream3 =
                                     LocalContext.current.contentResolver.openInputStream(
                                         viewModel.imgUriState3!!
                                     )

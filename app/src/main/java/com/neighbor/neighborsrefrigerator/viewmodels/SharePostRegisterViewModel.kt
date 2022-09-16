@@ -33,7 +33,9 @@ class SharePostRegisterViewModel: ViewModel() {
     var imgUriState1 by mutableStateOf<Uri?>(null)
     var imgUriState2 by mutableStateOf<Uri?>(null)
     var imgUriState3 by mutableStateOf<Uri?>(null)
-    var imgInputStream by mutableStateOf<InputStream?>(null)
+    var imgInputStream1 by mutableStateOf<InputStream?>(null)
+    var imgInputStream2 by mutableStateOf<InputStream?>(null)
+    var imgInputStream3 by mutableStateOf<InputStream?>(null)
     var validateDate = mutableStateOf("")
     var validateImgUriState by mutableStateOf<Uri?>(null)
     var validateImgInputStream by mutableStateOf<InputStream?>(null)
@@ -107,9 +109,9 @@ class SharePostRegisterViewModel: ViewModel() {
             validateType = validateType,
             validateDate = validateDate.value,
             validateImg = validateImgInputStream?.let { encodeImgToBase64(it) },
-            productimg1 = imgInputStream?.let { encodeImgToBase64(it) },
-            productimg2 = "",
-            productimg3 = "",
+            productimg1 = imgInputStream1?.let { encodeImgToBase64(it) },
+            productimg2 = imgInputStream2?.let { encodeImgToBase64(it) },
+            productimg3 = imgInputStream3?.let { encodeImgToBase64(it) },
             latitude = location[0],
             longitude = location[1],
             distance = 0.0,
