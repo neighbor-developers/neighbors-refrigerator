@@ -41,10 +41,10 @@ fun GuideScreen(loginViewModel: LoginViewModel) {
         HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
             when(page)  {
                 0 -> {
-                    slideImage.value = R.drawable.img_1
+                    slideImage.value = R.drawable.guide_1
                 }
                 1 -> {
-                    slideImage.value = R.drawable.img
+                    slideImage.value = R.drawable.guide_2
                 }
             }
 
