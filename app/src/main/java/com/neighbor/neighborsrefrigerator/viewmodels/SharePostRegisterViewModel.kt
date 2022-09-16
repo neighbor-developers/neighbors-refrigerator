@@ -107,7 +107,7 @@ class SharePostRegisterViewModel: ViewModel() {
             updatedAt = "",
             state = "1",
             validateType = validateType,
-            validateDate = validateDate.value,
+            validateDate = validateImgInputStream?.let { encodeImgToBase64(it) },
             validateImg = validateImgInputStream?.let { encodeImgToBase64(it) },
             productimg1 = imgInputStream1?.let { encodeImgToBase64(it) },
             productimg2 = imgInputStream2?.let { encodeImgToBase64(it) },
