@@ -18,10 +18,12 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.R
+import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
 import com.neighbor.neighborsrefrigerator.utilities.App
+import com.neighbor.neighborsrefrigerator.utilities.CalLevel
 import com.neighbor.neighborsrefrigerator.utilities.UseGeocoder
 import com.neighbor.neighborsrefrigerator.view.*
 import com.neighbor.neighborsrefrigerator.viewmodels.MainViewModel
@@ -47,9 +49,16 @@ fun Drawer(
     val searchAddressDialogViewModel by remember{
         mutableStateOf(SearchAddressDialogViewModel())
     }
+
+    var postData : List<PostData> by remember {
+        mutableStateOf(arrayListOf())
+    }
+
     val nickname = UserSharedPreference(App.context()).getUserPrefs("nickname")
     val flowerVer = UserSharedPreference(App.context()).getLevelPref("flowerVer")
     val id = UserSharedPreference(App.context()).getUserPrefs("id")!!.toInt()
+    val CalLevel = CalLevel()
+    val level = CalLevel.GetUserLevel(postData)
 
 
     var flowerDialogState by remember { mutableStateOf(false) }
@@ -98,10 +107,28 @@ fun Drawer(
             ) {
                 Image(
                     painter = painterResource(
-                        when (flowerVer) {
-                            1 -> R.drawable.level2_ver1
-                            2 -> R.drawable.level2_ver2
-                            3 -> R.drawable.level2_ver3
+                        when(level) {
+                            2 ->
+                            when (flowerVer) {
+                                1 -> R.drawable.level2_ver1
+                                2 -> R.drawable.level2_ver2
+                                3 -> R.drawable.level2_ver3
+                                else -> R.drawable.level1
+                            }
+                            3 ->
+                                when(flowerVer){
+                                    1 -> R.drawable.level3_ver1
+                                    2 -> R.drawable.level3_ver2
+                                    3 -> R.drawable.level3_ver3
+                                    else -> R.drawable.level1
+                                }
+                            4 ->
+                                when(flowerVer){
+                                    1 -> R.drawable.level4_ver1
+                                    2 -> R.drawable.level4_ver2
+                                    3 -> R.drawable.level4_ver3
+                                    else -> R.drawable.level1
+                                }
                             else -> R.drawable.level1
                         }
                     ),
@@ -130,7 +157,7 @@ fun Drawer(
         }
         drawerMenu.forEach { menu ->
             when(menu){
-                "내 정보" -> DrawerItem(menu = menu, click = { navController.navigate(NAV_ROUTE.TRADE_HISTORY.routeName) })
+                "내 정보" -> DrawerItem(menu = menu, click = { navController.navigate("${NAV_ROUTE.TRADE_HISTORY.routeName}/${id!!}") })
                 "내 위치 바꾸기" -> DrawerItem(menu = menu, click = { locationDialogState = true })
                 "설정" -> DrawerItem(menu = menu, click = { navController.navigate(NAV_ROUTE.SETTING.routeName) })
                 "문의하기" -> DrawerItem(menu = menu, click = { inquiryDialogState = true })

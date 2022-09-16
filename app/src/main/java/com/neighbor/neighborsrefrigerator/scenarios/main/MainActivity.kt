@@ -40,6 +40,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
+import com.neighbor.neighborsrefrigerator.data.UserData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.network.DBAccessModule
 import com.neighbor.neighborsrefrigerator.scenarios.intro.StartActivity
@@ -158,6 +159,7 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
 
     // 네비게이션 컨트롤러
     val navController = rememberNavController()
+    var userId = UserSharedPreference(App.context()).getUserPrefs("id")
 
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute){
@@ -187,8 +189,10 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String){
         composable(NAV_ROUTE.SETTING.routeName){
             Setting(navController = navController,mainViewModel = mainViewModel)
         }
-        composable(NAV_ROUTE.TRADE_HISTORY.routeName){
-            ShowUserProfile()
+        composable("${NAV_ROUTE.TRADE_HISTORY.routeName}/{userId}", arguments = listOf(navArgument("userId"){type = NavType.IntType})){
+            ShowUserProfile(
+                navController = navController,
+                userId = it.arguments?.getInt("chatId") ?:0)
         }
         composable(NAV_ROUTE.REVIEW.routeName){
             val post = remember {

@@ -21,12 +21,14 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.neighbor.neighborsrefrigerator.R
 import com.neighbor.neighborsrefrigerator.data.PostData
 import com.neighbor.neighborsrefrigerator.data.UserSharedPreference
 import com.neighbor.neighborsrefrigerator.scenarios.main.NAV_ROUTE
+import com.neighbor.neighborsrefrigerator.scenarios.main.ShowUserProfile
 import com.neighbor.neighborsrefrigerator.scenarios.main.post.ItemImage
 import com.neighbor.neighborsrefrigerator.utilities.App
 import com.neighbor.neighborsrefrigerator.utilities.CalDistance
@@ -404,14 +406,19 @@ fun PostDataScreen(
                                     )
                                 }
                             )
-                            Text(
-                                text = nickname,
-                                color = Color.White,
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
-
+                            val navController = rememberNavController()
+                            TextButton(
+                                onClick = {
+                                    navHostController.navigate("${NAV_ROUTE.TRADE_HISTORY.routeName}/${post.userId!!}")
+                                }){
+                                    Text(
+                                        text = nickname,
+                                        color = Color.White,
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
                         }
 
                     }
