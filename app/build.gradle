@@ -5,11 +5,14 @@ plugins {
     id 'kotlin-parcelize'
     id 'kotlin-kapt'
 }
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
     compileSdk 32
 
     defaultConfig {
+
         applicationId "com.neighbor.neighborsrefrigerator"
         minSdk 23
         targetSdk 32
@@ -20,6 +23,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        buildConfigField "String", "EIP", properties["ec2ip.key"]
     }
 
     buildTypes {
